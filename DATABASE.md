@@ -96,7 +96,7 @@ for production use with security, performance, and compliance requirements.
 | employee_id | TEXT | NOT NULL | Employee identifier for reporting |
 | module_name | TEXT | NOT NULL | Training module identifier |
 | completed_at | DATETIME | DEFAULT CURRENT_TIMESTAMP | Module completion timestamp |
-| progress_data | TEXT | | JSON blob containing module-specific progress data |
+| progress_data | TEXT | | JSON blob with module progress data |
 
 **Indexes:**
 - idx_onboarding_progress_user_id on user_id
