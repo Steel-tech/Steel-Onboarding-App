@@ -152,7 +152,7 @@ for production use with security, performance, and compliance requirements.
 | Column | Type | Constraints | Description |
 |--------|------|-------------|-------------|
 | id | INTEGER | PRIMARY KEY AUTOINCREMENT | Unique log entry identifier |
-| user_id | INTEGER | FK to users.id | Foreign key reference (null for system events) |
+| user_id | INTEGER | FK to users.id | Foreign key (null for system events) |
 | employee_id | TEXT | | Employee identifier when applicable |
 | action | TEXT | NOT NULL | Action type/category performed |
 | details | TEXT | | JSON blob containing action-specific details |
