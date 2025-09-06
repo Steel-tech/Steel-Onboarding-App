@@ -27,7 +27,7 @@ for production use with security, performance, and compliance requirements.
 |--------|------|-------------|-------------|
 | id | INTEGER | PRIMARY KEY AUTOINCREMENT | Unique user identifier |
 | username | TEXT | UNIQUE NOT NULL | Login username (lowercase) |
-| password_hash | TEXT | NOT NULL | bcrypt hashed password (12 rounds minimum) |
+| password_hash | TEXT | NOT NULL | bcrypt hashed password (12+ rounds) |
 | role | TEXT | NOT NULL DEFAULT 'employee' | User role: admin, hr, employee |
 | name | TEXT | NOT NULL | Full display name |
 | email | TEXT | | Email address for notifications |
