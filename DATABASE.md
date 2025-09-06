@@ -205,7 +205,7 @@ for production use with security, performance, and compliance requirements.
 
 | From Table | From Column | To Table | To Column | Type | Description |
 |------------|-------------|----------|-----------|------|-------------|
-| employee_data | user_id | users | id | many-to-one | Each employee belongs to one user account |
+| employee_data | user_id | users | id | many-to-one | Employee belongs to user account |
 | onboarding_progress | user_id | users | id | many-to-one | Progress records linked to user accounts |
 | form_submissions | user_id | users | id | many-to-one | Form submissions associated with user accounts |
 | audit_logs | user_id | users | id | many-to-one | Audit logs track user activities |
