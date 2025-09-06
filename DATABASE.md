@@ -147,7 +147,7 @@ for production use with security, performance, and compliance requirements.
 
 ### Audit Logs Table
 
-**Purpose**: Security audit trail and compliance logging for all system activities
+**Purpose**: Security audit trail and compliance logging for system activities
 
 | Column | Type | Constraints | Description |
 |--------|------|-------------|-------------|
