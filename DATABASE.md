@@ -124,7 +124,7 @@ for production use with security, performance, and compliance requirements.
 | employee_id | TEXT | NOT NULL | Employee identifier for audit trails |
 | form_type | TEXT | NOT NULL | Type/category of form submitted |
 | form_data | TEXT | NOT NULL | JSON blob with complete form data |
-| digital_signature | TEXT | | Base64 encoded digital signature image |
+| digital_signature | TEXT | | Base64 encoded signature image |
 | submitted_at | DATETIME | DEFAULT CURRENT_TIMESTAMP | Form submission timestamp |
 | ip_address | TEXT | | Client IP address for audit purposes |
 | user_agent | TEXT | | Browser user agent for audit purposes |
