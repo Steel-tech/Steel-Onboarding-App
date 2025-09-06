@@ -187,7 +187,7 @@ for production use with security, performance, and compliance requirements.
 | employee_id | TEXT | NOT NULL | Employee ID for notification context |
 | notification_type | TEXT | NOT NULL | Notification category/trigger |
 | message | TEXT | NOT NULL | Notification message content |
-| sent_at | DATETIME | DEFAULT CURRENT_TIMESTAMP | Notification generation timestamp |
+| sent_at | DATETIME | DEFAULT CURRENT_TIMESTAMP | Notification timestamp |
 | email_sent | BOOLEAN | DEFAULT 0 | Email delivery success flag |
 
 **Sample Data:**
