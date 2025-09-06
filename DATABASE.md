@@ -178,7 +178,7 @@ for production use with security, performance, and compliance requirements.
 
 ### HR Notifications Table
 
-**Purpose**: HR notification tracking and email delivery status monitoring
+**Purpose**: HR notification tracking and email delivery status
 
 | Column | Type | Constraints | Description |
 |--------|------|-------------|-------------|
