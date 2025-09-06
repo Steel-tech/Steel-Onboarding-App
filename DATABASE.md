@@ -563,7 +563,8 @@ if (req.user.role !== 'hr' && req.user.id !== targetUserId) {
 // Log all significant activities with context
 await database.run(
   'INSERT INTO audit_logs (user_id, employee_id, action, details, ip_address, user_agent) VALUES (?, ?, ?, ?, ?, ?)',
-  [userId, employeeId, action, JSON.stringify(details), req.ip, req.headers['user-agent']]
+  [userId, employeeId, action, JSON.stringify(details), req.ip, 
+   req.headers['user-agent']]
 );
 
 // Include relevant details for audit trail
