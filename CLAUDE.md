@@ -1,0 +1,405 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code
+in this repository.
+
+## Project Overview
+
+This is a **vanilla JavaScript/HTML/CSS web application** for employee
+onboarding at Flawless Steel Welding. The application is completely client-side
+with no Node.js dependencies or build process required. The app emphasizes
+**professional company culture** and **founder story storytelling** to create
+an engaging onboarding experience that builds pride and connection to the
+company's mission.
+
+## Core Architecture
+
+### Application Structure
+
+- **Single-page application** with tab-based navigation
+- **LocalStorage persistence** for saving user progress and form data
+- **No backend required** - runs entirely in the browser
+- **Progressive enhancement** - works without JavaScript but enhanced with it
+
+### Key Files
+
+- `index.html` - Main HTML structure with all content sections
+- `script.js` - Core application logic, state management, and interactivity
+- `styles.css` - All styling and responsive design
+- `fsw-onboarding-processor.js` - n8n Super Code for processing onboarding data
+- `fsw-report-generator.js` - n8n Super Code for generating completion reports
+
+### State Management Pattern
+
+```javascript
+// Central state object in script.js
+appState = {
+    currentTab: 'welcome',
+    progress: 0,
+    completedModules: [],
+    employeeData: {},
+    checklistItems: {},
+    analytics: {...}
+}
+```
+
+All state changes go through `saveState()` to persist to localStorage.
+
+## Development Commands
+
+### Running the Application
+
+```bash
+# Option 1: Open directly in browser
+open index.html
+
+# Option 2: Use Python's simple HTTP server
+python3 -m http.server 8000
+# Then navigate to http://localhost:8000
+
+# Option 3: Use Node's http-server (if available)
+npx http-server -p 8000
+```
+
+### Testing Changes
+
+Since this is a vanilla JS app, testing is manual:
+
+1. Open in browser
+2. Clear localStorage to test fresh state: `localStorage.clear()`
+3. Test responsive design with browser dev tools
+4. Check console for any errors
+
+## Key Implementation Patterns
+
+### Adding New Content Sections
+
+New tabs require updates in three places:
+
+1. **HTML** - Add tab button in navigation and content section
+2. **CSS** - Style the new section if needed
+3. **JavaScript** - No changes needed, tab system is automatic
+
+### Company Story CSS Architecture
+
+The founder story sections use a sophisticated styling system:
+
+#### Timeline Styling Pattern
+
+```css
+.timeline {
+    position: relative;
+    padding-left: 2rem;
+}
+
+.timeline::before {
+    /* Vertical gradient line */
+    background: linear-gradient(to bottom, var(--accent-color), var(--secondary-color));
+}
+
+.timeline-marker {
+    /* Circular gradient markers */
+    background: linear-gradient(135deg, var(--accent-color), var(--primary-color));
+    border-radius: 50%;
+}
+
+.timeline-content {
+    /* Clean card styling with left border accent */
+    border-left: 4px solid var(--accent-color);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+}
+```
+
+#### Professional Card Hover Effects
+
+```css
+.differentiator-card {
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.differentiator-card::before {
+    /* Top gradient border */
+    background: linear-gradient(90deg, var(--accent-color), var(--secondary-color));
+}
+
+.differentiator-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+```
+
+#### Dark Theme Brand Section
+
+```css
+.brand-philosophy {
+    /* Professional dark gradient */
+    background: linear-gradient(135deg, var(--primary-color) 0%, 
+                                var(--dark-gray) 100%);
+    color: white;
+}
+
+.founder-quote {
+    /* Semi-transparent overlay styling */
+    background: rgba(255,255,255,0.1);
+    border-left: 4px solid var(--warning-color);
+}
+```
+
+### Form Data Handling
+
+All forms follow this pattern:
+
+```javascript
+// Form submission prevents default
+form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    // Process data
+    // Update appState
+    // Call saveState()
+});
+```
+
+### Progress Tracking
+
+Progress is calculated from:
+
+- Completed safety modules
+- Downloaded documents
+- Checked checklist items
+- Form submissions
+
+### Video Player Integration
+
+The orientation video at `orientation-video.mp4` has custom progress tracking:
+
+- Saves viewing progress to localStorage
+- Marks complete at 90% watched
+- Integrated with overall progress system
+
+## n8n Integration
+
+The project includes two n8n Super Code scripts that can be used in n8n workflows:
+
+### fsw-onboarding-processor.js
+
+- Validates employee form data
+- Generates unique employee IDs
+- Creates training schedules based on position
+- Returns processed employee records
+
+### fsw-report-generator.js
+
+- Generates completion reports
+- Tracks safety compliance
+- Monitors training progress
+- Outputs formatted reports for HR
+
+## Company-Specific Customization
+
+### Contact Information
+
+- **Company**: Flawless Steel Welding
+- **Address**: 5353 Joliet St, Denver, CO 80239
+- **Phone**: (720) 638-7289
+
+### Branding Elements
+
+- Logo: `Flawless Steel Logo_vector_ydMod3 (002) Page 003.jpg`
+- Primary colors defined in CSS variables
+- Company-specific safety protocols in content
+
+### Company Story Components
+
+The application includes a comprehensive **founder story section** that serves as
+both cultural onboarding and brand education:
+
+#### Timeline Section (`timeline-section`)
+
+- **Victor Garcia's journey** from 2011 startup ($10,500 investment) to
+  AISC-certified leader
+- **Visual timeline** with gradient-styled markers and content cards
+- **Key milestones**: 2011 (startup), 2017 (growth), 2022 (union partnership),
+  2025 (current status)
+- **Professional narrative** emphasizing quality, growth, and community
+  investment
+
+#### Differentiators Section (`differentiators-section`)
+
+- **Grid-based layout** showcasing company strengths
+- **AISC certification** and technical capabilities
+- **Union partnership** with Ironworkers Local 24
+- **Community commitment** and Latino-owned business values
+
+#### Brand Philosophy Section (`brand-philosophy`)
+
+- **Dark-themed section** with gradient background for emphasis
+- **"Flawless" brand explanation** connecting name to quality standards
+- **Founder quote** with professional styling and attribution
+- **Company values** presented as actionable principles
+
+## Security Considerations
+
+The application includes:
+
+- Content Security Policy headers in HTML
+- No external API calls (fully offline-capable)
+- Input validation on all forms
+- XSS protection through proper escaping
+
+## Browser Compatibility
+
+Minimum supported browsers:
+
+- Chrome 90+
+- Firefox 88+
+- Safari 14+
+- Edge 90+
+
+Key JavaScript features used:
+
+- ES6 arrow functions
+- Template literals
+- LocalStorage API
+- querySelector/querySelectorAll
+- Fetch API (for potential future enhancements)
+
+## Common Modifications
+
+### Update Company Information
+
+Edit directly in `index.html` - search for company-specific text and replace.
+
+### Change Styling/Colors
+
+Modify CSS variables in `styles.css`:
+
+```css
+:root {
+    --primary-color: #2c3e50;
+    --secondary-color: #e74c3c;
+    --success-color: #2ecc71;
+}
+```
+
+### Add New Safety Modules
+
+1. Add HTML structure in safety section of `index.html`
+2. Include "Mark Complete" button with `data-module` attribute
+3. Progress calculation updates automatically
+
+### Modify Document List
+
+Update the documents section in `index.html` with new PDF/document links.
+
+### Update Company Story Content
+
+When modifying the founder story sections, maintain these patterns:
+
+#### Timeline Updates
+
+```html
+<div class="timeline-item">
+    <div class="timeline-marker">
+        <span class="timeline-year">YYYY</span>
+    </div>
+    <div class="timeline-content">
+        <h5>Milestone Title</h5>
+        <p>Professional narrative describing growth, challenges, achievements...</p>
+    </div>
+</div>
+```
+
+#### Differentiator Cards
+
+```html
+<div class="differentiator-card">
+    <div class="differentiator-icon">
+        <i class="fas fa-icon-name"></i>
+    </div>
+    <h5>Strength Title</h5>
+    <p>Professional description emphasizing capability and value...</p>
+</div>
+```
+
+#### Brand Philosophy Content
+
+- Use **dark theme** (`brand-philosophy` class) for emphasis
+- Include **founder quotes** with proper attribution
+- Focus on **quality standards** and **professional values**
+- Maintain **inspiring but professional** tone
+
+## Troubleshooting
+
+### Progress Not Saving
+
+```javascript
+// Check localStorage in console
+console.log(localStorage.getItem('onboardingAppState'));
+// Clear corrupted state if needed
+localStorage.clear();
+```
+
+### Video Not Playing
+
+- Check file exists: `orientation-video.mp4`
+- Verify browser supports MP4
+- Check console for CORS errors if hosted
+
+### Forms Not Submitting
+
+- Verify JavaScript is enabled
+- Check browser console for errors
+- Ensure all required fields have values
+
+## Design Philosophy and Maintenance Guidelines
+
+### Professional Branding Standards
+
+The application maintains a **professional, inspiring tone** throughout the
+company story sections:
+
+- **Authentic storytelling** - Victor Garcia's journey from $10,500 startup to
+  AISC leader
+- **Community focus** - Latino-owned business, union partnership, local
+  investment
+- **Quality emphasis** - "Flawless" brand meaning, AISC certification,
+  precision standards
+- **Professional presentation** - Clean gradients, sophisticated hover effects,
+  readable typography
+
+### Content Maintenance Best Practices
+
+#### When updating company milestones
+
+1. **Maintain chronological order** in timeline section
+2. **Use consistent narrative style** - professional but personal
+3. **Emphasize growth and values** - community, quality, opportunity
+4. **Include specific metrics** when relevant (revenue, employees,
+   certifications)
+
+#### When adding differentiators
+
+1. **Focus on measurable capabilities** - certifications, partnerships,
+   technical skills
+2. **Use appropriate FontAwesome icons** that match content
+3. **Keep descriptions concise** but impactful
+4. **Maintain visual consistency** in card styling
+
+#### Responsive Design Considerations
+
+- Timeline markers scale down on mobile (4rem → 3rem)
+- Differentiator grid becomes single column on mobile
+- Brand philosophy padding adjusts for smaller screens
+- All hover effects remain functional on touch devices
+
+### Quality Assurance Checklist
+
+Before deploying company story updates:
+
+- [ ] Timeline flows chronologically and tells cohesive story
+- [ ] All differentiator cards have consistent styling and working hover effects
+- [ ] Brand philosophy section maintains professional dark theme
+- [ ] Founder quote displays with proper attribution
+- [ ] Mobile responsive design works across all screen sizes
+- [ ] Content reflects current company status and achievements
