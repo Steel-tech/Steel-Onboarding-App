@@ -155,7 +155,7 @@ for production use with security, performance, and compliance requirements.
 | user_id | INTEGER | FK to users.id | Foreign key (null for system events) |
 | employee_id | TEXT | | Employee identifier when applicable |
 | action | TEXT | NOT NULL | Action type/category performed |
-| details | TEXT | | JSON blob containing action-specific details |
+| details | TEXT | | JSON blob with action-specific details |
 | ip_address | TEXT | | Client IP address for security tracking |
 | user_agent | TEXT | | Browser user agent information |
 | created_at | DATETIME | DEFAULT CURRENT_TIMESTAMP | Log entry timestamp |
