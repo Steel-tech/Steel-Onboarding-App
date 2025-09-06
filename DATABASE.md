@@ -184,7 +184,7 @@ for production use with security, performance, and compliance requirements.
 |--------|------|-------------|-------------|
 | id | INTEGER | PRIMARY KEY AUTOINCREMENT | Unique notification identifier |
 | user_id | INTEGER | NOT NULL, FK to users.id | Foreign key to users table |
-| employee_id | TEXT | NOT NULL | Employee identifier for notification context |
+| employee_id | TEXT | NOT NULL | Employee ID for notification context |
 | notification_type | TEXT | NOT NULL | Notification category/trigger |
 | message | TEXT | NOT NULL | Notification message content |
 | sent_at | DATETIME | DEFAULT CURRENT_TIMESTAMP | Notification generation timestamp |
