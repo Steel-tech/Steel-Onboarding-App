@@ -196,7 +196,7 @@ for production use with security, performance, and compliance requirements.
   "user_id": 3,
   "employee_id": "FSW123456",
   "notification_type": "ONBOARDING_STARTED",
-  "message": "New employee John Smith has started onboarding process",
+  "message": "New employee John Smith started onboarding process",
   "email_sent": 1
 }
 ```
