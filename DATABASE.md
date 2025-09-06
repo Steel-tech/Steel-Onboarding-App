@@ -31,7 +31,7 @@ for production use with security, performance, and compliance requirements.
 | role | TEXT | NOT NULL DEFAULT 'employee' | User role: admin, hr, employee |
 | name | TEXT | NOT NULL | Full display name |
 | email | TEXT | | Email address for notifications |
-| created_at | DATETIME | DEFAULT CURRENT_TIMESTAMP | Account creation timestamp |
+| created_at | DATETIME | DEFAULT CURRENT_TIMESTAMP | Account creation time |
 | last_login | DATETIME | | Last successful login timestamp |
 | is_active | BOOLEAN | DEFAULT 1 | Account status flag |
 
