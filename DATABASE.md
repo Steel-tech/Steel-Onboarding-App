@@ -66,7 +66,7 @@ for production use with security, performance, and compliance requirements.
 | position | TEXT | NOT NULL | Job title/position |
 | start_date | DATE | NOT NULL | Employment start date |
 | supervisor | TEXT | | Assigned supervisor name |
-| created_at | DATETIME | DEFAULT CURRENT_TIMESTAMP | Record creation timestamp |
+| created_at | DATETIME | DEFAULT CURRENT_TIMESTAMP | Record creation time |
 | updated_at | DATETIME | DEFAULT CURRENT_TIMESTAMP | Last update timestamp |
 
 **Indexes:**
