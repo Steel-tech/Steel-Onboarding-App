@@ -58,7 +58,7 @@ for production use with security, performance, and compliance requirements.
 | Column | Type | Constraints | Description |
 |--------|------|-------------|-------------|
 | id | INTEGER | PRIMARY KEY AUTOINCREMENT | Unique record identifier |
-| user_id | INTEGER | NOT NULL, FK to users.id | Foreign key reference to users table |
+| user_id | INTEGER | NOT NULL, FK to users.id | Foreign key to users table |
 | employee_id | TEXT | UNIQUE | Company-generated employee ID (FSW######) |
 | name | TEXT | NOT NULL | Employee full name |
 | email | TEXT | NOT NULL | Employee work email address |
@@ -92,7 +92,7 @@ for production use with security, performance, and compliance requirements.
 | Column | Type | Constraints | Description |
 |--------|------|-------------|-------------|
 | id | INTEGER | PRIMARY KEY AUTOINCREMENT | Unique progress record |
-| user_id | INTEGER | NOT NULL, FK to users.id | Foreign key reference to users table |
+| user_id | INTEGER | NOT NULL, FK to users.id | Foreign key to users table |
 | employee_id | TEXT | NOT NULL | Employee identifier for reporting |
 | module_name | TEXT | NOT NULL | Training module identifier |
 | completed_at | DATETIME | DEFAULT CURRENT_TIMESTAMP | Module completion timestamp |
@@ -120,7 +120,7 @@ for production use with security, performance, and compliance requirements.
 | Column | Type | Constraints | Description |
 |--------|------|-------------|-------------|
 | id | INTEGER | PRIMARY KEY AUTOINCREMENT | Unique submission identifier |
-| user_id | INTEGER | NOT NULL, FK to users.id | Foreign key reference to users table |
+| user_id | INTEGER | NOT NULL, FK to users.id | Foreign key to users table |
 | employee_id | TEXT | NOT NULL | Employee identifier for audit trails |
 | form_type | TEXT | NOT NULL | Type/category of form submitted |
 | form_data | TEXT | NOT NULL | JSON blob containing complete form data |
@@ -183,7 +183,7 @@ for production use with security, performance, and compliance requirements.
 | Column | Type | Constraints | Description |
 |--------|------|-------------|-------------|
 | id | INTEGER | PRIMARY KEY AUTOINCREMENT | Unique notification identifier |
-| user_id | INTEGER | NOT NULL, FK to users.id | Foreign key reference to users table |
+| user_id | INTEGER | NOT NULL, FK to users.id | Foreign key to users table |
 | employee_id | TEXT | NOT NULL | Employee identifier for notification context |
 | notification_type | TEXT | NOT NULL | Notification category/trigger |
 | message | TEXT | NOT NULL | Notification message content |
