@@ -1,6 +1,7 @@
 # Steel Onboarding Application - Database Documentation
 
-Complete database architecture documentation for the Steel Onboarding Application SQLite database system.
+Complete database architecture documentation for the Steel Onboarding
+Application SQLite database system.
 
 ## Overview
 
