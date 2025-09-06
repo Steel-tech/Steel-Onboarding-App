@@ -59,7 +59,7 @@ for production use with security, performance, and compliance requirements.
 |--------|------|-------------|-------------|
 | id | INTEGER | PRIMARY KEY AUTOINCREMENT | Unique record identifier |
 | user_id | INTEGER | NOT NULL, FK to users.id | Foreign key to users table |
-| employee_id | TEXT | UNIQUE | Company-generated employee ID (FSW######) |
+| employee_id | TEXT | UNIQUE | Company employee ID (FSW######) |
 | name | TEXT | NOT NULL | Employee full name |
 | email | TEXT | NOT NULL | Employee work email address |
 | phone | TEXT | | Employee phone number |
