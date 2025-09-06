@@ -95,7 +95,7 @@ for production use with security, performance, and compliance requirements.
 | user_id | INTEGER | NOT NULL, FK to users.id | Foreign key to users table |
 | employee_id | TEXT | NOT NULL | Employee identifier for reporting |
 | module_name | TEXT | NOT NULL | Training module identifier |
-| completed_at | DATETIME | DEFAULT CURRENT_TIMESTAMP | Module completion timestamp |
+| completed_at | DATETIME | DEFAULT CURRENT_TIMESTAMP | Module completion time |
 | progress_data | TEXT | | JSON blob with module progress data |
 
 **Indexes:**
