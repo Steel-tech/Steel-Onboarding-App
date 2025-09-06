@@ -22,56 +22,80 @@
 
 ## Enhanced Project Description
 
-A comprehensive, enterprise-grade web-based onboarding system specifically designed for steel fabrication and welding companies. This professional single-page application (SPA) delivers a complete digital transformation of the employee onboarding experience, combining safety-first training, compliance tracking, and modern web technologies to ensure every new hire receives consistent, thorough preparation for their role in the steel industry.
+A comprehensive, enterprise-grade **full-stack web application** specifically designed for steel fabrication and welding companies. This production-ready system combines a modern frontend with a secure Node.js/Express backend and SQLite database to deliver complete digital transformation of the employee onboarding experience, featuring safety-first training, compliance tracking, HR automation, and advanced security measures.
 
-## Updated Tech Stack
+## Production Tech Stack
 
 ### Frontend Technologies
 
 - **HTML5** - Semantic structure with accessibility features
 - **CSS3** - Modern styling with CSS Grid and Flexbox
-- **Vanilla JavaScript (ES6+)** - No framework dependencies for maximum performance
+- **Vanilla JavaScript (ES6+)** - Modular architecture with API client
 - **Font Awesome 6.0** - Professional iconography
-- **localStorage API** - Client-side data persistence
+- **API Client** - Structured backend communication with offline support
 
-### Backend Integration
+### Backend Technologies
 
-- **n8n Workflow Automation** - Serverless backend processing
-- **Webhook Integration** - Real-time data synchronization
-- **Super Code Processors** - Custom business logic automation
+- **Node.js** - High-performance JavaScript runtime
+- **Express.js** - Robust web application framework
+- **SQLite3** - Embedded database with 6 production tables
+- **JWT Authentication** - Secure token-based authentication
+- **bcrypt** - Password hashing with 12 rounds
+- **Helmet.js** - Security middleware with CSP headers
+- **Express Rate Limiting** - API abuse protection
+- **Nodemailer** - HR notification email system
 
-### Security & Performance
+### Security & Infrastructure
 
-- **Content Security Policy (CSP)** - XSS protection
-- **Responsive Design** - Mobile-first approach
-- **Progressive Enhancement** - Works without JavaScript
+- **Content Security Policy (CSP)** - XSS and injection protection
+- **CORS Configuration** - Cross-origin request security
+- **Input Validation** - Server-side data sanitization
+- **Audit Logging** - Complete activity tracking
+- **Role-based Access Control** - Employee/HR/Admin roles
+- **Environment Variables** - Secure configuration management
 - **Git LFS** - Large file optimization for video content
 
-## Architecture Overview
+## Full-Stack Architecture
 
-### Frontend SPA (Single Page Application)
+### Frontend (Client-Side)
 
-The onboarding portal is built as a modern SPA with:
-
+**Modern SPA with backend integration:**
 - **Tab-based Navigation:** 8 distinct modules for organized learning
-- **State Management:** Real-time progress tracking and data persistence
-- **Analytics Engine:** User behavior tracking and completion metrics
-- **Video Integration:** Custom HTML5 video player with progress tracking
-- **Export System:** PDF-ready report generation
+- **API Client:** Structured communication with offline support
+- **State Management:** Real-time progress with server synchronization
+- **Authentication:** JWT token management and role-based features
+- **Video Integration:** Custom HTML5 player with progress tracking
+- **Form System:** Digital signatures and server validation
 
-### Backend Processors
+### Backend (Server-Side)
 
-Two specialized n8n Super Code processors handle:
+**Production Node.js/Express server with:**
+- **Database Layer:** SQLite with 6 production tables
+- **Authentication API:** JWT-based login/logout system
+- **Progress API:** Module completion tracking
+- **Form API:** Digital form submissions with signatures
+- **HR Dashboard API:** Employee progress monitoring
+- **Email Notifications:** Automated HR alerts
+- **Audit System:** Complete activity logging
 
-1. **FSW Onboarding Processor** - Validates and processes employee data
-2. **FSW Report Generator** - Creates comprehensive completion reports
+### Database Schema
 
-### Report Generation
+**SQLite database with 6 core tables:**
+1. **users** - Authentication and role management
+2. **employee_data** - Personal information and job details
+3. **onboarding_progress** - Module completion tracking
+4. **form_submissions** - Digital forms with signatures
+5. **audit_logs** - Security and activity tracking
+6. **hr_notifications** - HR alert management
 
-- **Real-time Analytics:** Session tracking and interaction monitoring
-- **Progress Metrics:** Module completion and time-spent analytics
-- **Export Capabilities:** JSON data export for HR systems
-- **Compliance Reporting:** Safety training completion verification
+### Security Implementation
+
+- **Multi-layer Authentication:** JWT tokens with role validation
+- **Data Encryption:** bcrypt password hashing (12 rounds)
+- **Request Validation:** Express-validator input sanitization
+- **Rate Limiting:** Protection against API abuse
+- **Audit Trail:** Complete user activity logging
+- **Email Notifications:** Real-time HR alerts for all actions
 
 ## Complete Feature List
 
@@ -305,85 +329,253 @@ Differentiators are maintained in a grid structure that automatically adapts to 
 
 ### Prerequisites
 
+**System Requirements:**
+- **Node.js** 18.0.0 or higher
+- **npm** 9.0.0 or higher
 - Modern web browser (Chrome 90+, Firefox 88+, Safari 14+, Edge 90+)
-- Web server (Apache, Nginx, or local development server)
 - Git LFS for video file handling
 
-### Large File Handling Setup
+**Optional for Production:**
+- SSL certificate for HTTPS
+- Reverse proxy (Nginx/Apache)
+- Process manager (PM2)
 
-The orientation video (1.5GB) uses Git LFS for efficient version control:
+### Quick Start
+
+**Get the application running in 3 commands:**
+
+```bash
+# 1. Clone and setup
+git clone <repository-url>
+cd steel-onboarding-app
+
+# 2. Install dependencies and setup database
+npm run setup
+
+# 3. Start the server
+npm start
+```
+
+**The application will be available at:**
+- **Frontend:** http://localhost:3001
+- **API:** http://localhost:3001/api
+- **Default Login:** admin / admin2025!
+
+### Detailed Installation Steps
+
+#### 1. **Clone Repository with LFS**
 
 ```bash
 # Install Git LFS if not already installed
 git lfs install
 
-# Clone repository with LFS files
+# Clone repository with large files
 git clone <repository-url>
 cd steel-onboarding-app
 
-# Verify LFS files are downloaded
+# Verify LFS files are downloaded (orientation video)
 git lfs ls-files
 ```
 
-### Installation Steps
+#### 2. **Install Dependencies**
 
-1. **Clone Repository**
+```bash
+# Install Node.js dependencies
+npm install
 
-   ```bash
-   git clone <repository-url>
-   cd steel-onboarding-app
-   ```
+# Verify installation
+node --version  # Should be 18.0.0+
+npm --version   # Should be 9.0.0+
+```
 
-2. **Verify File Structure**
+#### 3. **Database Setup**
 
-   ```bash
-   ls -la
-   # Ensure orientation-video.mp4 is present and properly sized
-   ```
+```bash
+# Initialize SQLite database and create tables
+node setup-database.js
 
-3. **Deploy to Web Server**
+# Or use the setup script
+npm run setup
+```
 
-   ```bash
-   # Copy files to web server document root
-   cp -r * /var/www/html/onboarding/
-   ```
+#### 4. **Environment Configuration**
 
-4. **Configure Permissions**
+Create `.env` file for production settings:
 
-   ```bash
-   # Set appropriate file permissions
-   chmod 644 *.html *.css *.js
-   chmod 644 *.pdf *.mp4 *.ppt *.pptx
-   ```
+```bash
+# Server Configuration
+PORT=3001
+NODE_ENV=production
+FRONTEND_URL=https://your-domain.com
 
-5. **Test Installation**
-   - Open `index.html` in web browser
-   - Verify all modules load correctly
-   - Test video playback functionality
-   - Confirm data persistence in localStorage
+# Database
+DB_PATH=./production.db
 
-### n8n Integration Setup
+# Security
+JWT_SECRET=your-super-secure-secret-key-here
+BCRYPT_ROUNDS=12
+SESSION_TIMEOUT=1800000
 
-1. **Import Super Code Processors**
+# Email Configuration (for HR notifications)
+EMAIL_HOST=smtp.gmail.com
+EMAIL_PORT=587
+EMAIL_USER=your-email@company.com
+EMAIL_PASS=your-app-password
+HR_EMAIL=hr@flawlesssteelwelding.com
+ADMIN_EMAIL=admin@flawlesssteelwelding.com
+```
 
-   ```javascript
-   // Copy content from fsw-onboarding-processor.js
-   // Paste into n8n Super Code node
-   ```
+#### 5. **Start the Application**
 
-2. **Configure Webhooks**
+```bash
+# Development mode (with auto-restart)
+npm run dev
 
-   ```javascript
-   // Set up webhook endpoint for form submissions
-   POST /webhook/onboarding
-   ```
+# Production mode
+npm start
 
-3. **Test Workflow**
+# Check server health
+curl http://localhost:3001/api/health
+```
 
-   ```javascript
-   // Send test data to verify processing
-   // Check report generation functionality
-   ```
+### Production Deployment
+
+#### **Using PM2 (Recommended)**
+
+```bash
+# Install PM2 globally
+npm install -g pm2
+
+# Start application with PM2
+pm2 start server.js --name "steel-onboarding"
+
+# Save PM2 configuration
+pm2 save
+pm2 startup
+```
+
+#### **Using Docker**
+
+Create `Dockerfile`:
+
+```dockerfile
+FROM node:18-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --only=production
+COPY . .
+EXPOSE 3001
+CMD ["npm", "start"]
+```
+
+```bash
+# Build and run
+docker build -t steel-onboarding .
+docker run -p 3001:3001 -v ./data:/app/data steel-onboarding
+```
+
+#### **Nginx Reverse Proxy**
+
+```nginx
+server {
+    listen 80;
+    server_name your-domain.com;
+    
+    location / {
+        proxy_pass http://localhost:3001;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_cache_bypass $http_upgrade;
+    }
+}
+```
+
+### First-Time Setup
+
+#### **1. Login as Admin**
+
+- Navigate to http://localhost:3001
+- Use default credentials: `admin` / `admin2025!`
+- **IMPORTANT:** Change the default password immediately
+
+#### **2. Create HR Users**
+
+The system supports role-based access:
+
+- **employee** - Basic onboarding access
+- **hr** - Employee progress monitoring
+- **admin** - Full system access
+
+#### **3. Customize Company Information**
+
+Update company-specific details in `index.html`:
+
+- Company contact information
+- Safety procedures specific to your operations
+- Equipment and tool lists
+- Document links and training materials
+
+### Database Management
+
+#### **Backup Database**
+
+```bash
+# Create backup
+npm run backup
+
+# Manual backup
+cp onboarding.db backup-$(date +%Y%m%d).db
+```
+
+#### **View Database**
+
+```bash
+# Install SQLite3 CLI
+sqlite3 onboarding.db
+
+# View tables
+.tables
+
+# View employee data
+SELECT * FROM employee_data;
+```
+
+### Testing Installation
+
+#### **Health Check**
+
+```bash
+# Test server health
+curl http://localhost:3001/api/health
+
+# Should return:
+{
+  "status": "healthy",
+  "timestamp": "2024-01-15T10:30:00.000Z",
+  "uptime": 120.5
+}
+```
+
+#### **Authentication Test**
+
+```bash
+# Test login endpoint
+curl -X POST http://localhost:3001/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"username":"admin","password":"admin2025!"}'
+```
+
+#### **Frontend Test**
+
+- Open http://localhost:3001 in browser
+- Verify all tabs load without errors
+- Test video playback (orientation-video.mp4)
+- Complete a test module and check progress
 
 ## Usage Guide
 
@@ -831,59 +1023,225 @@ For urgent technical issues preventing onboarding completion:
 
 ## API Reference
 
-### Key Functions & Data Structures
+### Backend API Endpoints
 
-#### Application State Management
+#### Authentication Endpoints
 
 ```javascript
-// Global application state object
-appState = {
-    currentTab: 'welcome',           // Active module tab
-    progress: 0,                     // Overall completion percentage (0-100)
-    completedModules: [],            // Array of completed module IDs
-    employeeData: {                  // Employee information
-        name: 'string',
-        email: 'string', 
-        phone: 'string',
-        position: 'string',
-        startDate: 'date',
-        supervisor: 'string'
-    },
-    checklistItems: {},              // Checklist completion status
-    analytics: {                     // Session analytics data
-        sessionStart: timestamp,
-        timeSpentPerTab: {},
-        totalTimeSpent: number,
-        completionTimes: {},
-        interactions: [],
-        lastActivity: timestamp
-    }
-};
+// POST /api/auth/login
+{
+  "username": "string",
+  "password": "string"
+}
+
+// Response:
+{
+  "success": true,
+  "token": "jwt-token",
+  "user": {
+    "id": 1,
+    "username": "admin",
+    "role": "hr",
+    "name": "HR Administrator"
+  }
+}
 ```
 
-#### Core Functions
+#### Employee Data Endpoints
 
 ```javascript
+// POST /api/employee/data
+// Headers: Authorization: Bearer <token>
+{
+  "name": "John Smith",
+  "email": "john@company.com",
+  "phone": "555-1234",
+  "position": "Welder",
+  "start_date": "2024-01-15",
+  "supervisor": "Mike Johnson"
+}
+
+// Response:
+{
+  "success": true,
+  "employeeId": "FSW123456"
+}
+```
+
+#### Progress Tracking Endpoints
+
+```javascript
+// POST /api/progress/module
+// Headers: Authorization: Bearer <token>
+{
+  "moduleName": "safety-training",
+  "progressData": {
+    "completionTime": "2024-01-15T10:30:00Z",
+    "score": 95,
+    "timeSpent": 1800
+  }
+}
+```
+
+#### Form Submission Endpoints
+
+```javascript
+// POST /api/forms/submit
+// Headers: Authorization: Bearer <token>
+{
+  "formType": "emergency-contact",
+  "formData": {
+    "contactName": "Jane Smith",
+    "relationship": "Spouse",
+    "phone": "555-5678"
+  },
+  "digitalSignature": "data:image/png;base64,..."
+}
+```
+
+#### HR Dashboard Endpoints
+
+```javascript
+// GET /api/hr/dashboard
+// Headers: Authorization: Bearer <token>
+// Role: hr or admin required
+
+// Response:
+{
+  "employees": [
+    {
+      "employee_id": "FSW123456",
+      "name": "John Smith",
+      "position": "Welder",
+      "completed_modules": 6,
+      "submitted_forms": 4,
+      "last_login": "2024-01-15T14:30:00Z"
+    }
+  ],
+  "stats": {
+    "totalEmployees": 25,
+    "completedOnboarding": 20,
+    "completionRate": 80
+  }
+}
+```
+
+#### Data Export Endpoint
+
+```javascript
+// GET /api/backup/export
+// Headers: Authorization: Bearer <token>
+// Role: hr or admin required
+
+// Response: JSON file download with all employee data
+{
+  "timestamp": "2024-01-15T10:30:00Z",
+  "exported_by": "admin",
+  "employees": [...],
+  "progress": [...],
+  "forms": [...],
+  "audit_logs": [...]
+}
+```
+
+### Frontend API Client
+
+#### APIClient Class
+
+```javascript
+// Initialize API client
+const apiClient = new APIClient();
+
+// Set authentication token
+apiClient.setToken('jwt-token');
+
+// Make authenticated requests
+const result = await apiClient.request('/employee/data', {
+  method: 'POST',
+  body: JSON.stringify(employeeData)
+});
+
+// Handle offline mode
+if (!apiClient.isOnline) {
+  // Data stored locally and synced when back online
+}
+```
+
+#### Core Frontend Functions
+
+```javascript
+// Authentication functions
+async function login(username, password)     // Login and store token
+function logout()                            // Clear token and redirect
+function isAuthenticated()                   // Check if user is logged in
+
+// Data persistence functions
+function saveEmployeeData(data)              // Save to server and localStorage
+function saveModuleProgress(moduleId, data)  // Update completion status
+function submitForm(formType, data, signature) // Submit form with digital signature
+
 // Navigation and state management
-function showTab(tabName)           // Switch to specified tab
-function updateProgress()           // Recalculate completion percentage
-function saveState()               // Persist state to localStorage
-function loadState()               // Restore state from localStorage
-
-// Data management
-function updateEmployeeData(data)   // Update employee information
-function markModuleComplete(moduleId) // Mark module as completed
-function updateChecklistItem(itemId, status) // Update checklist status
-
-// Analytics functions
-function trackAnalyticsEvent(eventName, data) // Log user interaction
-function calculateTimeSpent(moduleId)         // Calculate time in module
-function generateReport()                     // Create completion report
+function showTab(tabName)                    // Switch to specified tab
+function updateProgress()                    // Recalculate completion percentage
+function saveState()                         // Persist state to localStorage
+function loadState()                         // Restore state from localStorage
 
 // Video player functions
-function initializeVideoPlayer()    // Setup video player controls
-function saveVideoProgress()        // Save viewing position
-function checkVideoCompletion()     // Verify 90% completion
+function initializeVideoPlayer()             // Setup video player controls
+function saveVideoProgress()                 // Save viewing position to server
+function checkVideoCompletion()              // Verify 90% completion
+```
+
+### Database Schema Reference
+
+#### Users Table
+
+```sql
+CREATE TABLE users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT UNIQUE NOT NULL,
+    password_hash TEXT NOT NULL,
+    role TEXT NOT NULL DEFAULT 'employee',
+    name TEXT NOT NULL,
+    email TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    last_login DATETIME,
+    is_active BOOLEAN DEFAULT 1
+);
+```
+
+#### Employee Data Table
+
+```sql
+CREATE TABLE employee_data (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    employee_id TEXT UNIQUE,
+    name TEXT NOT NULL,
+    email TEXT NOT NULL,
+    phone TEXT,
+    position TEXT NOT NULL,
+    start_date DATE NOT NULL,
+    supervisor TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users (id)
+);
+```
+
+#### Progress Tracking Table
+
+```sql
+CREATE TABLE onboarding_progress (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    employee_id TEXT NOT NULL,
+    module_name TEXT NOT NULL,
+    completed_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    progress_data TEXT, -- JSON blob
+    FOREIGN KEY (user_id) REFERENCES users (id),
+    UNIQUE(user_id, module_name)
+);
 ```
 
 #### Data Export Structure
@@ -960,38 +1318,113 @@ function checkVideoCompletion()     // Verify 90% completion
 }
 ```
 
-### Integration Endpoints
+### Security Implementation
 
-#### Webhook Data Format
+#### JWT Token Structure
 
 ```javascript
-// POST /webhook/onboarding
+// JWT Payload
 {
-  "method": "POST",
-  "headers": {
-    "Content-Type": "application/json",
-    "X-Webhook-Source": "steel-onboarding-app"
-  },
-  "body": {
-    "eventType": "onboarding_progress|completion|error",
-    "timestamp": "ISO timestamp",
-    "employeeData": { /* Employee object */ },
-    "progressData": { /* Progress object */ },
-    "analytics": { /* Analytics object */ }
-  }
+  "id": 1,
+  "username": "admin",
+  "role": "hr",
+  "iat": 1642234567,  // Issued at
+  "exp": 1642263367   // Expires in 8 hours
 }
 ```
 
-### Browser Storage Schema
+#### Request Validation
 
 ```javascript
-// localStorage key structure
+// Example validation middleware
+const { body, validationResult } = require('express-validator');
+
+const employeeDataValidation = [
+    body('name').isLength({ min: 2, max: 100 }).trim().escape(),
+    body('email').isEmail().normalizeEmail(),
+    body('position').isIn(['Welder', 'Fabricator', 'Supervisor', 'Admin']),
+    body('start_date').isISO8601().toDate()
+];
+```
+
+#### Rate Limiting Configuration
+
+```javascript
+// Authentication endpoints: 5 attempts per 15 minutes
+// General API endpoints: 100 requests per 15 minutes
+// Strict endpoints: 10 requests per 15 minutes
+
+const authLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 5,
+    message: 'Too many login attempts'
+});
+```
+
+### Email Notification System
+
+#### HR Notification Types
+
+```javascript
+// Automated email notifications sent to HR
+const notificationTypes = {
+    'ONBOARDING_STARTED': 'Employee begins onboarding',
+    'MODULE_COMPLETED': 'Training module completed',
+    'FORM_SUBMITTED': 'Form submitted with digital signature',
+    'ONBOARDING_COMPLETED': 'All requirements satisfied'
+};
+```
+
+#### Email Configuration
+
+```javascript
+// SMTP settings in .env file
+EMAIL_HOST=smtp.gmail.com
+EMAIL_PORT=587
+EMAIL_USER=notifications@company.com
+EMAIL_PASS=app-specific-password
+HR_EMAIL=hr@flawlesssteelwelding.com
+```
+
+### Data Storage Schema
+
+#### Browser localStorage Structure
+
+```javascript
+// Client-side storage for offline support
 {
-  "onboardingAppState": "JSON string of complete app state",
-  "fsw_onboarding_employee": "Encrypted employee data",
-  "fsw_onboarding_progress": "Module completion tracking",
-  "fsw_onboarding_analytics": "Session analytics data",
-  "fsw_onboarding_video_position": "Video playback position"
+  "authToken": "jwt-token-string",
+  "onboardingAppState": {
+    "currentTab": "welcome",
+    "progress": 65,
+    "completedModules": ["welcome", "safety", "orientation"],
+    "employeeData": { /* employee info */ },
+    "checklistItems": { /* completion status */ },
+    "analytics": { /* session data */ }
+  },
+  "offlineQueue": [
+    /* Pending API calls to sync when online */
+  ]
+}
+```
+
+#### Audit Log Structure
+
+```javascript
+// Complete activity tracking
+{
+  "id": 1,
+  "user_id": 5,
+  "employee_id": "FSW123456",
+  "action": "MODULE_COMPLETED",
+  "details": {
+    "moduleName": "safety-training",
+    "completionTime": "2024-01-15T10:30:00Z",
+    "score": 95
+  },
+  "ip_address": "192.168.1.100",
+  "user_agent": "Mozilla/5.0...",
+  "created_at": "2024-01-15T10:30:00Z"
 }
 ```
 
@@ -1010,13 +1443,18 @@ function checkVideoCompletion()     // Verify 90% completion
 
 ---
 
-*Last Updated: September 2024*
-*Version: 2.1 - Enhanced with Founder Story & Company Values*
-*Compatibility: All modern browsers, mobile responsive*
+*Last Updated: January 2025*
+*Version: 3.0 - Production Full-Stack Application*
+*Compatibility: Node.js 18+, all modern browsers, mobile responsive*
 
-**Recent Updates:**
-- Added interactive founder's story timeline (2011-2025)
-- Integrated "What Sets Us Apart" differentiators section  
-- Included founder quote and brand philosophy
-- Enhanced company information module with cultural content
-- Improved mobile responsiveness for timeline components
+**Major Updates:**
+- **Full-Stack Architecture:** Complete Node.js/Express backend with SQLite database
+- **JWT Authentication:** Secure multi-role authentication system
+- **HR Dashboard:** Real-time employee progress monitoring
+- **Email Notifications:** Automated HR alerts for all onboarding events
+- **Digital Signatures:** Form submission with signature capture
+- **Audit Logging:** Complete security and activity tracking
+- **Offline Support:** API client with offline queue and sync
+- **Production Security:** Helmet, CORS, rate limiting, input validation
+- **Database Schema:** 6 production tables with foreign key relationships
+- **Deployment Ready:** PM2, Docker, and Nginx configuration examples
