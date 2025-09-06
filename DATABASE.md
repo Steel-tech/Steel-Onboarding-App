@@ -5,7 +5,9 @@ Application SQLite database system.
 
 ## Overview
 
-SQLite database system supporting user authentication, employee onboarding tracking, form submissions, audit logging, and HR notifications. Designed for production use with security, performance, and compliance requirements.
+SQLite database system supporting user authentication, employee onboarding
+tracking, form submissions, audit logging, and HR notifications. Designed
+for production use with security, performance, and compliance requirements.
 
 ## Database Configuration
 
