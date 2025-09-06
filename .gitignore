@@ -1,0 +1,177 @@
+# Operating System Files
+# =========================
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msm
+*.msp
+*.lnk
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# IDE and Editor Files
+# ====================
+
+# Visual Studio Code
+.vscode/
+*.code-workspace
+.history/
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.ipr
+*.iws
+out/
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+*.swp
+*.swo
+*.swn
+.vim/
+
+# Emacs
+*~
+\#*\#
+.\#*
+.emacs.desktop
+.emacs.desktop.lock
+
+# Temporary Files
+# ===============
+*.tmp
+*.temp
+*.log
+*.cache
+tmp/
+temp/
+logs/
+
+# Local Storage & Database
+# ========================
+memories.json
+*.db
+*.sqlite
+*.sqlite3
+localdata/
+
+# Backup Files
+# ============
+*.bak
+*.backup
+*.old
+*.orig
+backup/
+backups/
+
+# Node.js (if added later)
+# ========================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.npm
+.yarn
+package-lock.json
+yarn.lock
+
+# Environment Files
+# =================
+.env
+.env.local
+.env.development
+.env.production
+.env.test
+*.env
+
+# Build Outputs (if build process added later)
+# ============================================
+dist/
+build/
+out/
+.cache/
+
+# Test Coverage
+# =============
+coverage/
+*.lcov
+.nyc_output/
+
+# Documentation Build
+# ==================
+docs/_build/
+docs/.doctrees/
+
+# Sensitive Information
+# ====================
+*.key
+*.pem
+*.crt
+*.p12
+credentials.json
+secrets.json
+config.local.js
+
+# Media Files (large video files excluded from repository)
+# ============================================
+orientation-video.mp4
+*.avi
+*.mov
+*.wmv
+*.flv
+*.webm
+
+# Large Files (optional - uncomment if needed)
+# ============================================
+# *.pdf
+# *.ppt
+# *.pptx
+# *.doc
+# *.docx
+
+# Debug Files
+# ===========
+debug/
+*.stackdump
+core
+
+# Archive Files
+# =============
+*.zip
+*.tar
+*.tar.gz
+*.rar
+*.7z
+
+# Custom Patterns
+# ==============
+*-local.*
+*.local
+.tmp/

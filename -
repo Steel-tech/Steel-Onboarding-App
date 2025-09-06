@@ -1,0 +1,516 @@
+WELDING PROCEDURE SPECIFICATIONS (WPS)          YES        X. 
+PREQUALIFIED D1.1.   QUALIFIED BY TESTING_______
+Or PROCEDURE QUALIFICATION RECORDS (PQR)     Prequalified.
+
+     Identification #                  E-7018/SMAW-3/8 -3G                 .   
+Revision; 
+
+By   
+
+Company Name        XYZ       . 
+Authorized By Elvis
+Date  
+Welding Process (es);                           SMAW                              .        
+Type 
+Manual       X  .
+Semi-Automatic  ______       
+Supporting PQR No. (s)                    Prequalified                          .
+              Machine_              
+Automatic  _____
+
+
+JOINT DESIGN USED                          B – U2a                          .
+POSITION
+Type: 
+Single       X    .
+Double Weld   ________
+Position of Groove            Vertical      .                         
+Fillet _________
+Backing
+Yes         X    .
+No  _______
+Vertical Progression 
+Up      X   .
+Down  _____
+Backing Material            Table 3.1 Group I & Group II.                .                      
+_____________________________________________
+Root Opening           1/4”.                 
+Root Face Dimension
+ ELECTRICAL CHARACTERISTICS
+Groove Angle      45 deg  .                         
+Radius (J-U) __________
+Transfer Mode    (GMAW)                                                            .
+Back gouging: 
+Yes ___
+No    X  . 
+Method _____
+Short Circuiting  ___
+Globular___
+Spray  ___
+___________________________________________
+Current:
+AC
+DCEP      X  .
+DCEN         
+Pulsed
+BASE MATALS
+Other                                                                                               .
+Material Spec.               Table 3.1 Group I & Group II.                .                                         
+Tungsten Electrode (GTAW)                                                         .
+Type or Grade               Table 3.1 Group I & Group II.                .                      
+Size                                                                                                  .
+Thickness: 
+Groove       3/8”  .
+Fillet  _______
+ Type                                                                                               .
+Diameter (Pipe)                                                                              .
+                                                                                                         .
+___________________________________________
+TECHNIQUE
+FILLER METALS
+Stringer or Weave Bead                       Stringer or Weave             .
+AWS Specification                              AWS A5.1                          .
+Multi-pass or Single Pass (per side)          Multi-Pass                   .
+AWS Classification                                E-7018                             .                   
+Number of Electrodes                                1 Electrode                  .
+Electrode Classification                              F4                                .             
+Electrode Spacing:
+Longitudinal                                      .
+SHIELDING                                             N/A                              .
+
+Lateral                                               .
+Flux                                          .           
+Gas                                           .                         
+
+Angle                                                 .
+                                                 .
+Composition                             .
+Contact tube Work Distance                                                          .
+Electrode-Flux (Class)
+Flow Rate                                 .
+Peening                                                                                           .
+                                                 .
+Gas  cup size                            .
+Interpass Cleaning        Chipping Hammer, Wire Brush, Grind    .
+p
+PREHEAT
+POSTWELD HEAT TREATMENT
+Preheat Temp., Min (Deg. F.)             50 degrees F      .
+Temp. (Degrees F.)                                  N/A                                .
+1/8” to 3/4” incl.  None* .
+Over 3/4” to 1-1/2” incl.  50  .
+Time                                                                                                .
+Over 1-1/2” to 2-1/2” incl.  150   . 
+Over 2-1/2    225    .
+
+Interpass Temp., (Deg. F.) Min              Refer to D1.1                  .
+                                                                                                        .
+*When the base metal temp. is below 32 F the base metal shall be preheated to at least 70 F and this min. temp. maintained during welding
+WELDING PROCEDURE
+Pass or
+Process
+Filler Metals
+Current
+Volts
+Travel Speed
+Joint Details
+STRINGER
+Weld Layer(s)ClassDiam.Type & PolarityAmps & Wire SpeedInches per Minute
+
+ALL
+SMAW
+
+3G
+
+E-7018
+3/32”
+
+1/8”
+
+5/32”
+
+DCEP
+80 to 110
+
+90 to150
+
+110 to 230
+20 to 22
+
+20 to 21
+
+20 to 22        8 
+To 
+12
+IPMPlate Thickness:   3/8 Inch
+Backing Bar:    1” x 8” x 1/4”
+Other:  R = 1/4”                  Ti = 3/8”
+
+HOW TO 
+READ & UNDERSTAND 
+WELDING PROCEDURES
+
+Line 1:-----
+Verifies that this is a WPS (Welding Procedure Specification).
+
+
+Line 2:-----
+States whether the Procedure is Prequalified or was Qualified by Testing. If it is Prequalified the AWS Code Section is in the Blank. This Procedure is Prequalified under D1.1
+
+
+Line 3:-----
+If the welding Procedure had to be qualified by testing the number of the PQR (Procedure Qualification Record) will be on the blank on this line.
+
+
+Line 4:-----
+This line has the WPS ID number on it, the last revision date & who the revision was by. 
+
+
+Line 5:-----
+This line has the Company who the WPS is for, Who authorized it & the date it was authorized.
+
+
+Line 6:-----
+This line gives the welding process SMAW (Shielded Metal Arc Welding) STICK and whether it is manual or semi-automatic. Stick is manual and Wire is semi-automatic.
+
+
+Line 7:-----
+On this line would appear the PQR number if the Procedure was qualified by testing and was the weld process by machine or automatic.
+
+
+Line 8:-----
+This line gives the joint design which is referenced from the code book used. (AWS D1.1)
+
+
+Line 9:-----
+The type of weld single (all from one side), double (welded from both sides), the position of the weld (vertical) and was it a groove or fillet weld.
+
+
+Line 10:----
+Was backing used either yes or no in this case it is Yes, and if vertical is the progression up or down, in this procedure the progression is Up.
+
+
+Line 11:----
+What is the backing material? In this procedure any material listed in AWS D1.1Table 3.1 Group I & II can be used
+
+
+Line 12:----
+What is the root opening (in this procedure the root opening is 1/4 inch). There is not root face dimension as the bevel has no land on it.
+
+
+Line 13:----
+What is the groove angle for the procedure? In this procedure the angle is 45 degrees, this is the total included angle not the angle on each side of the plate. If it was a radiused groove, as when welding round bar to plate what is the radius. Las if using the GMAW Process what is the Transfer Mode.
+
+
+Line 14:----
+Is back gouging being performed and if Yes what is the method (i.e. grinding, arc gouging, etc.) In this procedure no back gouging is performed. If GMAW is used is the transfer method short circuiting, Globular or Spray.
+
+
+Line 15:----
+Type of currant AC, DCEP (Direct Currant Electrode Positive), DCEN (Direct Currant Electrode Negative), or Pulsed. In this procedure the type is DCEP. The electrode is hooked up to the positive terminal of the welding machine.
+
+
+Line 16:----
+What is the Material Specifications of the Base Metal? You can weld any metal in AWS D1.1 Table 3.1 Group I & II. For GMAW what type of Tungsten Electrode is used.
+
+
+Line 17:----
+What is the Type or Grade of the base metal? You can weld any metal in AWS D1.1 Table 3.1 Group I & II. What is the Size of the tungsten Electrode?
+
+
+Line 18:----
+What is the thickness of the base metal used in the groove or fillet weld/ In this procedure it is 3/8’s of an inch thick. 
+
+
+Line 19:----
+If a pipe procedure what is the Diameter of the pipe. N/A in this procedure.
+
+
+Line 19.5--
+What technique is used Stringer beads of weave beads? In this procedure Stringer or weave can be used.
+
+
+Line 20:----
+What is the AWS Specification for the Filler Metal being used? In this procedure it is A5.1. This number can be found on the electrode container. Is this a multi-pass or Single pass weld per side? In this procedure is a Multi-pass weld.
+
+
+Line 21:----
+What is the AWS Classification for the Filler Metal being used? In this procedure it is E-7018. This number can be found on the electrode container. How many electrodes are used in this procedure. For this Procedure the number is One.
+
+
+Line 22:----
+What is the Electrode Classification?  There is a table covering F1, F2, G3 & F4 electrodes in AWS D1.1. In this procedure E-7018 is an F4 Electrode. (This means you are qualified to weld any F4, F3, F2 or F1 electrode. You are permitted to weld an electrode in a lower numbered classification in what you certified on but can not weld in higher classified electrodes. On the right side if you are using multiple electrodes what is their Longitudinal Spacing.
+
+
+Line 23:----
+What type of shielding gas is being used? This is a N/A for this Procedure as E-7018 has flux on it. (i.e. self shielded)
+
+
+Line 24:----
+What Type of Flux or Gas are being used for the welding process? Both are N/A for this Procedure.
+
+
+Line 25:----
+What is the composition of the gas? (i.e. 100% CO2, 25% CO2 & 75% Argon, etc.) Contact Tube Work distance is N/a for this Procedure.
+
+
+Line 26:----
+Electrode Flux (Class0 N/A), Flow Rate of the Gas [X CFH [Cubic Feet Hour)], Is peening required or done and how, N/A in this Procedure.
+
+
+Line 27:----
+What is the Gas cup Size N/A for this Procedure? How is Interpass Cleaning done? In this Procedure chipper Hammer, Wire brush or grinding are allowed.
+
+
+Line 28:----
+What is the Minimum Pre-Heat temperature in degrees Fahrenheit? 50 Degrees is the Minimum temperature the metal can be to weld on it. (50 Degrees for the metal not the ambient air temperature. The steel can be mush colder than the air in the morning or on cool days.) Postweld Heat Treatment is N/A in this Procedure.
+
+
+Line 29:----
+1/8” to 3/4” inclusive None but note *. Over 3/4 to 1-1/2” inclusive 50 degrees Min. Time for Postweld Heat Treatment N/A for this Procedure.
+
+
+Line 30:----
+Over 1/12” to 2-1/2” inclusive 150 degrees Min. Over 2-12’ 225 degrees Min.
+
+
+Line 31:----
+Interpass temperature refer to the Table in AWS D1.1.
+
+
+Line 32:----
+* As to preheat requirements.
+
+
+Line 33, Row A:-
+Reference for the Pass in the Weld Procedure.
+
+
+
+Line 33, Row B:-
+Reference for the Process in the Weld Procedure.
+
+
+Line 33, Row C:-
+Reference for the filler Metal in the Weld Procedure.
+
+
+Line 33, Row D:-
+Reference for the Currant in the Weld Procedure.
+
+
+Line 33, Row E:-
+Reference for the Volts in the Weld Procedure.
+
+
+Line 33, Row F:-
+Reference for the Travel Speed in the Weld Procedure.
+
+
+Line 33, Row G:
+Reference for the Joint Detail in the Weld Procedure.
+
+
+Line 34, Row 1:--
+References the Weld Layer/s.
+
+
+Line 34, Row 2:--
+BLANK
+
+
+Line 34, Row 3:--
+References the Classification of the Filler Metal.
+
+
+Line 34, Row 4:--
+References the Diameter of the Electrode/s.
+
+
+Line 34, Row 5:--
+References the Type & Polarity of the Current..
+
+
+Line 34, Row 6:--
+References the Amps &/Or Wire Feed Speed of the Electrode. (If applicable)
+
+
+Line 34, Row 7:
+BLANK
+
+
+Line 34, Row 8:
+References the Inches Per Minute of electrode travel.
+
+
+Line 34, Row 9:
+References the Details of the Weld Joint.
+
+
+Line 35, Row 1:--
+Says the Procedure covers all weld layers
+
+
+Line 35, Row 2:--
+The Process is SMAW in the 3G position. (Vertical)
+
+
+Line 35, Row 3:--
+Electrode Classification is E-7018
+
+
+Line 35, Row 4:--
+Gives the Electrode Diameters covered by the Procedure. (3/32”, 1/8” & 5/32”)
+
+
+Line 35, Row 5:--
+Give the Currant type and polarity; DC and Electrode Positive.
+
+
+Line 35, Row 6:--
+Gives the Amperage Ranges for each diameter electrode. (80-110 Amps for 3/32”, 90-150 Amps for 1/8”, 110-230 Amps for 5/32”.) If the Amperage at the electrode is above these Ranges a Welding Inspector can make you cut out every weld made at these setting. Welds made at too high a setting change the properties of the weld metal and it can be brittle.
+
+
+Line 35, Row 7:--
+Give the voltage Range for each size of Electrode. (20-22 for 3/32”, 20-21 for 1/8” & 20-22 for 5/32”)
+
+
+Line 35, Row 8:--
+Inches per minute of electrode travel (Between 8 and 12)
+
+
+Line 35, Row 9:--
+Complete detail of the Weld Joint and weld passes.
+
+
+Line 36, Row 1-4:--
+Gives the thickness of the weld coupon. 3/8”
+
+
+Line 36, Row 4-7:--
+Gives the size of the backing bar. 1” x 8” x1/4”
+
+
+Line 36, Row 8-9:--
+Gives the root opening 1/4” and again the thickness of the plate 3/8”
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Title:
+QMS No.:
+
+Page:
+1 of 
+Reading Welding Procedures
+Revision:
+0
+Date:
+
+
+
+
+
+
+Line 2
+
+Line 1
+
+Line 3
+
+Line 4
+
+Line 5
+
+Line 6
+
+Line 7
+
+Line 8
+
+Line 9
+
+Line 10
+
+Line 11
+
+Line 12
+
+Line 13
+
+Line 14
+
+Line 15
+
+Line 16
+
+Line 17
+
+Line 18
+
+Line 19
+
+Line 20
+
+Line 21
+
+Line 22
+
+Line 23
+
+Line 24
+
+Line 25
+
+Line 26
+
+Line 27
+
+Line 28
+
+Line 29
+
+Line 30
+
+Line 31
+
+Line 32
+
+  Row A       Row B               Row C                          Row D                  Row E         Row F                      Row G
+
+Line 33
+
+Line 34
+
+R
+
+Ti
+
+Line 35
+
+Line 36
+
+Row 1            Row 2             Row 3             Row 4           Row 5             Row 6               Row7                Row 8                            Row 9
+
+2 of 4
+
+3 of 4
+
+4 of 4
+
+
+
