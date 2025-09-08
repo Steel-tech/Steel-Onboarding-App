@@ -128,9 +128,9 @@ async function setupDatabase() {
                 
                 const insertUsers = `
                     INSERT INTO users (username, password_hash, role, name, email) VALUES
-                    ('admin', ?, 'admin', 'System Administrator', 'admin@flawlesssteelwelding.com'),
-                    ('hr', ?, 'hr', 'HR Administrator', 'hr@flawlesssteelwelding.com'),
-                    ('employee', ?, 'employee', 'New Employee', 'employee@flawlesssteelwelding.com');
+                    ('admin', ?, 'admin', 'System Administrator', 'admin@fsw-denver.com'),
+                    ('hr', ?, 'hr', 'HR Administrator', 'hr@fsw-denver.com'),
+                    ('employee', ?, 'employee', 'New Employee', 'employee@fsw-denver.com');
                 `;
                 
                 db.run(insertUsers, [adminPassword, hrPassword, employeePassword], function(err) {
@@ -195,12 +195,12 @@ BCRYPT_ROUNDS=12
 # Email Configuration (Update with your SMTP settings)
 EMAIL_HOST=smtp.gmail.com
 EMAIL_PORT=587
-EMAIL_USER=your-email@flawlesssteelwelding.com
+EMAIL_USER=your-email@fsw-denver.com
 EMAIL_PASS=your-app-password
 
 # Notification Recipients
-HR_EMAIL=hr@flawlesssteelwelding.com
-ADMIN_EMAIL=admin@flawlesssteelwelding.com
+HR_EMAIL=hr@fsw-denver.com
+ADMIN_EMAIL=admin@fsw-denver.com
 
 # Frontend Configuration
 FRONTEND_URL=http://localhost:3001

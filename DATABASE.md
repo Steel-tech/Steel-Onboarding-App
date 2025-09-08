@@ -46,7 +46,7 @@ for production use with security, performance, and compliance requirements.
   "username": "admin",
   "role": "admin",
   "name": "System Administrator",
-  "email": "admin@flawlesssteelwelding.com",
+  "email": "admin@fsw-denver.com",
   "is_active": 1
 }
 ```
@@ -78,7 +78,7 @@ for production use with security, performance, and compliance requirements.
 {
   "employee_id": "FSW123456",
   "name": "John Smith",
-  "email": "john.smith@flawlesssteelwelding.com",
+  "email": "john.smith@fsw-denver.com",
   "position": "Welder I",
   "start_date": "2025-01-15",
   "supervisor": "Mike Johnson"

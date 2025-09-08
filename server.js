@@ -40,8 +40,8 @@ const config = {
     EMAIL_PORT: process.env.EMAIL_PORT || 587,
     EMAIL_USER: process.env.EMAIL_USER || '',
     EMAIL_PASS: process.env.EMAIL_PASS || '',
-    HR_EMAIL: process.env.HR_EMAIL || 'hr@flawlesssteelwelding.com',
-    ADMIN_EMAIL: process.env.ADMIN_EMAIL || 'admin@flawlesssteelwelding.com',
+    HR_EMAIL: process.env.HR_EMAIL || 'hr@fsw-denver.com',
+    ADMIN_EMAIL: process.env.ADMIN_EMAIL || 'admin@fsw-denver.com',
     SESSION_TIMEOUT: process.env.SESSION_TIMEOUT || 30 * 60 * 1000, // 30 minutes
     BCRYPT_ROUNDS: parseInt(process.env.BCRYPT_ROUNDS) || 12
 };
