@@ -13,6 +13,7 @@ const AUTH_CONSTANTS = {
 
 class AuthManager {
     constructor() {
+        console.log('🔐 AuthManager: Constructor called');
         this.sessionTimeout = AUTH_CONSTANTS.SESSION_TIMEOUT;
         this.maxLoginAttempts = AUTH_CONSTANTS.MAX_LOGIN_ATTEMPTS;
         this.lockoutDuration = AUTH_CONSTANTS.LOCKOUT_DURATION;
