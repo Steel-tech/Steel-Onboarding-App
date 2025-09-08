@@ -58,7 +58,7 @@ document.addEventListener('DOMContentLoaded', function() {
         DOM_CACHE.init();
         loadState();
         initializeEventListeners();
-        initializeVideoPlayer();
+        initializeSimpleVideoTracking();
         updateProgress();
         showTab(appState.currentTab);
         initializePerformanceOptimizations();
