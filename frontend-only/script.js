@@ -1162,7 +1162,7 @@ function initializeVideoPlayer() {
             }
             
             // Update overall app progress
-            if (!appState.completedModules.includes('orientation-video') && highestProgress > 90) {
+            if (!appState.completedModules.includes('orientation-video') && highestProgress > CONSTANTS.VIDEO_COMPLETION_THRESHOLD) {
                 appState.completedModules.push('orientation-video');
                 saveState();
                 updateProgress();
@@ -1198,13 +1198,13 @@ function initializeVideoPlayer() {
         }
         
         // Show completion if watched
-        if (progress >= 90 && videoCompletion) {
+        if (progress >= CONSTANTS.VIDEO_COMPLETION_THRESHOLD && videoCompletion) {
             videoCompletion.style.display = 'block';
         }
     }
     
     // Check if video was previously completed
-    if (highestProgress >= 90) {
+    if (highestProgress >= CONSTANTS.VIDEO_COMPLETION_THRESHOLD) {
         if (videoCompletion) {
             videoCompletion.style.display = 'block';
         }
@@ -1359,7 +1359,7 @@ function initializeAnalytics() {
             trackAnalyticsEvent('user_inactive', {
                 duration: Date.now() - appState.analytics.lastActivity
             });
-        }, 300000); // 5 minutes of inactivity
+        }, CONSTANTS.INACTIVITY_TIMEOUT);
     }
 }
 
@@ -1374,8 +1374,8 @@ function trackInteraction(event) {
     
     appState.analytics.interactions.push(interaction);
     
-    // Keep only last 100 interactions to prevent memory issues
-    if (appState.analytics.interactions.length > 100) {
+    // Keep only last interactions to prevent memory issues
+    if (appState.analytics.interactions.length > CONSTANTS.INTERACTION_LOG_LIMIT) {
         appState.analytics.interactions.shift();
     }
 }
@@ -1389,7 +1389,7 @@ function trackAnalyticsEvent(eventType, data = {}) {
     };
     
     appState.analytics.interactions.push(event);
-    console.log('Analytics Event:', event);
+    logger.debug('Analytics Event tracked', event);
 }
 
 function trackTabSwitch(newTab) {
@@ -1479,7 +1479,7 @@ function formatDuration(ms) {
 class Logger {
     constructor() {
         this.logs = [];
-        this.maxLogs = 500;
+        this.maxLogs = CONSTANTS.MAX_LOGS;
     }
     
     log(level, message, data = {}) {
@@ -2094,7 +2094,7 @@ function initializeSignaturePad() {
     
     // Set up canvas
     signatureContext.strokeStyle = '#2c3e50';
-    signatureContext.lineWidth = 2;
+    signatureContext.lineWidth = CONSTANTS.SIGNATURE_LINE_WIDTH;
     signatureContext.lineCap = 'round';
     
     // Mouse events
@@ -2247,12 +2247,12 @@ function initializeProceduresAndForms() {
 
 // Show/hide document content instead of downloading
 function showDocumentContent(documentId, buttonElement) {
-    console.log('showDocumentContent called with:', documentId);
+    logger.debug('Document content toggle requested', { documentId });
     const contentDiv = document.getElementById(documentId + '-content');
-    console.log('Found content div:', contentDiv);
+    logger.debug('Content div lookup result', { found: !!contentDiv });
     
     if (!contentDiv) {
-        console.error('Content div not found for:', documentId + '-content');
+        logger.error('Content div not found', { elementId: documentId + '-content' });
         alert('Content not found for document: ' + documentId);
         return;
     }
@@ -2261,7 +2261,7 @@ function showDocumentContent(documentId, buttonElement) {
     
     if (contentDiv.style.display === 'none' || !contentDiv.style.display) {
         // Show content
-        console.log('Showing content for:', documentId);
+        logger.info('Showing document content', { documentId });
         contentDiv.style.display = 'block';
         buttonElement.innerHTML = '<i class="fas fa-eye-slash"></i> Hide Content';
         buttonElement.classList.add('active');
@@ -2275,7 +2275,7 @@ function showDocumentContent(documentId, buttonElement) {
         trackAnalyticsEvent('document_viewed', { document: documentId });
     } else {
         // Hide content
-        console.log('Hiding content for:', documentId);
+        logger.info('Hiding document content', { documentId });
         contentDiv.style.display = 'none';
         buttonElement.innerHTML = '<i class="fas fa-eye"></i> View Content';
         buttonElement.classList.remove('active');
