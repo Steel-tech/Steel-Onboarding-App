@@ -2417,6 +2417,72 @@ video::-webkit-media-controls-fullscreen-button {
         background: rgba(255,255,255,0.2);
         border-radius: 6px;
     }
+
+    /* New Video Link Mobile Design */
+    .video-access-card {
+        margin: 0 0 1rem 0;
+        border-radius: 8px;
+    }
+
+    .video-hero {
+        padding: 1.5rem;
+        border-radius: 8px 8px 0 0;
+    }
+
+    .video-hero i {
+        font-size: 3rem;
+    }
+
+    .video-hero h3 {
+        font-size: 1.5rem;
+    }
+
+    .video-hero p {
+        font-size: 1rem;
+    }
+
+    .video-link-section {
+        padding: 1.5rem;
+    }
+
+    .video-link-btn {
+        width: 100%;
+        padding: 1rem 1.5rem;
+        font-size: 1.1rem;
+        gap: 0.75rem;
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .video-duration {
+        margin-left: 0;
+        margin-top: 0.5rem;
+    }
+
+    .video-alternatives {
+        padding: 1.25rem;
+    }
+
+    .alternative-links {
+        gap: 0.5rem;
+    }
+
+    .alt-link-btn {
+        padding: 1rem;
+        font-size: 0.95rem;
+        min-height: 48px;
+    }
+
+    .video-completion-section {
+        padding: 1.5rem;
+    }
+
+    .completion-btn {
+        width: 100%;
+        padding: 1rem;
+        font-size: 1rem;
+        min-height: 48px;
+    }
     
     /* Logo scaling */
     .company-logo {
