@@ -46,20 +46,10 @@ class AuthManager {
     }
     
     initializeAuth() {
-        // Check if user is already authenticated
-        if (!this.isAuthenticated()) {
-            this.showLoginModal();
-        } else {
-            // Check if session is still valid
-            if (this.isSessionExpired()) {
-                this.logout();
-                return;
-            }
-            // Update last activity
-            this.updateLastActivity();
-            // Start session monitoring
-            this.startSessionMonitoring();
-        }
+        // CLIENT-SIDE MODE: No authentication required
+        // Automatically create a mock session for the app to work
+        this.createMockSession();
+        this.hideLoadingScreen();
     }
     
     // Simple password hashing (in production, use bcrypt or similar)
