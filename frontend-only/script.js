@@ -249,7 +249,7 @@ function completeModule(moduleName, button) {
         showNotification(`${moduleName.toUpperCase()} module completed!`);
         
         // Check if all modules are completed
-        if (appState.completedModules.length === 4) {
+        if (appState.completedModules.length === CONSTANTS.TOTAL_SAFETY_MODULES) {
             setTimeout(() => {
                 showCompletionModal('All safety modules completed! Great job!');
             }, 500);
@@ -430,8 +430,8 @@ function updateProgress() {
     const percentage = totalItems > 0 ? Math.round((completedItems / totalItems) * 100) : 0;
     appState.progress = percentage;
     
-    const progressBar = document.getElementById('progressBar');
-    const progressText = document.getElementById('progressText');
+    const progressBar = DOM_CACHE.progressBar || document.getElementById('progressBar');
+    const progressText = DOM_CACHE.progressText || document.getElementById('progressText');
     
     if (progressBar) {
         progressBar.style.width = percentage + '%';
@@ -512,7 +512,7 @@ function showNotification(message, type = 'success') {
     document.body.appendChild(notification);
     
     // Auto-dismiss after longer time for errors
-    const dismissTime = type === 'error' ? 5000 : 3000;
+    const dismissTime = type === 'error' ? CONSTANTS.ERROR_NOTIFICATION_DISMISS_TIME : CONSTANTS.NOTIFICATION_DISMISS_TIME;
     
     setTimeout(() => {
         if (notification.parentNode) {
@@ -533,7 +533,7 @@ function showTrainingModal(equipmentType) {
 
 // Handle document download with multiple fallback strategies
 function handleDocumentDownload(fileName, documentName, buttonElement) {
-    console.log(`Download requested: ${fileName}`);
+    logger.info('Document download requested', { fileName, documentName });
     
     // Create a simple download link and click it immediately
     const downloadLink = document.createElement('a');
@@ -571,7 +571,7 @@ function markDocumentAsDownloaded(fileName, documentName, buttonElement) {
 
 // Alternative download method using anchor element
 function tryAlternativeDownload(fileName, documentName, buttonElement) {
-    console.log(`Trying alternative download for: ${fileName}`);
+    logger.info('Trying alternative download method', { fileName, documentName });
     
     try {
         // Create temporary download link
@@ -598,14 +598,14 @@ function tryAlternativeDownload(fileName, documentName, buttonElement) {
         trackSuccessfulDownload(fileName, documentName, buttonElement);
         
     } catch (error) {
-        console.error('Alternative download failed:', error);
+        logger.error('Alternative download method failed', { error: error.message });
         handleDownloadFailure(fileName, documentName, buttonElement, error);
     }
 }
 
 // Track successful downloads with improved UI feedback
 function trackSuccessfulDownload(fileName, documentName, buttonElement) {
-    console.log(`Download initiated successfully: ${fileName}`);
+    logger.info('Download initiated successfully', { fileName, documentName });
     
     // Update UI immediately
     const card = buttonElement.closest('.document-card');
@@ -636,7 +636,7 @@ function trackSuccessfulDownload(fileName, documentName, buttonElement) {
 
 // Enhanced download failure handling
 function handleDownloadFailure(fileName, documentName, buttonElement, error) {
-    console.error(`Download failed for ${fileName}:`, error);
+    logger.error('Document download failed', { fileName, documentName, error: error.message });
     
     // Update button to show retry option
     const card = buttonElement.closest('.document-card');
@@ -1055,7 +1055,7 @@ function initializeVideoPlayer() {
     
     // Handle video load errors
     video.addEventListener('error', function(e) {
-        console.log('Video failed to load, showing fallback content');
+        logger.warn('Video failed to load, showing fallback content', { error: e.message });
         if (videoFallback && videoContainer) {
             video.style.display = 'none';
             videoFallback.style.display = 'block';
@@ -1070,14 +1070,14 @@ function initializeVideoPlayer() {
     
     // Test if video can be loaded
     video.addEventListener('loadedmetadata', function() {
-        console.log('Video loaded successfully');
+        logger.info('Video loaded successfully');
     });
     
     // If video source is not found, show fallback after a timeout
     setTimeout(() => {
         if (video.networkState === HTMLMediaElement.NETWORK_NO_SOURCE || 
             video.networkState === HTMLMediaElement.NETWORK_EMPTY) {
-            console.log('Video source not found, showing fallback');
+            logger.warn('Video source not found, showing fallback');
             if (videoFallback && videoContainer) {
                 video.style.display = 'none';
                 videoFallback.style.display = 'block';
