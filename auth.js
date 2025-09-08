@@ -238,8 +238,12 @@ class AuthManager {
     getSession() {
         try {
             const sessionData = localStorage.getItem('fswSession');
-            return sessionData ? JSON.parse(sessionData) : null;
+            console.log('🔐 AuthManager: getSession() - raw localStorage data:', sessionData);
+            const parsed = sessionData ? JSON.parse(sessionData) : null;
+            console.log('🔐 AuthManager: getSession() - parsed result:', parsed);
+            return parsed;
         } catch (error) {
+            console.error('🔐 AuthManager: getSession() - parsing error:', error.message);
             if (typeof logger !== 'undefined') {
                 logger.error('Error parsing session data', { error: error.message });
             } else {
