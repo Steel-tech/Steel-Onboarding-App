@@ -120,7 +120,7 @@ class AuthManager {
         // Focus on username field
         setTimeout(() => {
             document.getElementById('username').focus();
-        }, 100);
+        }, AUTH_CONSTANTS.USERNAME_FOCUS_DELAY);
     }
     
     handleLogin(form) {
@@ -145,21 +145,25 @@ class AuthManager {
             this.hideLoginModal();
             this.startApplication();
             
-            logger?.info('User authenticated successfully', {
-                username: username,
-                role: user.role,
-                timestamp: new Date().toISOString()
-            });
+            if (typeof logger !== 'undefined') {
+                logger.info('User authenticated successfully', {
+                    username: username,
+                    role: user.role,
+                    timestamp: new Date().toISOString()
+                });
+            }
         } else {
             // Failed login
             this.incrementLoginAttempts();
             this.showLoginError('Invalid username or password');
             
-            logger.warn('Failed login attempt', {
-                username: username,
-                attempts: this.getLoginAttempts(),
-                timestamp: new Date().toISOString()
-            });
+            if (typeof logger !== 'undefined') {
+                logger.warn('Failed login attempt', {
+                    username: username,
+                    attempts: this.getLoginAttempts(),
+                    timestamp: new Date().toISOString()
+                });
+            }
         }
     }
     
@@ -200,7 +204,11 @@ class AuthManager {
             const sessionData = localStorage.getItem('fswSession');
             return sessionData ? JSON.parse(sessionData) : null;
         } catch (error) {
-            console.error('Error parsing session data:', error);
+            if (typeof logger !== 'undefined') {
+                logger.error('Error parsing session data', { error: error.message });
+            } else {
+                console.error('Auth Error - Session parsing failed:', error.message);
+            }
             return null;
         }
     }
@@ -231,12 +239,12 @@ class AuthManager {
             });
         });
         
-        // Check session validity every minute
+        // Check session validity periodically
         setInterval(() => {
             if (this.isSessionExpired()) {
                 this.logout('Session expired');
             }
-        }, 60000);
+        }, AUTH_CONSTANTS.SESSION_CHECK_INTERVAL);
     }
     
     logout(reason = 'User logout') {
