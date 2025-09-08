@@ -21,11 +21,19 @@ class AuthManager {
     }
     
     initializeAuth() {
-        // CLIENT-SIDE MODE: No authentication required
-        // Automatically create a mock session for the app to work
-        console.log('[FSW Auth] Running in client-side mode - no authentication required');
-        this.createMockSession();
-        this.hideLoadingScreen();
+        // Check if employee is already registered
+        const existingEmployee = this.getExistingEmployee();
+        
+        if (existingEmployee) {
+            // Returning employee - create session and continue
+            console.log('[FSW Auth] Welcome back:', existingEmployee.name);
+            this.createEmployeeSession(existingEmployee);
+            this.hideLoadingScreen();
+        } else {
+            // New employee - show registration form
+            console.log('[FSW Auth] New employee - showing registration');
+            this.showEmployeeRegistration();
+        }
     }
     
     createMockSession() {
