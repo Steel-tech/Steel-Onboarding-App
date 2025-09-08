@@ -1,5 +1,5 @@
 // Authentication System for Steel Onboarding App
-// Simple but secure authentication for production use
+// CLIENT-SIDE ONLY VERSION - No authentication required
 
 // Auth constants
 const AUTH_CONSTANTS = {
@@ -13,560 +13,131 @@ const AUTH_CONSTANTS = {
 
 class AuthManager {
     constructor() {
-        console.log('🔐 AuthManager: Constructor called');
         this.sessionTimeout = AUTH_CONSTANTS.SESSION_TIMEOUT;
         this.maxLoginAttempts = AUTH_CONSTANTS.MAX_LOGIN_ATTEMPTS;
         this.lockoutDuration = AUTH_CONSTANTS.LOCKOUT_DURATION;
         
-        // In production, these would come from environment variables
-        this.credentials = {
-            // Format: username: { password: hashedPassword, role: 'employee'|'hr'|'admin' }
-            'employee': { 
-                password: this.hashPassword('fsw2025!'), // Default password
-                role: 'employee',
-                name: 'New Employee'
-            },
-            'hr': { 
-                password: this.hashPassword('hr2025!'), 
-                role: 'hr',
-                name: 'HR Administrator'
-            },
-            'victor@fsw-denver.com': {
-                password: this.hashPassword('admin2025!'),
-                role: 'admin',
-                name: 'Victor Garcia - Owner'
-            },
-            'admin': {
-                password: this.hashPassword('admin2025!'),
-                role: 'admin', 
-                name: 'Administrator'
-            }
-        };
-        
-        console.log('🔐 AuthManager: Credentials loaded, calling initializeAuth()');
         this.initializeAuth();
     }
     
     initializeAuth() {
-        console.log('🔐 AuthManager: initializeAuth() called');
-        // Check if user is already authenticated
-        const isAuth = this.isAuthenticated();
-        console.log('🔐 AuthManager: isAuthenticated() returned:', isAuth);
-        
-        if (!isAuth) {
-            console.log('🔐 AuthManager: User not authenticated, showing login modal');
-            this.showLoginModal();
-        } else {
-            console.log('🔐 AuthManager: User already authenticated, checking session');
-            // Check if session is still valid
-            if (this.isSessionExpired()) {
-                console.log('🔐 AuthManager: Session expired, logging out');
-                this.logout();
-                return;
-            }
-            console.log('🔐 AuthManager: Session valid, updating activity and starting monitoring');
-            // Update last activity
-            this.updateLastActivity();
-            // Start session monitoring
-            this.startSessionMonitoring();
-        }
+        // CLIENT-SIDE MODE: No authentication required
+        // Automatically create a mock session for the app to work
+        console.log('[FSW Auth] Running in client-side mode - no authentication required');
+        this.createMockSession();
+        this.hideLoadingScreen();
     }
     
-    // Simple password hashing (in production, use bcrypt or similar)
-    hashPassword(password) {
-        // Simple hash for demo - in production use proper bcrypt
-        let hash = 0;
-        for (let i = 0; i < password.length; i++) {
-            const char = password.charCodeAt(i);
-            hash = ((hash << 5) - hash) + char;
-            hash = hash & hash; // Convert to 32-bit integer
-        }
-        return hash.toString();
-    }
-    
-    showLoginModal() {
-        console.log('🔐 AuthManager: showLoginModal() called');
-        
-        // Hide main application
-        document.body.style.overflow = 'hidden';
-        console.log('🔐 AuthManager: Set body overflow to hidden');
-        
-        // Create login modal
-        console.log('🔐 AuthManager: Creating login modal element');
-        const loginModal = document.createElement('div');
-        loginModal.id = 'authModal';
-        loginModal.className = 'auth-modal';
-        loginModal.innerHTML = `
-            <div class="auth-modal-content">
-                <div class="auth-header">
-                    <img src="Flawless Steel Logo_vector_ydMod3 (002) Page 003.jpg" alt="Flawless Steel Welding" class="auth-logo">
-                    <h2>Employee Onboarding Portal</h2>
-                    <p>Please authenticate to access your onboarding materials</p>
-                </div>
-                
-                <form id="loginForm" class="auth-form">
-                    <div class="form-group">
-                        <label for="username">Username:</label>
-                        <input type="text" id="username" name="username" required 
-                               placeholder="Enter your username" autocomplete="username">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="password">Password:</label>
-                        <input type="password" id="password" name="password" required 
-                               placeholder="Enter your password" autocomplete="current-password">
-                    </div>
-                    
-                    <div id="loginError" class="auth-error" style="display: none;"></div>
-                    
-                    <button type="submit" class="auth-btn">
-                        <i class="fas fa-sign-in-alt"></i> Sign In
-                    </button>
-                    
-                    <div class="auth-footer">
-                        <p><strong>Available Accounts:</strong></p>
-                        <p>Employee: <code>employee</code> / <code>fsw2025!</code></p>
-                        <p>HR Admin: <code>hr</code> / <code>hr2025!</code></p>
-                        <p>Owner: <code>victor@fsw-denver.com</code> / <code>admin2025!</code></p>
-                        <p>Admin: <code>admin</code> / <code>admin2025!</code></p>
-                        <small>Contact HR at (720) 638-7289 for assistance</small>
-                    </div>
-                </form>
-            </div>
-        `;
-        
-        console.log('🔐 AuthManager: Appending modal to document.body');
-        document.body.appendChild(loginModal);
-        
-        console.log('🔐 AuthManager: Modal appended, adding form handler');
-        // Add login form handler
-        document.getElementById('loginForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            this.handleLogin(e.target);
-        });
-        
-        console.log('🔐 AuthManager: Form handler added, setting focus');
-        // Focus on username field
-        setTimeout(() => {
-            document.getElementById('username').focus();
-        }, AUTH_CONSTANTS.USERNAME_FOCUS_DELAY);
-        
-        console.log('🔐 AuthManager: Login modal setup complete');
-    }
-    
-    handleLogin(form) {
-        const formData = new FormData(form);
-        const username = formData.get('username').trim().toLowerCase();
-        const password = formData.get('password');
-        
-        // Check for lockout
-        if (this.isAccountLocked()) {
-            this.showLoginError('Account temporarily locked due to multiple failed attempts. Try again later.');
-            return;
-        }
-        
-        // Validate credentials
-        const user = this.credentials[username];
-        const hashedPassword = this.hashPassword(password);
-        
-        if (user && user.password === hashedPassword) {
-            // Successful login
-            this.createSession(username, user);
-            this.clearLoginAttempts();
-            this.hideLoginModal();
-            this.startApplication();
-            
-            if (typeof logger !== 'undefined') {
-                logger.info('User authenticated successfully', {
-                    username: username,
-                    role: user.role,
-                    timestamp: new Date().toISOString()
-                });
-            }
-        } else {
-            // Failed login
-            this.incrementLoginAttempts();
-            this.showLoginError('Invalid username or password');
-            
-            if (typeof logger !== 'undefined') {
-                logger.warn('Failed login attempt', {
-                    username: username,
-                    attempts: this.getLoginAttempts(),
-                    timestamp: new Date().toISOString()
-                });
-            }
-        }
-    }
-    
-    createSession(username, user) {
-        const session = {
-            username: username,
-            role: user.role,
-            name: user.name,
-            loginTime: Date.now(),
-            lastActivity: Date.now(),
-            sessionId: this.generateSessionId()
+    createMockSession() {
+        // Create a mock user session for the app to function
+        const mockUser = {
+            id: 'client-user-001',
+            username: 'client-user',
+            role: 'employee',
+            name: 'Onboarding User',
+            email: 'user@fsw-denver.com',
+            loginTime: Date.now()
         };
         
-        // Store session (encrypted in production)
-        localStorage.setItem('fswSession', JSON.stringify(session));
+        // Store session data
+        sessionStorage.setItem('fsw_user_session', JSON.stringify(mockUser));
+        sessionStorage.setItem('fsw_session_start', Date.now().toString());
         
-        // Update global app state with user info
-        if (typeof appState !== 'undefined') {
-            appState.currentUser = {
-                username: username,
-                role: user.role,
-                name: user.name
-            };
+        console.log('[FSW Auth] Mock session created for client-side app');
+        
+        // Trigger session ready event
+        this.onSessionReady(mockUser);
+    }
+    
+    hideLoadingScreen() {
+        const loadingScreen = document.getElementById('loadingScreen');
+        if (loadingScreen) {
+            setTimeout(() => {
+                loadingScreen.style.opacity = '0';
+                setTimeout(() => {
+                    loadingScreen.style.display = 'none';
+                    document.body.classList.remove('loading');
+                }, 500);
+            }, 1000);
         }
     }
     
-    generateSessionId() {
-        return Date.now().toString(36) + Math.random().toString(36).substring(2);
+    onSessionReady(user) {
+        // App is ready - no login modal needed
+        console.log('[FSW Auth] Session ready for:', user.name);
+        
+        // Initialize the main application
+        if (typeof initializeApp === 'function') {
+            initializeApp(user);
+        }
+        
+        // Fire custom event for other components
+        window.dispatchEvent(new CustomEvent('authReady', { 
+            detail: { user: user } 
+        }));
     }
     
+    // Mock authentication methods for compatibility
     isAuthenticated() {
-        const session = this.getSession();
-        console.log('🔐 AuthManager: isAuthenticated() - session:', session);
-        const isExpired = this.isSessionExpired();
-        console.log('🔐 AuthManager: isAuthenticated() - isExpired:', isExpired);
-        const result = session?.username && !isExpired;
-        console.log('🔐 AuthManager: isAuthenticated() - final result:', result);
-        return result;
+        return true; // Always authenticated in client-side mode
     }
     
-    getSession() {
-        try {
-            const sessionData = localStorage.getItem('fswSession');
-            console.log('🔐 AuthManager: getSession() - raw localStorage data:', sessionData);
-            const parsed = sessionData ? JSON.parse(sessionData) : null;
-            console.log('🔐 AuthManager: getSession() - parsed result:', parsed);
-            return parsed;
-        } catch (error) {
-            console.error('🔐 AuthManager: getSession() - parsing error:', error.message);
-            if (typeof logger !== 'undefined') {
-                logger.error('Error parsing session data', { error: error.message });
-            } else {
-                console.error('Auth Error - Session parsing failed:', error.message);
-            }
-            return null;
+    getCurrentUser() {
+        const sessionData = sessionStorage.getItem('fsw_user_session');
+        if (sessionData) {
+            return JSON.parse(sessionData);
         }
+        return null;
     }
     
-    isSessionExpired() {
-        const session = this.getSession();
-        if (!session) return true;
-        
-        const now = Date.now();
-        const lastActivity = session.lastActivity || session.loginTime;
-        
-        return (now - lastActivity) > this.sessionTimeout;
-    }
-    
-    updateLastActivity() {
-        const session = this.getSession();
-        if (session) {
-            session.lastActivity = Date.now();
-            localStorage.setItem('fswSession', JSON.stringify(session));
-        }
-    }
-    
-    startSessionMonitoring() {
-        // Update activity on user interaction
-        ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart'].forEach(event => {
-            document.addEventListener(event, () => {
-                this.updateLastActivity();
-            });
-        });
-        
-        // Check session validity periodically
-        setInterval(() => {
-            if (this.isSessionExpired()) {
-                this.logout('Session expired');
-            }
-        }, AUTH_CONSTANTS.SESSION_CHECK_INTERVAL);
-    }
-    
-    logout(reason = 'User logout') {
-        const session = this.getSession();
-        
-        if (session) {
-            if (typeof logger !== 'undefined') {
-                logger.info('User logged out', {
-                    username: session.username,
-                    reason: reason,
-                    sessionDuration: Date.now() - session.loginTime,
-                    timestamp: new Date().toISOString()
-                });
-            }
-        }
-        
+    logout() {
         // Clear session data
-        localStorage.removeItem('fswSession');
+        sessionStorage.removeItem('fsw_user_session');
+        sessionStorage.removeItem('fsw_session_start');
         
-        // Clear app state
-        if (typeof appState !== 'undefined') {
-            delete appState.currentUser;
-        }
-        
-        // Show logout notification
-        if (reason !== 'User logout') {
-            alert(`Session ended: ${reason}. Please log in again.`);
-        }
-        
-        // Reload page to restart authentication
+        // Reload page to reset state
         window.location.reload();
     }
     
-    // Login attempt tracking for security
-    getLoginAttempts() {
-        return parseInt(localStorage.getItem('loginAttempts') || '0');
-    }
-    
-    incrementLoginAttempts() {
-        const attempts = this.getLoginAttempts() + 1;
-        localStorage.setItem('loginAttempts', attempts.toString());
-        localStorage.setItem('lastFailedLogin', Date.now().toString());
-    }
-    
-    clearLoginAttempts() {
-        localStorage.removeItem('loginAttempts');
-        localStorage.removeItem('lastFailedLogin');
-    }
-    
-    isAccountLocked() {
-        const attempts = this.getLoginAttempts();
-        const lastFailed = parseInt(localStorage.getItem('lastFailedLogin') || '0');
-        
-        if (attempts >= this.maxLoginAttempts) {
-            const timeSinceLastFailed = Date.now() - lastFailed;
-            return timeSinceLastFailed < this.lockoutDuration;
-        }
-        
-        return false;
-    }
-    
-    showLoginError(message) {
-        const errorDiv = document.getElementById('loginError');
-        if (errorDiv) {
-            errorDiv.textContent = message;
-            errorDiv.style.display = 'block';
-        }
-    }
-    
-    hideLoginModal() {
-        const modal = document.getElementById('authModal');
-        if (modal) {
-            modal.remove();
-        }
-        document.body.style.overflow = '';
-    }
-    
-    startApplication() {
-        // Initialize the main application
-        if (typeof initializeEventListeners === 'function') {
-            // Main app is already loaded
-            showNotification(`Welcome, ${this.getSession().name}!`, 'success');
-        }
-    }
-    
-    // Utility method to get current user info
-    getCurrentUser() {
-        const session = this.getSession();
-        return session ? {
-            username: session.username,
-            role: session.role,
-            name: session.name
-        } : null;
-    }
-    
-    // Check if user has specific role
-    hasRole(role) {
-        const user = this.getCurrentUser();
-        return user && user.role === role;
-    }
-    
-    // Admin method to add new user (HR only)
-    addUser(username, password, role, name) {
-        const currentUser = this.getCurrentUser();
-        if (!currentUser || currentUser.role !== 'hr') {
-            throw new Error('Unauthorized: Only HR can add users');
-        }
-        
-        this.credentials[username] = {
-            password: this.hashPassword(password),
-            role: role,
-            name: name
-        };
-        
-        if (typeof logger !== 'undefined') {
-            logger.info('New user added', {
-                newUser: username,
-                role: role,
-                addedBy: currentUser.username,
-                timestamp: new Date().toISOString()
-            });
-        }
-        
+    // Session management
+    checkSession() {
+        // In client-side mode, session never expires
         return true;
     }
-}
-
-// CSS styles for authentication modal
-const authStyles = document.createElement('style');
-authStyles.textContent = `
-.auth-modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(135deg, var(--primary-color) 0%, var(--dark-gray) 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 10000;
-}
-
-.auth-modal-content {
-    background: white;
-    padding: 3rem;
-    border-radius: 10px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-    width: 90%;
-    max-width: 400px;
-    text-align: center;
-}
-
-.auth-header {
-    margin-bottom: 2rem;
-}
-
-.auth-logo {
-    max-width: 150px;
-    margin-bottom: 1rem;
-}
-
-.auth-header h2 {
-    color: var(--primary-color);
-    margin-bottom: 0.5rem;
-}
-
-.auth-header p {
-    color: #666;
-    font-size: 0.9rem;
-}
-
-.auth-form {
-    text-align: left;
-}
-
-.form-group {
-    margin-bottom: 1.5rem;
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: 0.5rem;
-    color: var(--primary-color);
-    font-weight: 600;
-}
-
-.form-group input {
-    width: 100%;
-    padding: 0.75rem;
-    border: 2px solid #ddd;
-    border-radius: 5px;
-    font-size: 1rem;
-    transition: border-color 0.3s ease;
-}
-
-.form-group input:focus {
-    outline: none;
-    border-color: var(--accent-color);
-    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
-}
-
-.auth-error {
-    background: #fee;
-    color: var(--danger-color);
-    padding: 0.75rem;
-    border-radius: 5px;
-    margin-bottom: 1rem;
-    border: 1px solid #fcc;
-    text-align: center;
-}
-
-.auth-btn {
-    width: 100%;
-    padding: 1rem;
-    background: linear-gradient(135deg, var(--accent-color), var(--primary-color));
-    color: white;
-    border: none;
-    border-radius: 5px;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    margin-bottom: 2rem;
-}
-
-.auth-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
-}
-
-.auth-footer {
-    padding-top: 2rem;
-    border-top: 1px solid #eee;
-    text-align: center;
-    font-size: 0.85rem;
-    color: #666;
-}
-
-.auth-footer code {
-    background: #f8f9fa;
-    padding: 0.2rem 0.4rem;
-    border-radius: 3px;
-    color: var(--primary-color);
-    font-weight: 600;
-}
-
-.auth-footer small {
-    display: block;
-    margin-top: 1rem;
-    color: #999;
-}
-
-@media (max-width: 480px) {
-    .auth-modal-content {
-        padding: 2rem 1.5rem;
-        margin: 1rem;
+    
+    extendSession() {
+        // Update session timestamp
+        sessionStorage.setItem('fsw_session_start', Date.now().toString());
     }
     
-    .auth-logo {
-        max-width: 120px;
+    // Mock methods for API compatibility
+    getAuthToken() {
+        return 'client-side-mode-no-token-needed';
+    }
+    
+    refreshToken() {
+        return Promise.resolve('client-side-mode-no-token-needed');
     }
 }
-`;
-
-document.head.appendChild(authStyles);
 
 // Initialize authentication when DOM is ready
-console.log('🔐 AUTH.JS: Script loaded, readyState:', document.readyState);
+let authManager = null;
 
-if (document.readyState === 'loading') {
-    console.log('🔐 AUTH.JS: DOM still loading, adding event listener');
-    document.addEventListener('DOMContentLoaded', () => {
-        console.log('🔐 AUTH.JS: DOMContentLoaded event fired, initializing AuthManager');
-        window.authManager = new AuthManager();
-    });
-} else {
-    console.log('🔐 AUTH.JS: DOM already loaded, initializing AuthManager immediately');
-    window.authManager = new AuthManager();
-}
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('[FSW Auth] Initializing client-side authentication system');
+    authManager = new AuthManager();
+});
 
-// Export for use in other scripts
+// Global auth functions for compatibility
+window.authManager = {
+    isAuthenticated: () => authManager ? authManager.isAuthenticated() : false,
+    getCurrentUser: () => authManager ? authManager.getCurrentUser() : null,
+    logout: () => authManager ? authManager.logout() : null,
+    checkSession: () => authManager ? authManager.checkSession() : true,
+    getAuthToken: () => authManager ? authManager.getAuthToken() : 'client-side-mode'
+};
+
+// Export for module systems
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = AuthManager;
+    module.exports = { AuthManager, AUTH_CONSTANTS };
 }
