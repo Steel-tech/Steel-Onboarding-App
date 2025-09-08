@@ -60,6 +60,7 @@ document.addEventListener('DOMContentLoaded', function() {
         initializeEventListeners();
         initializeSimpleVideoTracking();
         updateProgress();
+        personalizeWelcomeSection();
         showTab(appState.currentTab);
         initializePerformanceOptimizations();
         initializeAnalytics();
