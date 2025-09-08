@@ -145,6 +145,18 @@ class APIClient {
     
     // Progress tracking methods
     async saveModuleProgress(moduleName, progressData = {}) {
+        if (this.clientSideMode) {
+            // Client-side mode: Store directly in localStorage
+            const enrichedProgressData = {
+                ...progressData,
+                completedAt: new Date().toISOString(),
+                userAgent: navigator.userAgent
+            };
+            this.storeOfflineData('moduleProgress', { moduleName, progressData: enrichedProgressData });
+            console.log('Module progress stored locally:', moduleName);
+            return true;
+        }
+        
         try {
             const response = await this.request('/progress/module', {
                 method: 'POST',
