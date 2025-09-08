@@ -2,23 +2,7 @@
   "rewrites": [
     {
       "source": "/",
-      "destination": "/frontend-only/index.html"
-    },
-    {
-      "source": "/auth.js",
-      "destination": "/frontend-only/auth.js"
-    },
-    {
-      "source": "/script.js", 
-      "destination": "/frontend-only/script.js"
-    },
-    {
-      "source": "/styles.css",
-      "destination": "/frontend-only/styles.css"
-    },
-    {
-      "source": "/(.*)",
-      "destination": "/frontend-only/$1"
+      "destination": "/index.html"
     }
   ],
   "headers": [
