@@ -227,7 +227,12 @@ class AuthManager {
     
     isAuthenticated() {
         const session = this.getSession();
-        return session?.username && !this.isSessionExpired();
+        console.log('🔐 AuthManager: isAuthenticated() - session:', session);
+        const isExpired = this.isSessionExpired();
+        console.log('🔐 AuthManager: isAuthenticated() - isExpired:', isExpired);
+        const result = session?.username && !isExpired;
+        console.log('🔐 AuthManager: isAuthenticated() - final result:', result);
+        return result;
     }
     
     getSession() {
