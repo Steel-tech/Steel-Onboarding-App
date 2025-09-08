@@ -251,12 +251,14 @@ class AuthManager {
         const session = this.getSession();
         
         if (session) {
-            logger.info('User logged out', {
-                username: session.username,
-                reason: reason,
-                sessionDuration: Date.now() - session.loginTime,
-                timestamp: new Date().toISOString()
-            });
+            if (typeof logger !== 'undefined') {
+                logger.info('User logged out', {
+                    username: session.username,
+                    reason: reason,
+                    sessionDuration: Date.now() - session.loginTime,
+                    timestamp: new Date().toISOString()
+                });
+            }
         }
         
         // Clear session data
@@ -357,12 +359,14 @@ class AuthManager {
             name: name
         };
         
-        logger.info('New user added', {
-            newUser: username,
-            role: role,
-            addedBy: currentUser.username,
-            timestamp: new Date().toISOString()
-        });
+        if (typeof logger !== 'undefined') {
+            logger.info('New user added', {
+                newUser: username,
+                role: role,
+                addedBy: currentUser.username,
+                timestamp: new Date().toISOString()
+            });
+        }
         
         return true;
     }
