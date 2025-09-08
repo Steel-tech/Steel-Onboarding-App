@@ -91,7 +91,7 @@ localdata/
 backup/
 backups/
 
-# Node.js (if added later)
+# Node.js
 # ========================
 node_modules/
 npm-debug.log*
@@ -99,7 +99,8 @@ yarn-debug.log*
 yarn-error.log*
 .npm
 .yarn
-package-lock.json
+# Keep package-lock.json for reproducible builds
+# package-lock.json
 yarn.lock
 
 # Environment Files
