@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Steel Onboarding App - No Auth Test</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>Testing App Without Auth</h1>
+    <p>This is a test to see if the main app loads without authentication.</p>
+    
+    <div id="app">
+        <div class="container">
+            <h2>Welcome to Flawless Steel Welding Onboarding</h2>
+            <div id="progressContainer">
+                <div id="progressBar" style="width: 0%;"></div>
+                <span id="progressText">0% Complete</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Include the main script without auth -->
+    <script src="script.js"></script>
+    
+    <script>
+    // Override auth check for testing
+    console.log('Testing app without authentication...');
+    
+    // Check if main app loads
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('DOM loaded');
+        console.log('App state available:', typeof appState !== 'undefined');
+        console.log('Main functions available:', typeof showTab !== 'undefined');
+        
+        // Try to initialize the app manually
+        if (typeof loadState === 'function') {
+            console.log('Loading state...');
+            loadState();
+        }
+        
+        if (typeof initializeEventListeners === 'function') {
+            console.log('Initializing event listeners...');
+            initializeEventListeners();
+        }
+        
+        if (typeof updateProgress === 'function') {
+            console.log('Updating progress...');
+            updateProgress();
+        }
+    });
+    </script>
+</body>
+</html>
