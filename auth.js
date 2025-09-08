@@ -85,10 +85,14 @@ class AuthManager {
     }
     
     showLoginModal() {
+        console.log('🔐 AuthManager: showLoginModal() called');
+        
         // Hide main application
         document.body.style.overflow = 'hidden';
+        console.log('🔐 AuthManager: Set body overflow to hidden');
         
         // Create login modal
+        console.log('🔐 AuthManager: Creating login modal element');
         const loginModal = document.createElement('div');
         loginModal.id = 'authModal';
         loginModal.className = 'auth-modal';
