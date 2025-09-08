@@ -525,11 +525,16 @@ authStyles.textContent = `
 document.head.appendChild(authStyles);
 
 // Initialize authentication when DOM is ready
+console.log('🔐 AUTH.JS: Script loaded, readyState:', document.readyState);
+
 if (document.readyState === 'loading') {
+    console.log('🔐 AUTH.JS: DOM still loading, adding event listener');
     document.addEventListener('DOMContentLoaded', () => {
+        console.log('🔐 AUTH.JS: DOMContentLoaded event fired, initializing AuthManager');
         window.authManager = new AuthManager();
     });
 } else {
+    console.log('🔐 AUTH.JS: DOM already loaded, initializing AuthManager immediately');
     window.authManager = new AuthManager();
 }
 
