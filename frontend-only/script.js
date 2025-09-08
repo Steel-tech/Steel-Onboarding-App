@@ -55,6 +55,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Simulate loading time for better UX
     setTimeout(() => {
+        DOM_CACHE.init();
         loadState();
         initializeEventListeners();
         initializeVideoPlayer();
@@ -65,7 +66,7 @@ document.addEventListener('DOMContentLoaded', function() {
         hideLoadingScreen();
         
         trackAnalyticsEvent('app_initialized');
-    }, 1500);
+    }, CONSTANTS.LOADING_DELAY);
 });
 
 // Load saved state from localStorage
