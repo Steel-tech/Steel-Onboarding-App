@@ -201,6 +201,24 @@ class AuthManager {
         return session?.username && !this.isSessionExpired();
     }
     
+    createMockSession() {
+        // Create a mock session for client-side operation
+        const mockSession = {
+            username: 'client-user',
+            role: 'employee',
+            name: 'Employee',
+            loginTime: Date.now(),
+            lastActivity: Date.now(),
+            sessionId: 'mock-session-' + Date.now()
+        };
+        
+        try {
+            localStorage.setItem('fswSession', JSON.stringify(mockSession));
+        } catch (error) {
+            console.warn('Could not save mock session to localStorage:', error.message);
+        }
+    }
+    
     getSession() {
         try {
             const sessionData = localStorage.getItem('fswSession');
