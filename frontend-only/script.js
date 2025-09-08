@@ -1240,19 +1240,19 @@ document.head.appendChild(style);
 
 // Performance Optimization Functions
 function showLoadingScreen() {
-    const loadingScreen = document.getElementById('loadingScreen');
+    const loadingScreen = DOM_CACHE.loadingScreen || document.getElementById('loadingScreen');
     if (loadingScreen) {
         loadingScreen.style.display = 'flex';
     }
 }
 
 function hideLoadingScreen() {
-    const loadingScreen = document.getElementById('loadingScreen');
+    const loadingScreen = DOM_CACHE.loadingScreen || document.getElementById('loadingScreen');
     if (loadingScreen) {
         loadingScreen.classList.add('hidden');
         setTimeout(() => {
             loadingScreen.style.display = 'none';
-        }, 500);
+        }, CONSTANTS.STATE_SAVE_DEBOUNCE);
     }
 }
 
@@ -1637,10 +1637,10 @@ const debouncedSaveState = debounce(saveState, CONSTANTS.STATE_SAVE_DEBOUNCE);
 let saveStateTimer;
 let progressUpdateTimer;
 
-// Debounced auto-save every 30 seconds
+// Debounced auto-save using constants
 const debouncedAutoSave = debounce(() => {
     clearInterval(saveStateTimer);
-    saveStateTimer = setInterval(saveState, 30000);
+    saveStateTimer = setInterval(saveState, CONSTANTS.AUTO_SAVE_INTERVAL);
 }, 1000);
 
 // Initialize auto-save
@@ -1676,7 +1676,7 @@ function checkUnsavedChanges() {
 }
 
 // Optimized progress updates with throttling
-const throttledProgressUpdate = throttle(updateProgress, 250);
+const throttledProgressUpdate = throttle(updateProgress, CONSTANTS.PROGRESS_UPDATE_THROTTLE);
 
 function throttle(func, limit) {
     let inThrottle;
