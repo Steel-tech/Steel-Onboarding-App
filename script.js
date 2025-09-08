@@ -141,6 +141,94 @@ function getCurrentEmployee() {
     return null;
 }
 
+// Personalize the welcome section with employee information
+function personalizeWelcomeSection() {
+    const currentEmployee = getCurrentEmployee();
+    if (!currentEmployee) {
+        console.warn('No employee data found for personalization');
+        return;
+    }
+
+    // Update welcome card with employee information
+    const welcomeName = document.getElementById('employeeWelcomeName');
+    const employeePosition = document.getElementById('employeePosition');
+    const employeeStartDate = document.getElementById('employeeStartDate');
+    const employeeEmail = document.getElementById('employeeEmail');
+    const overallProgress = document.getElementById('overallProgress');
+    const miniProgressFill = document.getElementById('miniProgressFill');
+
+    if (welcomeName) {
+        welcomeName.textContent = `Welcome, ${currentEmployee.name}!`;
+    }
+
+    if (employeePosition) {
+        employeePosition.textContent = currentEmployee.position || 'New Team Member';
+    }
+
+    if (employeeStartDate) {
+        const startDate = new Date(currentEmployee.startDate);
+        employeeStartDate.textContent = startDate.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+    }
+
+    if (employeeEmail) {
+        employeeEmail.textContent = currentEmployee.email;
+    }
+
+    // Update progress display
+    const progressPercentage = Math.round(appState.progress);
+    if (overallProgress) {
+        overallProgress.textContent = `${progressPercentage}%`;
+    }
+
+    if (miniProgressFill) {
+        miniProgressFill.style.width = `${progressPercentage}%`;
+    }
+
+    // Add welcome message based on progress
+    updateWelcomeMessage(currentEmployee, progressPercentage);
+
+    console.log(`[FSW Welcome] Personalized for ${currentEmployee.name} (${progressPercentage}% complete)`);
+}
+
+function updateWelcomeMessage(employee, progress) {
+    const welcomeCard = document.getElementById('employeeWelcomeCard');
+    if (!welcomeCard) return;
+
+    // Remove any existing status message
+    const existingStatus = welcomeCard.querySelector('.welcome-status');
+    if (existingStatus) {
+        existingStatus.remove();
+    }
+
+    // Add status message based on progress
+    let statusMessage = '';
+    let statusClass = '';
+    
+    if (progress === 0) {
+        statusMessage = "Let's get started on your onboarding journey!";
+        statusClass = 'status-start';
+    } else if (progress < 50) {
+        statusMessage = "Great progress! Keep going to complete your onboarding.";
+        statusClass = 'status-progress';
+    } else if (progress < 100) {
+        statusMessage = "You're almost there! Just a few more steps to complete.";
+        statusClass = 'status-almost';
+    } else {
+        statusMessage = "🎉 Congratulations! You've completed your onboarding!";
+        statusClass = 'status-complete';
+    }
+
+    const statusElement = document.createElement('div');
+    statusElement.className = `welcome-status ${statusClass}`;
+    statusElement.innerHTML = `<p><i class="fas fa-info-circle"></i> ${statusMessage}</p>`;
+    
+    welcomeCard.appendChild(statusElement);
+}
+
 // Save state to localStorage
 function saveState() {
     try {
