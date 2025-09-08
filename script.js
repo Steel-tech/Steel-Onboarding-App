@@ -1040,175 +1040,73 @@ function closeModal() {
     modal.style.display = 'none';
 }
 
-// Video Player Controls
-function initializeVideoPlayer() {
-    const video = document.getElementById('orientationVideo');
-    const videoContainer = document.getElementById('videoContainer');
-    const videoFallback = document.getElementById('videoFallback');
-    const playPauseBtn = document.getElementById('playPauseBtn');
-    const muteBtn = document.getElementById('muteBtn');
-    const fullscreenBtn = document.getElementById('fullscreenBtn');
-    const videoProgress = document.getElementById('videoProgress');
-    const videoCompletion = document.getElementById('videoCompletion');
-    
-    if (!video) return; // Exit if video element doesn't exist
-    
-    // Handle video load errors
-    video.addEventListener('error', function(e) {
-        logger.warn('Video failed to load, showing fallback content', { error: e.message });
-        if (videoFallback && videoContainer) {
-            video.style.display = 'none';
-            videoFallback.style.display = 'block';
-            
-            // Hide video controls since video is not available
-            const videoControls = document.querySelector('.video-controls');
-            if (videoControls) {
-                videoControls.style.display = 'none';
-            }
-        }
-    });
-    
-    // Test if video can be loaded
-    video.addEventListener('loadedmetadata', function() {
-        logger.info('Video loaded successfully');
-    });
-    
-    // If video source is not found, show fallback after a timeout
-    setTimeout(() => {
-        if (video.networkState === HTMLMediaElement.NETWORK_NO_SOURCE || 
-            video.networkState === HTMLMediaElement.NETWORK_EMPTY) {
-            logger.warn('Video source not found, showing fallback');
-            if (videoFallback && videoContainer) {
-                video.style.display = 'none';
-                videoFallback.style.display = 'block';
-                
-                const videoControls = document.querySelector('.video-controls');
-                if (videoControls) {
-                    videoControls.style.display = 'none';
-                }
-            }
-        }
-    }, 2000);
-    
-    let highestProgress = 0;
-    
-    // Load saved video progress
-    const savedVideoProgress = localStorage.getItem('videoProgress') || 0;
-    highestProgress = parseFloat(savedVideoProgress);
-    updateProgressDisplay(highestProgress);
-    
-    // Play/Pause functionality
-    if (playPauseBtn) {
-        playPauseBtn.addEventListener('click', function() {
-            if (video.paused) {
-                video.play();
-                this.innerHTML = '<i class="fas fa-pause"></i> Pause';
-            } else {
-                video.pause();
-                this.innerHTML = '<i class="fas fa-play"></i> Play Video';
-            }
-        });
-    }
-    
-    // Update button state when video plays/pauses
-    video.addEventListener('play', function() {
-        if (playPauseBtn) {
-            playPauseBtn.innerHTML = '<i class="fas fa-pause"></i> Pause';
-        }
-    });
-    
-    video.addEventListener('pause', function() {
-        if (playPauseBtn) {
-            playPauseBtn.innerHTML = '<i class="fas fa-play"></i> Play Video';
-        }
-    });
-    
-    // Mute/Unmute functionality
-    if (muteBtn) {
-        muteBtn.addEventListener('click', function() {
-            if (video.muted) {
-                video.muted = false;
-                this.innerHTML = '<i class="fas fa-volume-up"></i> Mute';
-            } else {
-                video.muted = true;
-                this.innerHTML = '<i class="fas fa-volume-mute"></i> Unmute';
-            }
-        });
-    }
-    
-    // Fullscreen functionality
-    if (fullscreenBtn) {
-        fullscreenBtn.addEventListener('click', function() {
-            if (video.requestFullscreen) {
-                video.requestFullscreen();
-            } else if (video.webkitRequestFullscreen) {
-                video.webkitRequestFullscreen();
-            } else if (video.msRequestFullscreen) {
-                video.msRequestFullscreen();
-            }
-        });
-    }
-    
-    // Track video progress
-    video.addEventListener('timeupdate', function() {
-        if (video.duration) {
-            const progress = (video.currentTime / video.duration) * 100;
-            
-            // Update highest progress
-            if (progress > highestProgress) {
-                highestProgress = progress;
-                localStorage.setItem('videoProgress', highestProgress);
-                updateProgressDisplay(highestProgress);
-            }
-            
-            // Update overall app progress
-            if (!appState.completedModules.includes('orientation-video') && highestProgress > CONSTANTS.VIDEO_COMPLETION_THRESHOLD) {
-                appState.completedModules.push('orientation-video');
-                saveState();
-                updateProgress();
-            }
-        }
-    });
-    
-    // Video ended event
-    video.addEventListener('ended', function() {
-        highestProgress = 100;
-        localStorage.setItem('videoProgress', 100);
-        updateProgressDisplay(100);
-        
-        // Show completion message
-        if (videoCompletion) {
-            videoCompletion.style.display = 'block';
-        }
-        
-        // Mark as completed in app state
-        if (!appState.completedModules.includes('orientation-video')) {
-            appState.completedModules.push('orientation-video');
-            saveState();
-            updateProgress();
-        }
-        
-        showNotification('Great job! You\'ve completed the orientation video.');
-    });
-    
-    // Update progress display
-    function updateProgressDisplay(progress) {
-        if (videoProgress) {
-            videoProgress.textContent = Math.round(progress) + '%';
-        }
-        
-        // Show completion if watched
-        if (progress >= CONSTANTS.VIDEO_COMPLETION_THRESHOLD && videoCompletion) {
-            videoCompletion.style.display = 'block';
-        }
-    }
-    
+// Simple Video Completion Tracking
+function initializeSimpleVideoTracking() {
     // Check if video was previously completed
-    if (highestProgress >= CONSTANTS.VIDEO_COMPLETION_THRESHOLD) {
-        if (videoCompletion) {
-            videoCompletion.style.display = 'block';
+    const videoCompleted = appState.completedModules.includes('video');
+    const completionStatus = document.getElementById('videoCompletionStatus');
+    
+    if (videoCompleted && completionStatus) {
+        completionStatus.style.display = 'block';
+        // Update the completion button to show completed state
+        const completionBtn = document.querySelector('[data-module="video"]');
+        if (completionBtn) {
+            completionBtn.innerHTML = '<i class="fas fa-check-circle"></i> Video Completed!';
+            completionBtn.classList.add('completed');
+            completionBtn.disabled = true;
         }
     }
+
+    // Set up primary video link (you can customize this URL)
+    const primaryVideoLink = document.getElementById('primaryVideoLink');
+    if (primaryVideoLink) {
+        // Replace with your actual video URL - examples:
+        // primaryVideoLink.href = 'https://youtu.be/YOUR_VIDEO_ID';
+        // primaryVideoLink.href = 'https://vimeo.com/YOUR_VIDEO_ID';
+        // primaryVideoLink.href = 'https://your-server.com/orientation-video.mp4';
+        
+        // For now, set to the local file as fallback
+        primaryVideoLink.href = 'orientation-video.mp4';
+        
+        // Track when link is clicked
+        primaryVideoLink.addEventListener('click', function() {
+            trackAnalyticsEvent('video_link_clicked', {
+                timestamp: Date.now(),
+                url: this.href
+            });
+            
+            showNotification('Opening orientation video in new tab...');
+        });
+    }
+}
+
+// Video completion handler
+function markVideoComplete(button) {
+    // Mark module as completed
+    if (!appState.completedModules.includes('video')) {
+        appState.completedModules.push('video');
+        saveState();
+        updateProgress();
+    }
+    
+    // Update UI
+    button.innerHTML = '<i class="fas fa-check-circle"></i> Video Completed!';
+    button.classList.add('completed');
+    button.disabled = true;
+    
+    // Show completion status
+    const completionStatus = document.getElementById('videoCompletionStatus');
+    if (completionStatus) {
+        completionStatus.style.display = 'block';
+    }
+    
+    // Track completion
+    trackAnalyticsEvent('video_completed', {
+        timestamp: Date.now(),
+        method: 'manual_mark'
+    });
+    
+    showNotification('Great! Orientation video marked as completed.');
 }
 
 // Add animation styles
