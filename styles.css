@@ -1182,6 +1182,171 @@ body {
     font-size: 0.85rem;
 }
 
+/* Employee Welcome Card */
+.employee-welcome-card {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border: 1px solid #dee2e6;
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+.employee-welcome-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(90deg, var(--accent-color) 0%, var(--success-color) 100%);
+}
+
+.employee-avatar {
+    flex-shrink: 0;
+}
+
+.employee-avatar i {
+    font-size: 4rem;
+    color: var(--accent-color);
+    opacity: 0.8;
+}
+
+.employee-welcome-content {
+    flex: 1;
+}
+
+.employee-welcome-content h2 {
+    color: var(--primary-color);
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+    font-weight: 700;
+}
+
+.employee-details {
+    margin-bottom: 1.5rem;
+}
+
+.employee-details p {
+    margin-bottom: 0.5rem;
+    color: var(--dark-gray);
+    font-size: 1rem;
+}
+
+.employee-details strong {
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+.progress-overview {
+    margin-bottom: 1rem;
+}
+
+.progress-overview p {
+    margin-bottom: 0.75rem;
+    color: var(--primary-color);
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.mini-progress-bar {
+    width: 100%;
+    height: 8px;
+    background: #e1e5e9;
+    border-radius: 4px;
+    overflow: hidden;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.mini-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent-color) 0%, var(--success-color) 100%);
+    border-radius: 4px;
+    transition: width 0.5s ease;
+    position: relative;
+}
+
+.mini-progress-fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.3) 50%, transparent 100%);
+    animation: progressShimmer 2s infinite;
+}
+
+@keyframes progressShimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+.welcome-status {
+    margin-top: 1rem;
+    padding: 1rem;
+    border-radius: 8px;
+    border-left: 4px solid;
+}
+
+.welcome-status p {
+    margin: 0;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.welcome-status.status-start {
+    background: #e3f2fd;
+    border-left-color: var(--accent-color);
+    color: var(--primary-color);
+}
+
+.welcome-status.status-progress {
+    background: #fff3e0;
+    border-left-color: var(--warning-color);
+    color: #e65100;
+}
+
+.welcome-status.status-almost {
+    background: #f3e5f5;
+    border-left-color: #9c27b0;
+    color: #6a1b9a;
+}
+
+.welcome-status.status-complete {
+    background: #e8f5e8;
+    border-left-color: var(--success-color);
+    color: #2e7d32;
+}
+
+/* Mobile responsive for employee welcome card */
+@media (max-width: 768px) {
+    .employee-welcome-card {
+        flex-direction: column;
+        text-align: center;
+        padding: 1.5rem;
+    }
+
+    .employee-avatar i {
+        font-size: 3rem;
+    }
+
+    .employee-welcome-content h2 {
+        font-size: 1.5rem;
+    }
+
+    .employee-details {
+        text-align: left;
+    }
+}
+
 .schedule-list {
     list-style: none;
     padding: 0;
