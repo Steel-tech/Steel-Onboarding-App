@@ -135,18 +135,23 @@ class AuthManager {
             </div>
         `;
         
+        console.log('🔐 AuthManager: Appending modal to document.body');
         document.body.appendChild(loginModal);
         
+        console.log('🔐 AuthManager: Modal appended, adding form handler');
         // Add login form handler
         document.getElementById('loginForm').addEventListener('submit', (e) => {
             e.preventDefault();
             this.handleLogin(e.target);
         });
         
+        console.log('🔐 AuthManager: Form handler added, setting focus');
         // Focus on username field
         setTimeout(() => {
             document.getElementById('username').focus();
         }, AUTH_CONSTANTS.USERNAME_FOCUS_DELAY);
+        
+        console.log('🔐 AuthManager: Login modal setup complete');
     }
     
     handleLogin(form) {
