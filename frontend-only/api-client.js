@@ -168,6 +168,13 @@ class APIClient {
     
     // Form submission methods
     async submitForm(formType, formData, digitalSignature = null) {
+        if (this.clientSideMode) {
+            // Client-side mode: Store directly in localStorage
+            this.storeOfflineData('formSubmission', { formType, formData, digitalSignature });
+            console.log('Form stored locally (client-side mode):', formType);
+            return true; // Return success for client-side operation
+        }
+        
         try {
             const response = await this.request('/forms/submit', {
                 method: 'POST',
