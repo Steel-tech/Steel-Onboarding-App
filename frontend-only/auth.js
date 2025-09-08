@@ -29,6 +29,16 @@ class AuthManager {
                 password: this.hashPassword('hr2025!'), 
                 role: 'hr',
                 name: 'HR Administrator'
+            },
+            'victor@fsw-denver.com': {
+                password: this.hashPassword('admin2025!'),
+                role: 'admin',
+                name: 'Victor Garcia - Owner'
+            },
+            'admin': {
+                password: this.hashPassword('admin2025!'),
+                role: 'admin', 
+                name: 'Administrator'
             }
         };
         
