@@ -58,7 +58,6 @@ out/
 .vim/
 
 # Emacs
-*~
 \#*\#
 .\#*
 .emacs.desktop
