@@ -143,7 +143,23 @@ function getCurrentEmployee() {
 // Save state to localStorage
 function saveState() {
     try {
-        localStorage.setItem('onboardingAppState', JSON.stringify(appState));
+        // Get current employee session
+        const currentUser = getCurrentEmployee();
+        if (!currentUser) {
+            console.warn('No employee session found, cannot save state');
+            return;
+        }
+
+        // Save employee-specific state
+        const stateKey = `fsw_onboarding_${currentUser.email}`;
+        const stateToSave = {
+            ...appState,
+            lastSaved: Date.now()
+        };
+        
+        localStorage.setItem(stateKey, JSON.stringify(stateToSave));
+        console.log(`[FSW State] Progress saved for ${currentUser.name}`);
+        
     } catch (error) {
         console.error('Failed to save state to localStorage:', error);
         // Show user notification if save fails
