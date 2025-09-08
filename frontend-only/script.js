@@ -1631,7 +1631,7 @@ function handleNetworkError(error, context) {
 }
 
 // Optimized save state with debouncing
-const debouncedSaveState = debounce(saveState, 500);
+const debouncedSaveState = debounce(saveState, CONSTANTS.STATE_SAVE_DEBOUNCE);
 
 // Performance optimizations
 let saveStateTimer;
