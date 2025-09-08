@@ -65,8 +65,8 @@ class AuthManager {
         loginModal.innerHTML = `
             <div class="auth-modal-content">
                 <div class="auth-header">
-                    <img src="flawless-steel-logo-transparent.png" alt="Flawless Steel Welding" class="auth-logo">
-                    <h2>Employee Onboarding Portal</h2>
+                    <h2>🏭 Flawless Steel Welding</h2>
+                    <h3>Employee Onboarding Portal</h3>
                     <p>Please authenticate to access your onboarding materials</p>
                 </div>
                 
