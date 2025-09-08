@@ -1,11 +1,21 @@
 // Authentication System for Steel Onboarding App
 // Simple but secure authentication for production use
 
+// Auth constants
+const AUTH_CONSTANTS = {
+    SESSION_TIMEOUT: 30 * 60 * 1000, // 30 minutes
+    MAX_LOGIN_ATTEMPTS: 5,
+    LOCKOUT_DURATION: 15 * 60 * 1000, // 15 minutes
+    USERNAME_FOCUS_DELAY: 100,
+    SESSION_CHECK_INTERVAL: 60000, // 1 minute
+    HASH_BIT_MASK: 32
+};
+
 class AuthManager {
     constructor() {
-        this.sessionTimeout = 30 * 60 * 1000; // 30 minutes
-        this.maxLoginAttempts = 5;
-        this.lockoutDuration = 15 * 60 * 1000; // 15 minutes
+        this.sessionTimeout = AUTH_CONSTANTS.SESSION_TIMEOUT;
+        this.maxLoginAttempts = AUTH_CONSTANTS.MAX_LOGIN_ATTEMPTS;
+        this.lockoutDuration = AUTH_CONSTANTS.LOCKOUT_DURATION;
         
         // In production, these would come from environment variables
         this.credentials = {
