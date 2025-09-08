@@ -110,9 +110,11 @@ class AuthManager {
                     </button>
                     
                     <div class="auth-footer">
-                        <p><strong>Default Credentials:</strong></p>
+                        <p><strong>Available Accounts:</strong></p>
                         <p>Employee: <code>employee</code> / <code>fsw2025!</code></p>
                         <p>HR Admin: <code>hr</code> / <code>hr2025!</code></p>
+                        <p>Owner: <code>victor@fsw-denver.com</code> / <code>admin2025!</code></p>
+                        <p>Admin: <code>admin</code> / <code>admin2025!</code></p>
                         <small>Contact HR at (720) 638-7289 for assistance</small>
                     </div>
                 </form>
