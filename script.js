@@ -72,30 +72,72 @@ document.addEventListener('DOMContentLoaded', function() {
 // Load saved state from localStorage
 function loadState() {
     try {
-        const savedState = localStorage.getItem('onboardingAppState');
+        // Get current employee session
+        const currentUser = getCurrentEmployee();
+        if (!currentUser) {
+            console.warn('No employee session found, using default state');
+            return;
+        }
+
+        // Load employee-specific state
+        const stateKey = `fsw_onboarding_${currentUser.email}`;
+        const savedState = localStorage.getItem(stateKey);
+        
         if (savedState) {
             const parsedState = JSON.parse(savedState);
             // Validate the loaded state structure
             if (parsedState && typeof parsedState === 'object') {
                 appState = {
                     ...appState, // Keep defaults
-                    ...parsedState // Override with saved data
+                    ...parsedState, // Override with saved data
+                    employeeData: currentUser // Always use current session employee data
                 };
                 restoreCheckboxStates();
                 setTimeout(markDownloadedDocuments, 100);
+                console.log(`[FSW State] Loaded progress for ${currentUser.name}`);
             }
+        } else {
+            // First time for this employee - set up fresh state with their info
+            appState.employeeData = currentUser;
+            console.log(`[FSW State] Fresh start for ${currentUser.name}`);
         }
     } catch (error) {
         console.error('Failed to load saved state:', error);
         // Reset to default state if loading fails
+        const currentUser = getCurrentEmployee();
         appState = {
             currentTab: 'welcome',
             progress: 0,
             completedModules: [],
-            employeeData: {},
-            checklistItems: {}
+            employeeData: currentUser || {},
+            checklistItems: {},
+            procedureAcknowledgments: {},
+            formCompletions: {},
+            digitalSignatures: {},
+            analytics: {
+                sessionStart: Date.now(),
+                timeSpentPerTab: {},
+                totalTimeSpent: 0,
+                completionTimes: {},
+                interactions: [],
+                lastActivity: Date.now()
+            }
         };
     }
+}
+
+function getCurrentEmployee() {
+    // Get current employee from session
+    const sessionData = sessionStorage.getItem('fsw_user_session');
+    if (sessionData) {
+        try {
+            return JSON.parse(sessionData);
+        } catch (e) {
+            console.error('Invalid session data');
+            return null;
+        }
+    }
+    return null;
 }
 
 // Save state to localStorage
