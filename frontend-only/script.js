@@ -1,3 +1,34 @@
+// Constants for magic numbers
+const CONSTANTS = {
+    LOADING_DELAY: 1500,
+    SESSION_TIMEOUT: 30 * 60 * 1000, // 30 minutes
+    AUTO_SAVE_INTERVAL: 30000,
+    NOTIFICATION_DISMISS_TIME: 3000,
+    ERROR_NOTIFICATION_DISMISS_TIME: 5000,
+    VIDEO_COMPLETION_THRESHOLD: 90,
+    INTERACTION_LOG_LIMIT: 100,
+    TOTAL_SAFETY_MODULES: 4,
+    INACTIVITY_TIMEOUT: 300000, // 5 minutes
+    PROGRESS_UPDATE_THROTTLE: 250,
+    STATE_SAVE_DEBOUNCE: 500,
+    SIGNATURE_LINE_WIDTH: 2,
+    MAX_LOGS: 500,
+    SESSION_CHECK_INTERVAL: 60000 // 1 minute
+};
+
+// DOM element cache
+const DOM_CACHE = {
+    progressBar: null,
+    progressText: null,
+    loadingScreen: null,
+    // Initialize cache after DOM is ready
+    init() {
+        this.progressBar = document.getElementById('progressBar');
+        this.progressText = document.getElementById('progressText');
+        this.loadingScreen = document.getElementById('loadingScreen');
+    }
+};
+
 // State Management
 let appState = {
     currentTab: 'welcome',
