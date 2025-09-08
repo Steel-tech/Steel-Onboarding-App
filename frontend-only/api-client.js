@@ -113,6 +113,14 @@ class APIClient {
     
     // Employee data methods
     async saveEmployeeData(employeeData) {
+        if (this.clientSideMode) {
+            // Client-side mode: Store directly in localStorage
+            this.storeOfflineData('employeeData', employeeData);
+            const employeeId = 'local-' + Date.now(); // Generate local ID
+            console.log('Employee data stored locally:', employeeId);
+            return employeeId;
+        }
+        
         try {
             const response = await this.request('/employee/data', {
                 method: 'POST',
