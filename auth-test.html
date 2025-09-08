@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Authentication Test - Steel Onboarding</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #e74c3c;
+            --accent-color: #3498db;
+            --success-color: #2ecc71;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+            --dark-gray: #34495e;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+        
+        .test-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .status {
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        
+        .status.success { background: #d4edda; color: #155724; }
+        .status.error { background: #f8d7da; color: #721c24; }
+        .status.info { background: #d1ecf1; color: #0c5460; }
+        
+        button {
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 0.5rem;
+        }
+        
+        button:hover {
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🔐 Authentication System Test</h1>
+        
+        <div id="status" class="status info">
+            Initializing authentication test...
+        </div>
+        
+        <div class="test-info">
+            <h3>Expected Behavior:</h3>
+            <ul>
+                <li>This page should automatically show a login modal</li>
+                <li>You should be able to login with: <code>victor@fsw-denver.com</code> / <code>admin2025!</code></li>
+                <li>After login, you should see "Authentication successful" message</li>
+            </ul>
+        </div>
+        
+        <div class="debug-controls">
+            <h3>Debug Controls:</h3>
+            <button onclick="testAuth()">Test Auth System</button>
+            <button onclick="clearStorage()">Clear Storage</button>
+            <button onclick="showConsoleInfo()">Show Console Info</button>
+            <button onclick="forceLogin()">Force Login Modal</button>
+        </div>
+        
+        <div id="debugInfo" style="margin-top: 2rem;">
+            <h3>Debug Information:</h3>
+            <pre id="debugOutput">Waiting for auth system to load...</pre>
+        </div>
+    </div>
+
+    <script>
+        // Debug functions
+        function updateStatus(message, type = 'info') {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.className = 'status ' + type;
+            console.log('🔧 TEST:', message);
+        }
+        
+        function updateDebugOutput() {
+            const output = document.getElementById('debugOutput');
+            const info = {
+                'AuthManager exists': typeof window.authManager !== 'undefined',
+                'Session data': localStorage.getItem('fswSession'),
+                'Login attempts': localStorage.getItem('loginAttempts'),
+                'Document ready state': document.readyState,
+                'Auth script loaded': document.querySelector('script[src="auth.js"]') !== null
+            };
+            
+            output.textContent = JSON.stringify(info, null, 2);
+        }
+        
+        function testAuth() {
+            updateStatus('Testing authentication system...', 'info');
+            updateDebugOutput();
+            
+            if (typeof window.authManager === 'undefined') {
+                updateStatus('❌ AuthManager not loaded!', 'error');
+                return;
+            }
+            
+            const currentUser = window.authManager.getCurrentUser();
+            if (currentUser) {
+                updateStatus(`✅ User authenticated: ${currentUser.name} (${currentUser.role})`, 'success');
+            } else {
+                updateStatus('🔑 No authenticated user - login modal should appear', 'info');
+            }
+        }
+        
+        function clearStorage() {
+            localStorage.clear();
+            sessionStorage.clear();
+            updateStatus('Storage cleared - page will reload', 'info');
+            setTimeout(() => window.location.reload(), 1000);
+        }
+        
+        function showConsoleInfo() {
+            console.log('=== AUTH SYSTEM DEBUG INFO ===');
+            console.log('AuthManager:', window.authManager);
+            console.log('Session:', localStorage.getItem('fswSession'));
+            console.log('Login attempts:', localStorage.getItem('loginAttempts'));
+            updateStatus('Debug info logged to console', 'info');
+        }
+        
+        function forceLogin() {
+            if (typeof window.authManager !== 'undefined') {
+                localStorage.removeItem('fswSession');
+                window.authManager.showLoginModal();
+                updateStatus('Login modal forced to appear', 'info');
+            } else {
+                updateStatus('❌ AuthManager not available', 'error');
+            }
+        }
+        
+        // Initialize test when page loads
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                testAuth();
+                
+                // Check if login was successful
+                const checkAuth = setInterval(() => {
+                    if (typeof window.authManager !== 'undefined') {
+                        const user = window.authManager.getCurrentUser();
+                        if (user) {
+                            updateStatus(`🎉 Authentication successful! Welcome ${user.name}`, 'success');
+                            clearInterval(checkAuth);
+                        }
+                    }
+                }, 1000);
+            }, 2000);
+        });
+        
+        // Update debug info every 2 seconds
+        setInterval(updateDebugOutput, 2000);
+    </script>
+    
+    <!-- Load the authentication system -->
+    <script src="auth.js"></script>
+</body>
+</html>
