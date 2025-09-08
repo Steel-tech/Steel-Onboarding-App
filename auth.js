@@ -43,6 +43,7 @@ class AuthManager {
             }
         };
         
+        console.log('🔐 AuthManager: Credentials loaded, calling initializeAuth()');
         this.initializeAuth();
     }
     
