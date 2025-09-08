@@ -1,0 +1,50 @@
+# Files to exclude from Vercel deployment
+
+# Large media files
+orientation-video.mp4
+*.mp4
+*.avi
+*.mov
+*.wmv
+
+# Development files
+node_modules/
+.git/
+.env
+.env.local
+memories.json
+
+# Database files (will use environment variables for production)
+onboarding.db
+*.db
+*.sqlite
+*.sqlite3
+
+# Backup files
+backups/
+*.backup
+*.bak
+
+# Log files
+*.log
+logs/
+
+# IDE files
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Documentation (optional - remove if you want docs deployed)
+*.md
+!README.md
+
+# Test files
+test-*
+*test*
+
+# Build artifacts
+dist/
+build/

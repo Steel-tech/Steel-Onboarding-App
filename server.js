@@ -8,7 +8,8 @@ const rateLimit = require('express-rate-limit');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
-const sqlite3 = require('sqlite3').verbose();
+// PostgreSQL database module
+const Database = require('./database');
 const path = require('path');
 const fs = require('fs').promises;
 const crypto = require('crypto');
@@ -34,7 +35,7 @@ const PORT = process.env.PORT || 3001;
 // Environment configuration
 const config = {
     JWT_SECRET: process.env.JWT_SECRET || crypto.randomBytes(64).toString('hex'),
-    DB_PATH: process.env.DB_PATH || path.join(__dirname, 'onboarding.db'),
+    DATABASE_URL: process.env.DATABASE_URL,
     EMAIL_HOST: process.env.EMAIL_HOST || 'smtp.gmail.com',
     EMAIL_PORT: process.env.EMAIL_PORT || 587,
     EMAIL_USER: process.env.EMAIL_USER || '',
@@ -102,143 +103,29 @@ app.use(express.static(path.join(__dirname), {
     }
 }));
 
-// Database setup
-class Database {
-    constructor() {
-        this.db = null;
-    }
-    
-    async init() {
-        try {
-            this.db = new sqlite3.Database(config.DB_PATH);
-            await this.createTables();
-            console.log('✅ Database initialized successfully');
-        } catch (error) {
-            console.error('❌ Database initialization failed:', error);
-            throw error;
-        }
-    }
-    
-    createTables() {
-        return new Promise((resolve, reject) => {
-            const tables = `
-                CREATE TABLE IF NOT EXISTS users (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    username TEXT UNIQUE NOT NULL,
-                    password_hash TEXT NOT NULL,
-                    role TEXT NOT NULL DEFAULT 'employee',
-                    name TEXT NOT NULL,
-                    email TEXT,
-                    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-                    last_login DATETIME,
-                    is_active BOOLEAN DEFAULT 1
-                );
-                
-                CREATE TABLE IF NOT EXISTS employee_data (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    user_id INTEGER NOT NULL,
-                    employee_id TEXT UNIQUE,
-                    name TEXT NOT NULL,
-                    email TEXT NOT NULL,
-                    phone TEXT,
-                    position TEXT NOT NULL,
-                    start_date DATE NOT NULL,
-                    supervisor TEXT,
-                    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-                    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-                    FOREIGN KEY (user_id) REFERENCES users (id)
-                );
-                
-                CREATE TABLE IF NOT EXISTS onboarding_progress (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    user_id INTEGER NOT NULL,
-                    employee_id TEXT NOT NULL,
-                    module_name TEXT NOT NULL,
-                    completed_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-                    progress_data TEXT, -- JSON blob for additional data
-                    FOREIGN KEY (user_id) REFERENCES users (id),
-                    UNIQUE(user_id, module_name)
-                );
-                
-                CREATE TABLE IF NOT EXISTS form_submissions (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    user_id INTEGER NOT NULL,
-                    employee_id TEXT NOT NULL,
-                    form_type TEXT NOT NULL,
-                    form_data TEXT NOT NULL, -- JSON blob
-                    digital_signature TEXT, -- Base64 signature data
-                    submitted_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-                    ip_address TEXT,
-                    user_agent TEXT,
-                    FOREIGN KEY (user_id) REFERENCES users (id),
-                    UNIQUE(user_id, form_type)
-                );
-                
-                CREATE TABLE IF NOT EXISTS audit_logs (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    user_id INTEGER,
-                    employee_id TEXT,
-                    action TEXT NOT NULL,
-                    details TEXT, -- JSON blob
-                    ip_address TEXT,
-                    user_agent TEXT,
-                    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-                    FOREIGN KEY (user_id) REFERENCES users (id)
-                );
-                
-                CREATE TABLE IF NOT EXISTS hr_notifications (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    user_id INTEGER NOT NULL,
-                    employee_id TEXT NOT NULL,
-                    notification_type TEXT NOT NULL,
-                    message TEXT NOT NULL,
-                    sent_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-                    email_sent BOOLEAN DEFAULT 0,
-                    FOREIGN KEY (user_id) REFERENCES users (id)
-                );
-            `;
-            
-            this.db.exec(tables, (err) => {
-                if (err) reject(err);
-                else resolve();
-            });
-        });
-    }
-    
-    run(query, params = []) {
-        return new Promise((resolve, reject) => {
-            this.db.run(query, params, function(err) {
-                if (err) reject(err);
-                else resolve({ id: this.lastID, changes: this.changes });
-            });
-        });
-    }
-    
-    get(query, params = []) {
-        return new Promise((resolve, reject) => {
-            this.db.get(query, params, (err, row) => {
-                if (err) reject(err);
-                else resolve(row);
-            });
-        });
-    }
-    
-    all(query, params = []) {
-        return new Promise((resolve, reject) => {
-            this.db.all(query, params, (err, rows) => {
-                if (err) reject(err);
-                else resolve(rows);
-            });
-        });
-    }
-}
+// Database setup - PostgreSQL initialization
 
-// Initialize database
-const database = new Database();
-database.init().catch(error => {
-    console.error('Failed to initialize database:', error);
-    process.exit(1);
-});
+// Initialize database (lazy initialization)
+let database = null;
+let databaseInitPromise = null;
+
+const getDatabaseConnection = async () => {
+    if (database) {
+        return database;
+    }
+    
+    if (!databaseInitPromise) {
+        databaseInitPromise = (async () => {
+            console.log('🔄 Initializing database connection...');
+            const db = new Database();
+            await db.init();
+            database = db;
+            return db;
+        })();
+    }
+    
+    return databaseInitPromise;
+};
 
 // Email service
 class EmailService {
@@ -378,8 +265,9 @@ const authenticateToken = (req, res, next) => {
 // Audit logging
 const logActivity = async (userId, employeeId, action, details, req) => {
     try {
-        await database.run(
-            'INSERT INTO audit_logs (user_id, employee_id, action, details, ip_address, user_agent) VALUES (?, ?, ?, ?, ?, ?)',
+        const db = await getDatabaseConnection();
+        await db.run(
+            'INSERT INTO audit_logs (user_id, employee_id, action, details, ip_address, user_agent) VALUES ($1, $2, $3, $4, $5, $6)',
             [userId, employeeId, action, JSON.stringify(details), req.ip, req.headers['user-agent']]
         );
     } catch (error) {
@@ -404,7 +292,7 @@ app.post('/api/auth/login',
         
         // Get user from database
         const user = await database.get(
-            'SELECT * FROM users WHERE username = ? AND is_active = 1',
+            'SELECT * FROM users WHERE username = $1 AND is_active = TRUE',
             [username.toLowerCase()]
         );
         
@@ -422,7 +310,7 @@ app.post('/api/auth/login',
         
         // Update last login
         await database.run(
-            'UPDATE users SET last_login = CURRENT_TIMESTAMP WHERE id = ?',
+            'UPDATE users SET last_login = CURRENT_TIMESTAMP WHERE id = $1',
             [user.id]
         );
         
@@ -476,9 +364,18 @@ app.post('/api/employee/data',
         
         // Insert or update employee data
         await database.run(
-            `INSERT OR REPLACE INTO employee_data 
+            `INSERT INTO employee_data 
              (user_id, employee_id, name, email, phone, position, start_date, supervisor, updated_at) 
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)`,
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, CURRENT_TIMESTAMP)
+             ON CONFLICT (employee_id) DO UPDATE SET
+                user_id = EXCLUDED.user_id,
+                name = EXCLUDED.name,
+                email = EXCLUDED.email,
+                phone = EXCLUDED.phone,
+                position = EXCLUDED.position,
+                start_date = EXCLUDED.start_date,
+                supervisor = EXCLUDED.supervisor,
+                updated_at = CURRENT_TIMESTAMP`,
             [req.user.id, employeeId, name, email, phone, position, start_date, supervisor]
         );
         
@@ -514,7 +411,7 @@ app.post('/api/progress/module',
         
         // Get employee data
         const employee = await database.get(
-            'SELECT employee_id, name, position FROM employee_data WHERE user_id = ?',
+            'SELECT employee_id, name, position FROM employee_data WHERE user_id = $1',
             [req.user.id]
         );
         
@@ -524,9 +421,12 @@ app.post('/api/progress/module',
         
         // Record module completion
         await database.run(
-            `INSERT OR REPLACE INTO onboarding_progress 
+            `INSERT INTO onboarding_progress 
              (user_id, employee_id, module_name, progress_data) 
-             VALUES (?, ?, ?, ?)`,
+             VALUES ($1, $2, $3, $4)
+             ON CONFLICT (user_id, module_name) DO UPDATE SET
+                progress_data = EXCLUDED.progress_data,
+                completed_at = CURRENT_TIMESTAMP`,
             [req.user.id, employee.employee_id, moduleName, JSON.stringify(progressData || {})]
         );
         
@@ -563,7 +463,7 @@ app.post('/api/forms/submit',
         
         // Get employee data
         const employee = await database.get(
-            'SELECT employee_id, name, position FROM employee_data WHERE user_id = ?',
+            'SELECT employee_id, name, position FROM employee_data WHERE user_id = $1',
             [req.user.id]
         );
         
@@ -573,9 +473,15 @@ app.post('/api/forms/submit',
         
         // Save form submission
         await database.run(
-            `INSERT OR REPLACE INTO form_submissions 
+            `INSERT INTO form_submissions 
              (user_id, employee_id, form_type, form_data, digital_signature, ip_address, user_agent) 
-             VALUES (?, ?, ?, ?, ?, ?, ?)`,
+             VALUES ($1, $2, $3, $4, $5, $6, $7)
+             ON CONFLICT (user_id, form_type) DO UPDATE SET
+                form_data = EXCLUDED.form_data,
+                digital_signature = EXCLUDED.digital_signature,
+                submitted_at = CURRENT_TIMESTAMP,
+                ip_address = EXCLUDED.ip_address,
+                user_agent = EXCLUDED.user_agent`,
             [
                 req.user.id, 
                 employee.employee_id, 
@@ -684,7 +590,7 @@ app.get('/api/backup/export', authenticateToken, async (req, res) => {
             employees: await database.all('SELECT * FROM employee_data'),
             progress: await database.all('SELECT * FROM onboarding_progress'),
             forms: await database.all('SELECT * FROM form_submissions'),
-            audit_logs: await database.all('SELECT * FROM audit_logs WHERE created_at >= date("now", "-30 days")')
+            audit_logs: await database.all('SELECT * FROM audit_logs WHERE created_at >= CURRENT_DATE - INTERVAL \'30 days\'')
         };
         
         await logActivity(req.user.id, null, 'DATA_EXPORTED', { recordCount: exportData.employees.length }, req);
@@ -700,24 +606,42 @@ app.get('/api/backup/export', authenticateToken, async (req, res) => {
 });
 
 // Health check endpoint
-app.get('/api/health', (req, res) => {
-    res.json({ 
-        status: 'healthy', 
-        timestamp: new Date().toISOString(),
-        uptime: process.uptime()
-    });
+app.get('/api/health', async (req, res) => {
+    try {
+        // Try to get database connection (but don't fail if it's not available)
+        let dbStatus = 'unknown';
+        try {
+            const db = await getDatabaseConnection();
+            dbStatus = 'connected';
+        } catch (error) {
+            dbStatus = 'disconnected';
+        }
+        
+        res.json({ 
+            status: 'healthy', 
+            database: dbStatus,
+            timestamp: new Date().toISOString(),
+            uptime: process.uptime()
+        });
+    } catch (error) {
+        res.status(500).json({
+            status: 'unhealthy',
+            error: error.message,
+            timestamp: new Date().toISOString()
+        });
+    }
 });
 
 // Initialize default admin user
 const initializeDefaultUsers = async () => {
     try {
-        const existingUser = await database.get('SELECT id FROM users WHERE username = ?', ['admin']);
+        const existingUser = await database.get('SELECT id FROM users WHERE username = $1', ['admin']);
         
         if (!existingUser) {
             const hashedPassword = await bcrypt.hash('admin2025!', config.BCRYPT_ROUNDS);
             
             await database.run(
-                'INSERT INTO users (username, password_hash, role, name) VALUES (?, ?, ?, ?)',
+                'INSERT INTO users (username, password_hash, role, name) VALUES ($1, $2, $3, $4)',
                 ['admin', hashedPassword, 'hr', 'HR Administrator']
             );
             
@@ -732,7 +656,7 @@ const initializeDefaultUsers = async () => {
 app.listen(PORT, async () => {
     console.log(`\n🚀 Steel Onboarding Server running on port ${PORT}`);
     console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
-    console.log(`🗄️  Database: ${config.DB_PATH}`);
+    console.log(`🗄️  Database: PostgreSQL (${config.DATABASE_URL ? 'Connected' : 'Not configured'})`);
     console.log(`📧 Email service: ${config.EMAIL_USER ? 'Configured' : 'Not configured'}`);
     
     // Initialize default users
@@ -744,10 +668,10 @@ app.listen(PORT, async () => {
 });
 
 // Graceful shutdown
-process.on('SIGTERM', () => {
+process.on('SIGTERM', async () => {
     console.log('SIGTERM received, shutting down gracefully');
-    if (database.db) {
-        database.db.close();
+    if (database) {
+        await database.close();
     }
     process.exit(0);
 });

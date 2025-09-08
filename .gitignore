@@ -175,3 +175,4 @@ core
 *-local.*
 *.local
 .tmp/
+.vercel
