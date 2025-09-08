@@ -48,15 +48,23 @@ class AuthManager {
     }
     
     initializeAuth() {
+        console.log('🔐 AuthManager: initializeAuth() called');
         // Check if user is already authenticated
-        if (!this.isAuthenticated()) {
+        const isAuth = this.isAuthenticated();
+        console.log('🔐 AuthManager: isAuthenticated() returned:', isAuth);
+        
+        if (!isAuth) {
+            console.log('🔐 AuthManager: User not authenticated, showing login modal');
             this.showLoginModal();
         } else {
+            console.log('🔐 AuthManager: User already authenticated, checking session');
             // Check if session is still valid
             if (this.isSessionExpired()) {
+                console.log('🔐 AuthManager: Session expired, logging out');
                 this.logout();
                 return;
             }
+            console.log('🔐 AuthManager: Session valid, updating activity and starting monitoring');
             // Update last activity
             this.updateLastActivity();
             // Start session monitoring
