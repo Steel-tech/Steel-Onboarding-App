@@ -1552,7 +1552,7 @@ const YOUTUBE_CONFIG = {
     // Replace this with your actual YouTube video ID
     // Example: if your YouTube URL is https://www.youtube.com/watch?v=ABC123DEF45
     // Then your VIDEO_ID should be: ABC123DEF45
-    VIDEO_ID: 'YOUR_VIDEO_ID_HERE', // UPDATE THIS AFTER YOUTUBE UPLOAD
+    VIDEO_ID: 'iYN_kTnYWR4', // Flawless Steel Welding Orientation Video
     
     // YouTube API configuration
     PLAYER_VARS: {
