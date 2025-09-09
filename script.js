@@ -100,6 +100,10 @@ document.addEventListener('DOMContentLoaded', function() {
             initializePerformanceOptimizations();
             initializeAnalytics();
             
+            // Initialize prerequisite checks
+            updateDocumentsAccess();
+            updateCompletionButtons();
+            
             trackAnalyticsEvent('app_initialized');
         }, 500);
     });
