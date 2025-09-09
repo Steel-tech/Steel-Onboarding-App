@@ -49,26 +49,37 @@ let appState = {
     }
 };
 
-// Initialize app with loading screen
+// Initialize app - wait for authentication
 document.addEventListener('DOMContentLoaded', function() {
     showLoadingScreen();
     
-    // Simulate loading time for better UX
-    setTimeout(() => {
-        DOM_CACHE.init();
-        loadState();
-        initializeEventListeners();
-        initializeSimpleVideoTracking();
-        updateProgress();
-        personalizeWelcomeSection();
-        showTab(appState.currentTab);
-        initializePerformanceOptimizations();
-        initializeAnalytics();
-        hideLoadingScreen();
+    // Wait for authentication to be ready
+    window.addEventListener('authReady', function(event) {
+        const user = event.detail.user;
+        console.log('[FSW App] Authentication ready, initializing app for:', user.name);
         
-        trackAnalyticsEvent('app_initialized');
-    }, CONSTANTS.LOADING_DELAY);
+        // Initialize app with authenticated user
+        setTimeout(() => {
+            DOM_CACHE.init();
+            loadState();
+            initializeEventListeners();
+            initializeSimpleVideoTracking();
+            updateProgress();
+            personalizeWelcomeSection();
+            showTab(appState.currentTab);
+            initializePerformanceOptimizations();
+            initializeAnalytics();
+            
+            trackAnalyticsEvent('app_initialized');
+        }, 500); // Shorter delay since auth is already complete
+    });
 });
+
+// Global app initialization function (called by auth system)
+function initializeApp(user) {
+    console.log('[FSW App] App initialization requested for:', user.name);
+    // This triggers the authReady event handled above
+}
 
 // Load saved state from localStorage
 function loadState() {
@@ -128,7 +139,12 @@ function loadState() {
 }
 
 function getCurrentEmployee() {
-    // Get current employee from session
+    // Get current employee from auth manager
+    if (window.authManager && window.authManager.getCurrentUser) {
+        return window.authManager.getCurrentUser();
+    }
+    
+    // Fallback: try session storage (for backwards compatibility)
     const sessionData = sessionStorage.getItem('fsw_user_session');
     if (sessionData) {
         try {
