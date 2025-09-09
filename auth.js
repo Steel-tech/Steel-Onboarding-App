@@ -438,7 +438,6 @@ class SupabaseAuthManager {
         const authModal = document.getElementById('authModal');
         if (authModal) {
             authModal.remove();
-            document.body.style.overflow = 'auto';
         }
     }
     
