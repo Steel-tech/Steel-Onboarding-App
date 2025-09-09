@@ -298,7 +298,7 @@ class SupabaseAuthManager {
             loginBtn.disabled = true;
             
             // Sign in with Supabase
-            const { user, session } = await authHelpers.signIn(email, password);
+            const { user, session } = await window.authHelpers.signIn(email, password);
             
             console.log('[FSW Auth] Login successful for:', email);
             
