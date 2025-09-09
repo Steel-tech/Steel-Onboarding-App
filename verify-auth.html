@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auth System Verification</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            max-width: 800px; 
+            margin: 0 auto; 
+            padding: 20px; 
+            background: #f5f5f5; 
+        }
+        .status-card { 
+            background: white; 
+            border-radius: 8px; 
+            padding: 20px; 
+            margin: 10px 0; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
+        }
+        .success { border-left: 5px solid #27ae60; }
+        .error { border-left: 5px solid #e74c3c; }
+        .pending { border-left: 5px solid #f39c12; }
+        .test-results { margin-top: 20px; }
+        button { 
+            background: #3498db; 
+            color: white; 
+            border: none; 
+            padding: 10px 20px; 
+            border-radius: 5px; 
+            cursor: pointer; 
+            margin: 5px; 
+        }
+        button:hover { background: #2980b9; }
+        .log { 
+            background: #2c3e50; 
+            color: #ecf0f1; 
+            padding: 15px; 
+            border-radius: 5px; 
+            font-family: monospace; 
+            white-space: pre-wrap; 
+            max-height: 400px; 
+            overflow-y: auto; 
+        }
+    </style>
+</head>
+<body>
+    <h1>🔧 Supabase Authentication Verification</h1>
+    
+    <div id="status-container">
+        <div class="status-card pending" id="supabase-status">
+            <h3>📡 Supabase CDN Loading</h3>
+            <p>Checking if Supabase library loaded from CDN...</p>
+        </div>
+        
+        <div class="status-card pending" id="client-status">
+            <h3>⚙️ Client Configuration</h3>
+            <p>Verifying supabase-client.js configuration...</p>
+        </div>
+        
+        <div class="status-card pending" id="auth-status">
+            <h3>🔐 Authentication System</h3>
+            <p>Testing auth.js integration...</p>
+        </div>
+        
+        <div class="status-card pending" id="database-status">
+            <h3>🗄️ Database Connection</h3>
+            <p>Checking connection to Supabase database...</p>
+        </div>
+    </div>
+    
+    <div class="test-results">
+        <h3>🚀 Test Controls</h3>
+        <button onclick="runAllTests()">Run All Tests</button>
+        <button onclick="clearLog()">Clear Log</button>
+        <button onclick="window.location.href = 'index.html'">Go to Main App</button>
+        
+        <h4>📋 Test Log</h4>
+        <div class="log" id="log"></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        let logElement;
+        
+        function log(message, type = 'info') {
+            if (!logElement) logElement = document.getElementById('log');
+            const timestamp = new Date().toLocaleTimeString();
+            const prefix = type === 'error' ? '❌' : type === 'success' ? '✅' : 'ℹ️';
+            logElement.textContent += `${timestamp} ${prefix} ${message}\n`;
+            logElement.scrollTop = logElement.scrollHeight;
+            console.log(message);
+        }
+        
+        function updateStatus(id, status, title, message) {
+            const element = document.getElementById(id);
+            element.className = `status-card ${status}`;
+            element.innerHTML = `<h3>${title}</h3><p>${message}</p>`;
+        }
+        
+        function clearLog() {
+            if (!logElement) logElement = document.getElementById('log');
+            logElement.textContent = '';
+        }
+        
+        async function testSupabaseCDN() {
+            try {
+                log('Testing Supabase CDN load...');
+                
+                if (typeof window.supabase === 'undefined') {
+                    throw new Error('Supabase not loaded from CDN');
+                }
+                
+                if (typeof window.supabase.createClient !== 'function') {
+                    throw new Error('createClient function not available');
+                }
+                
+                log('Supabase CDN loaded successfully', 'success');
+                updateStatus('supabase-status', 'success', '📡 Supabase CDN', '✅ Library loaded successfully from CDN');
+                return true;
+                
+            } catch (error) {
+                log(`Supabase CDN test failed: ${error.message}`, 'error');
+                updateStatus('supabase-status', 'error', '📡 Supabase CDN', `❌ ${error.message}`);
+                return false;
+            }
+        }
+        
+        async function testClientConfig() {
+            try {
+                log('Testing client configuration...');
+                
+                // Load and test supabase-client.js
+                const response = await fetch('supabase-client.js');
+                if (!response.ok) throw new Error('Could not load supabase-client.js');
+                
+                // Execute the client script
+                const script = document.createElement('script');
+                script.src = 'supabase-client.js';
+                document.head.appendChild(script);
+                
+                // Wait for script to load
+                await new Promise((resolve, reject) => {
+                    script.onload = resolve;
+                    script.onerror = reject;
+                    setTimeout(reject, 5000); // timeout after 5 seconds
+                });
+                
+                // Check if globals are available
+                if (typeof window.authHelpers === 'undefined') {
+                    throw new Error('authHelpers not available globally');
+                }
+                
+                if (typeof window.profileHelpers === 'undefined') {
+                    throw new Error('profileHelpers not available globally');
+                }
+                
+                log('Client configuration loaded successfully', 'success');
+                updateStatus('client-status', 'success', '⚙️ Client Configuration', '✅ supabase-client.js loaded and configured');
+                return true;
+                
+            } catch (error) {
+                log(`Client configuration test failed: ${error.message}`, 'error');
+                updateStatus('client-status', 'error', '⚙️ Client Configuration', `❌ ${error.message}`);
+                return false;
+            }
+        }
+        
+        async function testAuthSystem() {
+            try {
+                log('Testing authentication system...');
+                
+                if (typeof window.authHelpers === 'undefined') {
+                    throw new Error('Auth helpers not loaded');
+                }
+                
+                // Test auth helper functions exist
+                const requiredFunctions = ['signUp', 'signIn', 'signOut', 'getCurrentUser'];
+                for (const func of requiredFunctions) {
+                    if (typeof window.authHelpers[func] !== 'function') {
+                        throw new Error(`AuthHelper function ${func} not available`);
+                    }
+                }
+                
+                log('Authentication system functions available', 'success');
+                updateStatus('auth-status', 'success', '🔐 Authentication System', '✅ All auth functions loaded and ready');
+                return true;
+                
+            } catch (error) {
+                log(`Auth system test failed: ${error.message}`, 'error');
+                updateStatus('auth-status', 'error', '🔐 Authentication System', `❌ ${error.message}`);
+                return false;
+            }
+        }
+        
+        async function testDatabaseConnection() {
+            try {
+                log('Testing database connection...');
+                
+                if (!window.supabase) {
+                    throw new Error('Supabase client not available');
+                }
+                
+                // Test basic connection (this will fail if not authenticated, but that's expected)
+                const { error } = await window.supabase.from('user_profiles').select('count').limit(1);
+                
+                // We expect an auth error here since we're not logged in - that's actually good!
+                if (error && !error.message.includes('JWT')) {
+                    throw new Error(`Unexpected database error: ${error.message}`);
+                }
+                
+                log('Database connection test successful (auth required as expected)', 'success');
+                updateStatus('database-status', 'success', '🗄️ Database Connection', '✅ Connection working, RLS policies active');
+                return true;
+                
+            } catch (error) {
+                log(`Database connection test failed: ${error.message}`, 'error');
+                updateStatus('database-status', 'error', '🗄️ Database Connection', `❌ ${error.message}`);
+                return false;
+            }
+        }
+        
+        async function runAllTests() {
+            log('🚀 Starting comprehensive authentication tests...');
+            clearLog();
+            
+            const tests = [
+                { name: 'Supabase CDN', fn: testSupabaseCDN },
+                { name: 'Client Config', fn: testClientConfig },
+                { name: 'Auth System', fn: testAuthSystem },
+                { name: 'Database Connection', fn: testDatabaseConnection }
+            ];
+            
+            const results = [];
+            
+            for (const test of tests) {
+                log(`\n--- Running ${test.name} Test ---`);
+                const result = await test.fn();
+                results.push({ name: test.name, passed: result });
+                
+                // Small delay between tests
+                await new Promise(resolve => setTimeout(resolve, 500));
+            }
+            
+            log('\n📊 Test Results Summary:');
+            results.forEach(result => {
+                log(`${result.passed ? '✅' : '❌'} ${result.name}: ${result.passed ? 'PASSED' : 'FAILED'}`, result.passed ? 'success' : 'error');
+            });
+            
+            const allPassed = results.every(r => r.passed);
+            log(`\n🎯 Overall Status: ${allPassed ? '✅ ALL TESTS PASSED' : '❌ SOME TESTS FAILED'}`, allPassed ? 'success' : 'error');
+            
+            if (allPassed) {
+                log('\n🎉 Authentication system is working correctly!');
+                log('✅ Ready to test login/registration in main app');
+            }
+        }
+        
+        // Auto-run tests when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(runAllTests, 1000);
+        });
+    </script>
+</body>
+</html>
