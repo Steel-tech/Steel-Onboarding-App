@@ -113,6 +113,9 @@ document.addEventListener('DOMContentLoaded', function() {
             // Restore form completion states
             restoreFormCompletions();
             
+            // Check if employee info exists, show login modal if not
+            checkEmployeeLogin();
+            
             trackAnalyticsEvent('app_initialized');
         }, 500);
     });
