@@ -1036,8 +1036,18 @@
                 <h2 class="gradient-header">Important Documents & Resources</h2>
                 <p class="modern-subtitle">Download and review all required documents and training materials</p>
                 
+                <!-- Video Prerequisite Warning -->
+                <div id="documentsPrerequisiteWarning" class="modern-content-block" style="display: none; background: linear-gradient(135deg, #f39c12, #e67e22); color: white; text-align: center; margin-bottom: 2rem; padding: 1.5rem; border-radius: 12px;">
+                    <i class="fas fa-lock" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                    <h3 style="margin: 0 0 1rem 0;">Complete Orientation Video First</h3>
+                    <p style="margin: 0; font-size: 1.1rem;">You must complete the orientation video before accessing documents and training materials.</p>
+                    <button class="modern-button" onclick="showTab('video')" style="background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3); margin-top: 1rem;">
+                        <i class="fas fa-play-circle"></i> Go to Orientation Video
+                    </button>
+                </div>
+                
                 <!-- Download All Button -->
-                <div class="modern-content-block" style="text-align: center; margin-bottom: 2rem;">
+                <div class="modern-content-block" id="documentsMainContent" style="text-align: center; margin-bottom: 2rem;">
                     <button class="modern-button" id="downloadAllBtn" onclick="downloadAllDocuments()" style="background: linear-gradient(135deg, #2c3e50, #3498db); font-size: 1.1rem; padding: 1rem 2rem; min-width: 250px;">
                         <i class="fas fa-download" style="margin-right: 0.5rem;"></i>
                         Download All Documents
