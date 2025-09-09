@@ -66,6 +66,10 @@ document.addEventListener('DOMContentLoaded', function() {
         initializePerformanceOptimizations();
         initializeAnalytics();
         
+        // Initialize prerequisite checks
+        updateDocumentsAccess();
+        updateCompletionButtons();
+        
         // Hide loading screen
         const loadingScreen = document.getElementById('loadingScreen');
         if (loadingScreen) {
