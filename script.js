@@ -107,6 +107,9 @@ document.addEventListener('DOMContentLoaded', function() {
             updateDocumentsAccess();
             updateCompletionButtons();
             
+            // Restore form completion states
+            restoreFormCompletions();
+            
             trackAnalyticsEvent('app_initialized');
         }, 500);
     });
