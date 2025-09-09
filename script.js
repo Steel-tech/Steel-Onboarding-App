@@ -934,6 +934,9 @@ function trackDocumentDownload(documentName) {
         } else {
             showNotification(`${documentName} downloaded successfully!`);
         }
+        
+        // Update completion buttons when documents are downloaded
+        updateCompletionButtons();
     }
     
     updateProgress();
