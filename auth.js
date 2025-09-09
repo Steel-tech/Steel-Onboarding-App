@@ -1,7 +1,7 @@
 // Supabase Authentication System for Steel Onboarding App
 // Uses Supabase Auth for secure user authentication and session management
 
-import { supabase, authHelpers, profileHelpers } from './supabase-client.js';
+// supabase, authHelpers, profileHelpers are loaded from supabase-client.js
 
 // Auth constants
 const AUTH_CONSTANTS = {
