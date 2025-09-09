@@ -940,8 +940,122 @@ function downloadDocument(documentName) {
     showNotification(`${documentName} will be available soon.`);
 }
 
+// Check if video is completed (prerequisite for documents)
+function isVideoCompleted() {
+    return appState.completedModules && appState.completedModules.includes('video');
+}
+
+// Check if all required documents are downloaded (prerequisite for completion)
+function areAllDocumentsDownloaded() {
+    if (!appState.downloadedDocuments || appState.downloadedDocuments.length === 0) {
+        return false;
+    }
+    
+    const requiredDocuments = [
+        'Employee Handbook 2024',
+        'Health & Safety Manual 2024', 
+        'New Hire Orientation 2025',
+        'Orientation Presentation',
+        'Steel Erection Training',
+        'Welding Procedures Training'
+    ];
+    
+    return requiredDocuments.every(doc => 
+        appState.downloadedDocuments.some(downloaded => 
+            downloaded.includes(doc) || doc.includes(downloaded.substring(0, 10))
+        )
+    );
+}
+
+// Update documents section based on video completion
+function updateDocumentsAccess() {
+    const warning = document.getElementById('documentsPrerequisiteWarning');
+    const mainContent = document.getElementById('documentsMainContent');
+    const documentsSection = document.querySelector('#documents .modern-content-block:nth-of-type(3)');
+    
+    if (!isVideoCompleted()) {
+        // Show warning, hide content
+        if (warning) warning.style.display = 'block';
+        if (mainContent) mainContent.style.display = 'none';
+        if (documentsSection) documentsSection.style.display = 'none';
+        
+        // Hide all other document sections
+        const allDocSections = document.querySelectorAll('#documents .modern-grid, #documents .doc-category');
+        allDocSections.forEach(section => section.style.display = 'none');
+    } else {
+        // Hide warning, show content
+        if (warning) warning.style.display = 'none';
+        if (mainContent) mainContent.style.display = 'block';
+        if (documentsSection) documentsSection.style.display = 'block';
+        
+        // Show all document sections
+        const allDocSections = document.querySelectorAll('#documents .modern-grid, #documents .doc-category');
+        allDocSections.forEach(section => section.style.display = 'block');
+    }
+}
+
+// Update completion buttons based on document prerequisite
+function updateCompletionButtons() {
+    const allDocumentsDownloaded = areAllDocumentsDownloaded();
+    const completionButtons = document.querySelectorAll('.complete-btn, .modern-button[data-module]');
+    
+    completionButtons.forEach(btn => {
+        const module = btn.getAttribute('data-module');
+        
+        // Skip video completion button - no prerequisites for that
+        if (module === 'video') return;
+        
+        // Skip if already completed
+        if (appState.completedModules && appState.completedModules.includes(module)) return;
+        
+        if (!allDocumentsDownloaded) {
+            // Disable button and add warning
+            btn.disabled = true;
+            btn.style.opacity = '0.5';
+            btn.style.cursor = 'not-allowed';
+            
+            // Update button text to show requirement
+            const originalText = btn.innerHTML;
+            if (!originalText.includes('Complete Documents First')) {
+                btn.setAttribute('data-original-text', originalText);
+                btn.innerHTML = '<i class="fas fa-lock"></i> Complete Documents First';
+            }
+            
+            // Add click handler to show warning
+            btn.onclick = function(e) {
+                e.preventDefault();
+                showNotification('You must download and review all documents before marking modules as complete.', 'warning');
+                showTab('documents');
+                return false;
+            };
+        } else {
+            // Enable button and restore original text
+            btn.disabled = false;
+            btn.style.opacity = '1';
+            btn.style.cursor = 'pointer';
+            
+            const originalText = btn.getAttribute('data-original-text');
+            if (originalText) {
+                btn.innerHTML = originalText;
+                btn.removeAttribute('data-original-text');
+            }
+            
+            // Restore original click handler
+            btn.onclick = function() {
+                completeModule(module, this);
+            };
+        }
+    });
+}
+
 // Download all documents with staggered approach
 function downloadAllDocuments() {
+    // Check video prerequisite first
+    if (!isVideoCompleted()) {
+        showNotification('Please complete the orientation video first before downloading documents.', 'warning');
+        showTab('video');
+        return;
+    }
     const downloadAllBtn = document.getElementById('downloadAllBtn');
     const progressDiv = document.getElementById('downloadAllProgress');
     
