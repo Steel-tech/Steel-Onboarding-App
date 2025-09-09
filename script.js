@@ -1100,6 +1100,9 @@ function downloadAllDocuments() {
             updateProgress();
             showNotification('All documents downloaded successfully! 📁');
             
+            // Update completion buttons now that documents are downloaded
+            updateCompletionButtons();
+            
             // Reset button after 3 seconds
             setTimeout(() => {
                 downloadAllBtn.disabled = false;
