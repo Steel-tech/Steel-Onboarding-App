@@ -164,7 +164,24 @@ const profileHelpers = {
   }
 }
 
-// Make available globally for vanilla JS usage
-window.supabase = supabase
-window.authHelpers = authHelpers
-window.profileHelpers = profileHelpers
+// Initialize and make available globally
+initializeSupabase().then((client) => {
+  window.supabase = client;
+  window.authHelpers = authHelpers;
+  window.profileHelpers = profileHelpers;
+  window.supabaseConfig = supabaseConfig;
+  
+  // Dispatch ready event
+  window.dispatchEvent(new CustomEvent('supabaseReady', {
+    detail: { supabase: client, config: supabaseConfig }
+  }));
+  
+  console.log('[Supabase] Ready for authentication');
+}).catch((error) => {
+  console.error('[Supabase] Initialization failed:', error);
+  
+  // Dispatch error event
+  window.dispatchEvent(new CustomEvent('supabaseError', {
+    detail: { error: error.message }
+  }));
+});
