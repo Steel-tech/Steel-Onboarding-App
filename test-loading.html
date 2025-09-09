@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Loading Test</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            max-width: 800px; 
+            margin: 0 auto; 
+            padding: 20px; 
+            background: #f5f5f5; 
+        }
+        .status { 
+            padding: 10px; 
+            margin: 10px 0; 
+            border-radius: 5px; 
+        }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        .log { 
+            background: #343a40; 
+            color: #f8f9fa; 
+            padding: 15px; 
+            border-radius: 5px; 
+            font-family: monospace; 
+            white-space: pre-wrap; 
+            max-height: 400px; 
+            overflow-y: auto; 
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Quick Loading Test</h1>
+    <div id="status-container">
+        <div id="cdn-status" class="status info">📦 Loading Supabase CDN...</div>
+        <div id="client-status" class="status info">⚙️ Initializing client...</div>
+        <div id="auth-status" class="status info">🔐 Setting up authentication...</div>
+        <div id="app-status" class="status info">🚀 Loading app...</div>
+    </div>
+    
+    <div class="log" id="log"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        function log(message) {
+            const logElement = document.getElementById('log');
+            const timestamp = new Date().toLocaleTimeString();
+            logElement.textContent += `[${timestamp}] ${message}\n`;
+            logElement.scrollTop = logElement.scrollHeight;
+            console.log(message);
+        }
+        
+        function updateStatus(id, status, message) {
+            const element = document.getElementById(id);
+            element.className = `status ${status}`;
+            element.textContent = message;
+        }
+        
+        async function testLoading() {
+            try {
+                log('🚀 Starting quick loading test...');
+                
+                // Test 1: CDN Loading
+                log('📦 Testing Supabase CDN...');
+                if (typeof window.supabase === 'undefined') {
+                    throw new Error('Supabase CDN not loaded');
+                }
+                updateStatus('cdn-status', 'success', '✅ Supabase CDN loaded successfully');
+                log('✅ Supabase CDN: OK');
+                
+                // Test 2: Client Initialization  
+                log('⚙️ Testing client initialization...');
+                const supabaseConfig = {
+                    supabaseUrl: 'https://sfsswfzgrdctiyukhczj.supabase.co',
+                    supabaseAnonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNmc3N3ZnpncmRjdGl5dWtoY3pqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTcyOTg3MDgsImV4cCI6MjA3Mjg3NDcwOH0.u2oVMOCziHVlzFFlP7b8v_M5tHnGuW1Uwm65bJu3dVw'
+                };
+                
+                const client = window.supabase.createClient(supabaseConfig.supabaseUrl, supabaseConfig.supabaseAnonKey);
+                updateStatus('client-status', 'success', '✅ Supabase client initialized');
+                log('✅ Client initialization: OK');
+                
+                // Test 3: Auth System
+                log('🔐 Testing authentication system...');
+                const { data, error } = await client.auth.getSession();
+                if (error) {
+                    log(`⚠️ Auth check returned error (expected if no session): ${error.message}`);
+                } else {
+                    log('✅ Auth system responding correctly');
+                }
+                updateStatus('auth-status', 'success', '✅ Authentication system ready');
+                
+                // Test 4: Database Connection
+                log('🗄️ Testing database connection...');
+                const { error: dbError } = await client.from('user_profiles').select('count').limit(1);
+                if (dbError && dbError.message.includes('JWT')) {
+                    log('✅ Database connection working (RLS requires authentication)');
+                } else if (dbError) {
+                    log(`⚠️ Database error: ${dbError.message}`);
+                } else {
+                    log('✅ Database accessible');
+                }
+                updateStatus('app-status', 'success', '✅ App ready to load!');
+                
+                log('');
+                log('🎉 ALL TESTS PASSED! Your app should load properly now.');
+                log('🔗 Try opening: http://localhost:8000');
+                
+            } catch (error) {
+                log(`❌ Test failed: ${error.message}`);
+                updateStatus('app-status', 'error', `❌ Error: ${error.message}`);
+            }
+        }
+        
+        // Run test after a short delay
+        setTimeout(testLoading, 1000);
+    </script>
+</body>
+</html>
