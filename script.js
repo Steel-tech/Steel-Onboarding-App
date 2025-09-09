@@ -1017,7 +1017,7 @@ function updateCompletionButtons() {
         if (module === 'video') return;
         
         // Skip if already completed
-        if (appState.completedModules && appState.completedModules.includes(module)) return;
+        if (appState.completedModules?.includes(module)) return;
         
         if (!allDocumentsDownloaded) {
             // Disable button and add warning
