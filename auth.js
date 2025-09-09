@@ -547,13 +547,40 @@ class SupabaseAuthManager {
     }
 }
 
-// Initialize authentication when DOM is ready
+// Initialize authentication when DOM is ready and Supabase is loaded
 let authManager = null;
 
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('[FSW Auth] Waiting for Supabase to initialize...');
+    
+    // Wait for Supabase to be ready
+    if (window.supabase) {
+        // Already loaded
+        initializeAuthManager();
+    } else {
+        // Wait for supabaseReady event
+        window.addEventListener('supabaseReady', initializeAuthManager);
+        window.addEventListener('supabaseError', (event) => {
+            console.error('[FSW Auth] Supabase failed to initialize:', event.detail.error);
+            // Show error to user
+            document.body.innerHTML = `
+                <div style="padding: 2rem; text-align: center; color: #e74c3c;">
+                    <h2>⚠️ Authentication System Error</h2>
+                    <p>Failed to initialize Supabase: ${event.detail.error}</p>
+                    <p>Please check your configuration and try again.</p>
+                    <button onclick="window.location.reload()" style="padding: 0.5rem 1rem; background: #3498db; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                        Retry
+                    </button>
+                </div>
+            `;
+        });
+    }
+});
+
+function initializeAuthManager() {
     console.log('[FSW Auth] Initializing Supabase authentication system');
     authManager = new SupabaseAuthManager();
-});
+}
 
 // Clean up on page unload
 window.addEventListener('beforeunload', () => {
