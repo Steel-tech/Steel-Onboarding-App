@@ -6,7 +6,7 @@
     <title>Flawless Steel Welding - New Employee Onboarding</title>
     
     <!-- Security Headers -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; font-src 'self' https://cdnjs.cloudflare.com https://r2cdn.perplexity.ai data:; img-src 'self' data: blob:; media-src 'self' blob:; object-src 'none'; frame-src 'none'; connect-src 'self';">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; font-src 'self' https://cdnjs.cloudflare.com https://r2cdn.perplexity.ai data:; img-src 'self' data: blob:; media-src 'self' blob:; object-src 'none'; frame-src 'none'; connect-src 'self' https://*.supabase.co;">
     <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
     <meta http-equiv="Permissions-Policy" content="geolocation=(), microphone=(), camera=()">
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
@@ -1709,7 +1709,8 @@
     </div>
 
     <!-- Production-ready script loading -->
-    <script src="auth.js"></script>
+    <script type="module" src="supabase-client.js"></script>
+    <script src="auth.js" type="module"></script>
     <script src="api-client.js"></script>
     <script src="event-handlers.js"></script>
     <script src="script.js"></script>
