@@ -1,13 +1,13 @@
 // Supabase Client Configuration for Steel Onboarding App
-import { createClient } from '@supabase/supabase-js'
+// Uses global supabase from CDN
 
 // Supabase configuration
 const supabaseUrl = 'https://sfsswfzgrdctiyukhczj.supabase.co'
 // This anon key is safe to expose in client-side code
 const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNmc3N3ZnpncmRjdGl5dWtoY3pqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjYwMTI3ODUsImV4cCI6MjA0MTU4ODc4NX0.CfUBmC5lpF5DySVYawjCXBt9JBDm2wB-fgRe3rPPKhc'
 
-// Create Supabase client
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+// Create Supabase client using global supabase from CDN
+const supabase = window.supabase.createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
     autoRefreshToken: true,
     persistSession: true,
@@ -17,7 +17,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
 })
 
 // Auth helper functions
-export const authHelpers = {
+const authHelpers = {
   // Sign up new user
   async signUp(email, password, userData = {}) {
     const { data, error } = await supabase.auth.signUp({
@@ -70,7 +70,7 @@ export const authHelpers = {
 }
 
 // Database helpers for user profiles
-export const profileHelpers = {
+const profileHelpers = {
   // Create user profile after signup
   async createProfile(userId, profileData) {
     const { data, error } = await supabase
@@ -146,8 +146,6 @@ export const profileHelpers = {
 }
 
 // Make available globally for vanilla JS usage
-if (typeof window !== 'undefined') {
-  window.supabase = supabase
-  window.authHelpers = authHelpers
-  window.profileHelpers = profileHelpers
-}
+window.supabase = supabase
+window.authHelpers = authHelpers
+window.profileHelpers = profileHelpers
