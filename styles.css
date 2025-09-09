@@ -1182,6 +1182,90 @@ body {
     font-size: 0.85rem;
 }
 
+/* Auth Toggle Functionality */
+.auth-toggle {
+    padding: 1rem 2rem;
+    text-align: center;
+    border-top: 1px solid #e1e5e9;
+    background: #fafbfc;
+}
+
+.link-btn {
+    background: none;
+    border: none;
+    color: var(--accent-color);
+    font-size: 0.95rem;
+    cursor: pointer;
+    text-decoration: underline;
+    padding: 0.5rem;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.link-btn:hover {
+    color: var(--primary-color);
+    background: rgba(52, 152, 219, 0.1);
+    text-decoration: none;
+}
+
+.link-btn:focus {
+    outline: 2px solid var(--accent-color);
+    outline-offset: 2px;
+}
+
+/* Auth Success Message */
+.auth-success {
+    background: #f0f9ff;
+    border: 1px solid #7dd3fc;
+    color: #0c4a6e;
+    padding: 0.75rem;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.auth-success::before {
+    content: "✅";
+    font-size: 1rem;
+}
+
+/* Disabled Button State */
+.auth-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+.auth-btn:disabled:hover {
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+/* Password Input Styling */
+.auth-form input[type="password"] {
+    font-family: 'Courier New', monospace;
+    letter-spacing: 0.1em;
+}
+
+.auth-form input[type="password"]:focus {
+    font-family: 'Courier New', monospace;
+}
+
+/* Form Validation States */
+.auth-form input:invalid:not(:focus):not(:placeholder-shown) {
+    border-color: #dc2626;
+    background: #fef2f2;
+}
+
+.auth-form input:valid:not(:focus):not(:placeholder-shown) {
+    border-color: #059669;
+    background: #f0fdf4;
+}
+
 /* Employee Welcome Card */
 .employee-welcome-card {
     background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
