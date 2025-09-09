@@ -326,14 +326,7 @@ function initializeEventListeners() {
         });
     });
 
-    // Employee form submission
-    const employeeForm = document.getElementById('employeeForm');
-    if (employeeForm) {
-        employeeForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            saveEmployeeData();
-        });
-    }
+    // Employee form submission - now handled by login modal
 
     // Safety module completion buttons - include both selectors
     document.querySelectorAll('.complete-btn, .modern-button[data-module]').forEach(btn => {
