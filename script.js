@@ -73,6 +73,9 @@ document.addEventListener('DOMContentLoaded', function() {
         // Restore form completion states
         restoreFormCompletions();
         
+        // Check if employee info exists, show login modal if not
+        checkEmployeeLogin();
+        
         // Hide loading screen
         const loadingScreen = document.getElementById('loadingScreen');
         if (loadingScreen) {
