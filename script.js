@@ -1547,15 +1547,95 @@ function closeModal() {
     modal.style.display = 'none';
 }
 
-// Video Player and Completion Tracking
-function initializeVideoPlayer() {
+// YouTube Video Configuration and Tracking
+const YOUTUBE_CONFIG = {
+    // Replace this with your actual YouTube video ID
+    // Example: if your YouTube URL is https://www.youtube.com/watch?v=ABC123DEF45
+    // Then your VIDEO_ID should be: ABC123DEF45
+    VIDEO_ID: 'YOUR_VIDEO_ID_HERE', // UPDATE THIS AFTER YOUTUBE UPLOAD
+    
+    // YouTube API configuration
+    PLAYER_VARS: {
+        autoplay: 0,
+        controls: 1,
+        disablekb: 0,
+        enablejsapi: 1,
+        fs: 1,
+        iv_load_policy: 3,
+        modestbranding: 1,
+        rel: 0,
+        showinfo: 0
+    }
+};
+
+// Global YouTube player variable
+let youtubePlayer = null;
+
+// Load YouTube API
+function loadYouTubeAPI() {
+    if (window.YT && window.YT.Player) {
+        initializeYouTubePlayer();
+        return;
+    }
+    
+    const script = document.createElement('script');
+    script.src = 'https://www.youtube.com/iframe_api';
+    const firstScriptTag = document.getElementsByTagName('script')[0];
+    firstScriptTag.parentNode.insertBefore(script, firstScriptTag);
+    
+    // YouTube API callback
+    window.onYouTubeIframeAPIReady = initializeYouTubePlayer;
+}
+
+// Initialize YouTube player
+function initializeYouTubePlayer() {
+    const container = document.getElementById('youtubeVideoContainer');
+    const placeholder = document.getElementById('videoPlaceholder');
+    
+    if (!container || !placeholder) return;
+    
+    // Check if video ID is configured
+    if (YOUTUBE_CONFIG.VIDEO_ID === 'YOUR_VIDEO_ID_HERE') {
+        // Show setup message
+        placeholder.innerHTML = `
+            <div>
+                <i class="fas fa-cog" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.8;"></i>
+                <h4 style="margin-bottom: 0.5rem;">YouTube Setup Required</h4>
+                <p style="margin: 0; opacity: 0.9;">Please follow the YOUTUBE-SETUP.md instructions to configure your video</p>
+                <p style="margin-top: 0.5rem; font-size: 0.9rem; opacity: 0.7;">Update VIDEO_ID in script.js after uploading to YouTube</p>
+            </div>
+        `;
+        return;
+    }
+    
+    // Replace placeholder with YouTube player
+    placeholder.style.display = 'none';
+    
+    const playerDiv = document.createElement('div');
+    playerDiv.id = 'youtubePlayer';
+    container.appendChild(playerDiv);
+    
+    // Initialize YouTube player
+    youtubePlayer = new YT.Player('youtubePlayer', {
+        height: '450',
+        width: '100%',
+        videoId: YOUTUBE_CONFIG.VIDEO_ID,
+        playerVars: YOUTUBE_CONFIG.PLAYER_VARS,
+        events: {
+            onReady: onPlayerReady,
+            onStateChange: onPlayerStateChange
+        }
+    });
+}
+
+// YouTube player ready callback
+function onPlayerReady(event) {
     // Check if video was previously completed
     const videoCompleted = appState.completedModules.includes('video');
     const completionStatus = document.getElementById('videoCompletionStatus');
     
     if (videoCompleted && completionStatus) {
         completionStatus.style.display = 'block';
-        // Update the completion button to show completed state
         const completionBtn = document.querySelector('[data-module="video"]');
         if (completionBtn) {
             completionBtn.innerHTML = '<i class="fas fa-check-circle"></i> Video Completed!';
@@ -1563,67 +1643,116 @@ function initializeVideoPlayer() {
             completionBtn.disabled = true;
         }
     }
+    
+    trackAnalyticsEvent('youtube_player_ready', {
+        timestamp: Date.now(),
+        videoId: YOUTUBE_CONFIG.VIDEO_ID
+    });
+}
 
-    // Set up video player tracking
-    const video = document.getElementById('orientationVideo');
-    if (video) {
-        const requiredWatchPercentage = 0.9; // 90% completion required
-        
-        // Track video events
-        video.addEventListener('play', function() {
+// YouTube player state change callback
+let watchStartTime = null;
+let totalWatchTime = 0;
+
+function onPlayerStateChange(event) {
+    const videoCompleted = appState.completedModules.includes('video');
+    
+    switch (event.data) {
+        case YT.PlayerState.PLAYING:
+            watchStartTime = Date.now();
             trackAnalyticsEvent('video_started', {
                 timestamp: Date.now(),
-                currentTime: this.currentTime
+                currentTime: youtubePlayer.getCurrentTime()
             });
-        });
-        
-        video.addEventListener('timeupdate', function() {
-            const currentTime = this.currentTime;
-            const duration = this.duration;
             
-            if (duration && !isNaN(duration)) {
-                const watchedPercentage = currentTime / duration;
+            // Start periodic progress checking
+            if (!videoCompleted) {
+                startProgressTracking();
+            }
+            break;
+            
+        case YT.PlayerState.PAUSED:
+        case YT.PlayerState.ENDED:
+            if (watchStartTime) {
+                totalWatchTime += Date.now() - watchStartTime;
+                watchStartTime = null;
+            }
+            
+            if (event.data === YT.PlayerState.ENDED) {
+                trackAnalyticsEvent('video_ended', {
+                    timestamp: Date.now(),
+                    totalWatchTime: totalWatchTime,
+                    watchedFull: true
+                });
                 
-                // Auto-complete when 90% watched
-                if (watchedPercentage >= requiredWatchPercentage && !videoCompleted) {
-                    if (!appState.completedModules.includes('video')) {
-                        appState.completedModules.push('video');
-                        saveState();
-                        updateProgress();
-                        updateDocumentsAccess();
-                        
-                        showNotification('Great! You\'ve watched enough of the video to complete this requirement.', 'success');
-                        
-                        // Update completion button
-                        const completionBtn = document.querySelector('[data-module="video"]');
-                        if (completionBtn) {
-                            completionBtn.innerHTML = '<i class="fas fa-check-circle"></i> Video Completed!';
-                            completionBtn.classList.add('completed');
-                            completionBtn.disabled = true;
-                        }
-                        
-                        // Show completion status
-                        const completionStatus = document.getElementById('videoCompletionStatus');
-                        if (completionStatus) {
-                            completionStatus.style.display = 'block';
-                        }
-                        
-                        trackAnalyticsEvent('video_auto_completed', {
-                            timestamp: Date.now(),
-                            watchedPercentage: watchedPercentage
-                        });
-                    }
+                // Auto-complete on video end
+                if (!videoCompleted) {
+                    completeVideoModule();
                 }
             }
-        });
+            break;
+    }
+}
+
+// Progress tracking for YouTube video
+let progressInterval = null;
+
+function startProgressTracking() {
+    if (progressInterval) clearInterval(progressInterval);
+    
+    progressInterval = setInterval(() => {
+        if (!youtubePlayer || !youtubePlayer.getDuration) return;
         
-        video.addEventListener('ended', function() {
-            trackAnalyticsEvent('video_ended', {
-                timestamp: Date.now(),
-                watchedFull: true
-            });
+        const currentTime = youtubePlayer.getCurrentTime();
+        const duration = youtubePlayer.getDuration();
+        const videoCompleted = appState.completedModules.includes('video');
+        
+        if (duration && !videoCompleted) {
+            const watchedPercentage = currentTime / duration;
+            
+            // Auto-complete when 90% watched
+            if (watchedPercentage >= 0.9) {
+                completeVideoModule();
+                clearInterval(progressInterval);
+            }
+        }
+    }, 2000); // Check every 2 seconds
+}
+
+// Complete video module function
+function completeVideoModule() {
+    if (!appState.completedModules.includes('video')) {
+        appState.completedModules.push('video');
+        saveState();
+        updateProgress();
+        updateDocumentsAccess();
+        
+        showNotification('Great! You\'ve completed the orientation video requirement.', 'success');
+        
+        // Update completion button
+        const completionBtn = document.querySelector('[data-module="video"]');
+        if (completionBtn) {
+            completionBtn.innerHTML = '<i class="fas fa-check-circle"></i> Video Completed!';
+            completionBtn.classList.add('completed');
+            completionBtn.disabled = true;
+        }
+        
+        // Show completion status
+        const completionStatus = document.getElementById('videoCompletionStatus');
+        if (completionStatus) {
+            completionStatus.style.display = 'block';
+        }
+        
+        trackAnalyticsEvent('video_auto_completed', {
+            timestamp: Date.now(),
+            method: 'youtube_tracking'
         });
     }
+}
+
+// Main video initialization function
+function initializeVideoPlayer() {
+    loadYouTubeAPI();
 }
 
 // Video completion handler
