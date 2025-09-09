@@ -124,8 +124,7 @@ class SupabaseAuthManager {
             loadingScreen.style.display = 'none';
         }
 
-        // Hide main application
-        document.body.style.overflow = 'hidden';
+        // Hide main application (modal backdrop prevents interaction)
         
         // Create auth modal
         const authModal = document.createElement('div');
