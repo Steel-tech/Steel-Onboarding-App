@@ -27,8 +27,15 @@ class SupabaseAuthManager {
         try {
             console.log('[FSW Auth] Initializing Supabase authentication...');
             
+            // Check if supabase is available
+            if (!window.supabase) {
+                console.warn('[FSW Auth] Supabase client not ready, showing auth modal');
+                this.showAuthModal();
+                return;
+            }
+            
             // Check for existing session
-            const { data: { session }, error } = await supabase.auth.getSession();
+            const { data: { session }, error } = await window.supabase.auth.getSession();
             
             if (error) {
                 console.error('[FSW Auth] Session check failed:', error.message);
