@@ -70,6 +70,9 @@ document.addEventListener('DOMContentLoaded', function() {
         updateDocumentsAccess();
         updateCompletionButtons();
         
+        // Restore form completion states
+        restoreFormCompletions();
+        
         // Hide loading screen
         const loadingScreen = document.getElementById('loadingScreen');
         if (loadingScreen) {
