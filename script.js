@@ -203,8 +203,8 @@ function getCurrentEmployee() {
 
 // Personalize the welcome section with employee information
 function personalizeWelcomeSection() {
-    const currentEmployee = getCurrentEmployee();
-    if (!currentEmployee) {
+    const currentEmployee = appState.employeeData;
+    if (!currentEmployee || !currentEmployee.name) {
         console.warn('No employee data found for personalization');
         return;
     }
