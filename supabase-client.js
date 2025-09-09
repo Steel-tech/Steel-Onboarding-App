@@ -10,10 +10,10 @@ async function initializeSupabase() {
   try {
     console.log('[Supabase] Loading configuration...');
     
-    // Fallback configuration (working anon key)
+    // Your actual Supabase configuration
     supabaseConfig = {
       supabaseUrl: 'https://sfsswfzgrdctiyukhczj.supabase.co',
-      supabaseAnonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNmc3N3ZnpncmRjdGl5dWtoY3pqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjU0OTkzNjksImV4cCI6MjA0MTA3NTM2OX0.iF5WC-iUMN-3t4fOG5PVLxzQtSqpfHKZnr5B9gOJxKs'
+      supabaseAnonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNmc3N3ZnpncmRjdGl5dWtoY3pqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTcyOTg3MDgsImV4cCI6MjA3Mjg3NDcwOH0.u2oVMOCziHVlzFFlP7b8v_M5tHnGuW1Uwm65bJu3dVw'
     };
     
     // Create Supabase client
