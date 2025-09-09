@@ -1017,6 +1017,94 @@ function updateDocumentsAccess() {
     }
 }
 
+// Employee Login Functions
+function checkEmployeeLogin() {
+    if (!appState.employeeData || Object.keys(appState.employeeData).length === 0 || !appState.employeeData.name) {
+        // No employee data, show login modal
+        setTimeout(() => {
+            showEmployeeLoginModal();
+        }, 500);
+    } else {
+        // Employee data exists, update the summary
+        updateEmployeeSummary();
+    }
+}
+
+function showEmployeeLoginModal() {
+    const modal = document.getElementById('employeeLoginModal');
+    if (modal) {
+        // Pre-fill form if editing existing data
+        if (appState.employeeData) {
+            document.getElementById('login-name').value = appState.employeeData.name || '';
+            document.getElementById('login-email').value = appState.employeeData.email || '';
+            document.getElementById('login-phone').value = appState.employeeData.phone || '';
+            document.getElementById('login-position').value = appState.employeeData.position || '';
+            document.getElementById('login-start-date').value = appState.employeeData.startDate || '';
+            document.getElementById('login-supervisor').value = appState.employeeData.supervisor || '';
+        }
+        
+        modal.style.display = 'block';
+        
+        // Add form submission handler if not already added
+        const form = document.getElementById('employeeLoginForm');
+        if (form && !form.hasAttribute('data-handler-added')) {
+            form.setAttribute('data-handler-added', 'true');
+            form.addEventListener('submit', handleEmployeeLogin);
+        }
+    }
+}
+
+function handleEmployeeLogin(event) {
+    event.preventDefault();
+    
+    const formData = new FormData(event.target);
+    const employeeData = {
+        name: formData.get('name'),
+        email: formData.get('email'),
+        phone: formData.get('phone'),
+        position: formData.get('position'),
+        startDate: formData.get('startDate'),
+        supervisor: formData.get('supervisor') || 'TBD'
+    };
+    
+    // Validate required fields
+    if (!employeeData.name || !employeeData.email || !employeeData.phone || !employeeData.position || !employeeData.startDate) {
+        showNotification('Please fill in all required fields.', 'error');
+        return;
+    }
+    
+    // Save employee data
+    appState.employeeData = employeeData;
+    saveState();
+    
+    // Close modal
+    document.getElementById('employeeLoginModal').style.display = 'none';
+    
+    // Update UI
+    updateEmployeeSummary();
+    personalizeWelcomeSection();
+    
+    // Show success message
+    showNotification(`Welcome to Flawless Steel Welding, ${employeeData.name}!`, 'success');
+    
+    // Update progress
+    updateProgress();
+    
+    console.log('[FSW Login] Employee logged in:', employeeData.name);
+}
+
+function updateEmployeeSummary() {
+    if (!appState.employeeData) return;
+    
+    const data = appState.employeeData;
+    document.getElementById('summary-name').textContent = data.name || 'Not provided';
+    document.getElementById('summary-position').textContent = data.position || 'Not provided';
+    document.getElementById('summary-email').textContent = data.email || 'Not provided';
+    document.getElementById('summary-start-date').textContent = data.startDate ? 
+        new Date(data.startDate).toLocaleDateString() : 'Not provided';
+    document.getElementById('summary-phone').textContent = data.phone || 'Not provided';
+}
+
 // Restore form completion states from appState
 function restoreFormCompletions() {
     if (!appState.formCompletions) {
