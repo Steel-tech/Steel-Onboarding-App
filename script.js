@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', function() {
         DOM_CACHE.init();
         loadState();
         initializeEventListeners();
-        initializeSimpleVideoTracking();
+        initializeVideoPlayer();
         updateProgress();
         personalizeWelcomeSection();
         showTab(appState.currentTab);
@@ -99,7 +99,7 @@ document.addEventListener('DOMContentLoaded', function() {
             DOM_CACHE.init();
             loadState();
             initializeEventListeners();
-            initializeSimpleVideoTracking();
+            initializeVideoPlayer();
             updateProgress();
             personalizeWelcomeSection();
             showTab(appState.currentTab);
