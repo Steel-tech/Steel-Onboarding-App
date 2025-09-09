@@ -469,14 +469,13 @@
                         <p>Click the button below to access your required orientation video. This will open in a new tab for the best viewing experience.</p>
                     </div>
                     
-                    <!-- Primary Video Link -->
-                    <div class="video-link-section">
-                        <a href="#" class="video-link-btn" id="primaryVideoLink" target="_blank" rel="noopener">
-                            <i class="fas fa-external-link-alt"></i>
-                            Watch Orientation Video
-                            <span class="video-duration">15-20 minutes</span>
-                        </a>
-                        <p class="video-link-note">Opens in a new tab - you can return here when finished</p>
+                    <!-- Primary Video Player -->
+                    <div class="video-player-section">
+                        <video id="orientationVideo" controls preload="metadata" style="width: 100%; max-width: 800px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                            <source src="orientation-video.mp4" type="video/mp4">
+                            <p>Your browser doesn't support HTML5 video. You can <a href="orientation-video.mp4" download>download the video</a> instead.</p>
+                        </video>
+                        <p class="video-note" style="text-align: center; margin-top: 1rem; color: #666;">Duration: 15-20 minutes</p>
                     </div>
 
                     <!-- Alternative Options -->
