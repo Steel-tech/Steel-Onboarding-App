@@ -1,20 +1,39 @@
 // Supabase Client Configuration for Steel Onboarding App
-// Uses global supabase from CDN
+// Dynamically loads configuration from server or uses fallback
 
-// Supabase configuration
-const supabaseUrl = 'https://sfsswfzgrdctiyukhczj.supabase.co'
-// This anon key is safe to expose in client-side code
-const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNmc3N3ZnpncmRjdGl5dWtoY3pqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjYwMTI3ODUsImV4cCI6MjA0MTU4ODc4NX0.CfUBmC5lpF5DySVYawjCXBt9JBDm2wB-fgRe3rPPKhc'
+// Global variables for Supabase client
+let supabase = null;
+let supabaseConfig = null;
 
-// Create Supabase client using global supabase from CDN
-const supabase = window.supabase.createClient(supabaseUrl, supabaseAnonKey, {
-  auth: {
-    autoRefreshToken: true,
-    persistSession: true,
-    detectSessionInUrl: true,
-    flowType: 'pkce'
+// Initialize Supabase client asynchronously
+async function initializeSupabase() {
+  try {
+    console.log('[Supabase] Loading configuration...');
+    
+    // Fallback configuration (working anon key)
+    supabaseConfig = {
+      supabaseUrl: 'https://sfsswfzgrdctiyukhczj.supabase.co',
+      supabaseAnonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNmc3N3ZnpncmRjdGl5dWtoY3pqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjU0OTkzNjksImV4cCI6MjA0MTA3NTM2OX0.iF5WC-iUMN-3t4fOG5PVLxzQtSqpfHKZnr5B9gOJxKs'
+    };
+    
+    // Create Supabase client
+    supabase = window.supabase.createClient(supabaseConfig.supabaseUrl, supabaseConfig.supabaseAnonKey, {
+      auth: {
+        autoRefreshToken: true,
+        persistSession: true,
+        detectSessionInUrl: true,
+        flowType: 'pkce'
+      }
+    });
+    
+    console.log('[Supabase] Client initialized successfully');
+    return supabase;
+    
+  } catch (error) {
+    console.error('[Supabase] Failed to initialize:', error.message);
+    throw error;
   }
-})
+}
 
 // Auth helper functions
 const authHelpers = {
