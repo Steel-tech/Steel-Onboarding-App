@@ -1547,8 +1547,8 @@ function closeModal() {
     modal.style.display = 'none';
 }
 
-// Simple Video Completion Tracking
-function initializeSimpleVideoTracking() {
+// Video Player and Completion Tracking
+function initializeVideoPlayer() {
     // Check if video was previously completed
     const videoCompleted = appState.completedModules.includes('video');
     const completionStatus = document.getElementById('videoCompletionStatus');
@@ -1564,25 +1564,64 @@ function initializeSimpleVideoTracking() {
         }
     }
 
-    // Set up primary video link (you can customize this URL)
-    const primaryVideoLink = document.getElementById('primaryVideoLink');
-    if (primaryVideoLink) {
-        // Replace with your actual video URL - examples:
-        // primaryVideoLink.href = 'https://youtu.be/YOUR_VIDEO_ID';
-        // primaryVideoLink.href = 'https://vimeo.com/YOUR_VIDEO_ID';
-        // primaryVideoLink.href = 'https://your-server.com/orientation-video.mp4';
+    // Set up video player tracking
+    const video = document.getElementById('orientationVideo');
+    if (video) {
+        const requiredWatchPercentage = 0.9; // 90% completion required
         
-        // For now, set to the local file as fallback
-        primaryVideoLink.href = 'orientation-video.mp4';
-        
-        // Track when link is clicked
-        primaryVideoLink.addEventListener('click', function() {
-            trackAnalyticsEvent('video_link_clicked', {
+        // Track video events
+        video.addEventListener('play', function() {
+            trackAnalyticsEvent('video_started', {
                 timestamp: Date.now(),
-                url: this.href
+                currentTime: this.currentTime
             });
+        });
+        
+        video.addEventListener('timeupdate', function() {
+            const currentTime = this.currentTime;
+            const duration = this.duration;
             
-            showNotification('Opening orientation video in new tab...');
+            if (duration && !isNaN(duration)) {
+                const watchedPercentage = currentTime / duration;
+                
+                // Auto-complete when 90% watched
+                if (watchedPercentage >= requiredWatchPercentage && !videoCompleted) {
+                    if (!appState.completedModules.includes('video')) {
+                        appState.completedModules.push('video');
+                        saveState();
+                        updateProgress();
+                        updateDocumentsAccess();
+                        
+                        showNotification('Great! You\'ve watched enough of the video to complete this requirement.', 'success');
+                        
+                        // Update completion button
+                        const completionBtn = document.querySelector('[data-module="video"]');
+                        if (completionBtn) {
+                            completionBtn.innerHTML = '<i class="fas fa-check-circle"></i> Video Completed!';
+                            completionBtn.classList.add('completed');
+                            completionBtn.disabled = true;
+                        }
+                        
+                        // Show completion status
+                        const completionStatus = document.getElementById('videoCompletionStatus');
+                        if (completionStatus) {
+                            completionStatus.style.display = 'block';
+                        }
+                        
+                        trackAnalyticsEvent('video_auto_completed', {
+                            timestamp: Date.now(),
+                            watchedPercentage: watchedPercentage
+                        });
+                    }
+                }
+            }
+        });
+        
+        video.addEventListener('ended', function() {
+            trackAnalyticsEvent('video_ended', {
+                timestamp: Date.now(),
+                watchedFull: true
+            });
         });
     }
 }
