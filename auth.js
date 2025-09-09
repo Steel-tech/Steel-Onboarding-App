@@ -63,7 +63,7 @@ class SupabaseAuthManager {
     }
     
     setupAuthListener() {
-        this.authListener = supabase.auth.onAuthStateChange(async (event, session) => {
+        this.authListener = window.supabase.auth.onAuthStateChange(async (event, session) => {
             console.log('[FSW Auth] Auth state changed:', event);
             
             if (event === 'SIGNED_IN' && session?.user) {
