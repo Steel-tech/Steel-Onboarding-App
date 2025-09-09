@@ -586,7 +586,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function initializeAuthManager() {
     console.log('[FSW Auth] Initializing Supabase authentication system');
-    authManager = new SupabaseAuthManager();
+    
+    // Double-check that Supabase is ready
+    if (window.supabase && window.authHelpers) {
+        authManager = new SupabaseAuthManager();
+    } else {
+        console.error('[FSW Auth] Supabase not ready, retrying in 1 second...');
+        setTimeout(initializeAuthManager, 1000);
+    }
 }
 
 // Clean up on page unload
