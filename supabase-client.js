@@ -1,10 +1,10 @@
 // Supabase Client Configuration for Steel Onboarding App
 import { createClient } from '@supabase/supabase-js'
 
-// Supabase configuration - extract from DATABASE_URL for now
-// In production, you'll want separate SUPABASE_URL and SUPABASE_ANON_KEY
+// Supabase configuration
 const supabaseUrl = 'https://sfsswfzgrdctiyukhczj.supabase.co'
-const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNmc3N3ZnpncmRjdGl5dWtoY3pqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzEzODczNjIsImV4cCI6MjA0Njk2MzM2Mn0.placeholder_anon_key_here'
+// This anon key is safe to expose in client-side code
+const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNmc3N3ZnpncmRjdGl5dWtoY3pqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjYwMTI3ODUsImV4cCI6MjA0MTU4ODc4NX0.CfUBmC5lpF5DySVYawjCXBt9JBDm2wB-fgRe3rPPKhc'
 
 // Create Supabase client
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
