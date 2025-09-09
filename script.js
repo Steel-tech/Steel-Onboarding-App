@@ -940,6 +940,88 @@ function downloadDocument(documentName) {
     showNotification(`${documentName} will be available soon.`);
 }
 
+// Download all documents with staggered approach
+function downloadAllDocuments() {
+    const downloadAllBtn = document.getElementById('downloadAllBtn');
+    const progressDiv = document.getElementById('downloadAllProgress');
+    
+    // Define all available documents
+    const allDocuments = [
+        { fileName: 'fsw-employee-handbook-2024.pdf', displayName: 'Employee Handbook 2024' },
+        { fileName: 'fsw-health-safety-2024.pdf', displayName: 'Health & Safety Manual 2024' },
+        { fileName: 'fsw-new-hire-orientation-2025.pdf', displayName: 'New Hire Orientation 2025' },
+        { fileName: 'fsw-orientation-presentation.pptx', displayName: 'Orientation Presentation' },
+        { fileName: 'fsw-steel-erection-training.ppt', displayName: 'Steel Erection Training' },
+        { fileName: 'fsw-welding-procedures-training.pdf', displayName: 'Welding Procedures Training' }
+    ];
+    
+    // Disable button and show progress
+    downloadAllBtn.disabled = true;
+    downloadAllBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Downloading...';
+    progressDiv.style.display = 'block';
+    
+    let downloadCount = 0;
+    const totalDocuments = allDocuments.length;
+    
+    // Function to download each document with delay
+    const downloadWithDelay = (index) => {
+        if (index >= totalDocuments) {
+            // All downloads complete
+            progressDiv.innerHTML = `<i class="fas fa-check-circle"></i> All ${totalDocuments} documents downloaded successfully!`;
+            downloadAllBtn.innerHTML = '<i class="fas fa-check"></i> All Downloaded!';
+            downloadAllBtn.style.background = 'linear-gradient(135deg, #27ae60, #2ecc71)';
+            
+            // Track completion
+            if (!appState.downloadedDocuments) {
+                appState.downloadedDocuments = [];
+            }
+            allDocuments.forEach(doc => {
+                if (!appState.downloadedDocuments.includes(doc.displayName)) {
+                    appState.downloadedDocuments.push(doc.displayName);
+                    trackDocumentDownload(doc.displayName);
+                }
+            });
+            
+            saveState();
+            updateProgress();
+            showNotification('All documents downloaded successfully! 📁');
+            
+            // Reset button after 3 seconds
+            setTimeout(() => {
+                downloadAllBtn.disabled = false;
+                downloadAllBtn.innerHTML = '<i class="fas fa-download"></i> Download All Documents <i class="fas fa-file-archive"></i>';
+                downloadAllBtn.style.background = 'linear-gradient(135deg, #2c3e50, #3498db)';
+                progressDiv.style.display = 'none';
+            }, 3000);
+            
+            return;
+        }
+        
+        const doc = allDocuments[index];
+        downloadCount++;
+        
+        // Update progress
+        progressDiv.innerHTML = `<i class="fas fa-download"></i> Downloading ${downloadCount} of ${totalDocuments}: ${doc.displayName}...`;
+        
+        // Create download link
+        const downloadLink = document.createElement('a');
+        downloadLink.href = doc.fileName;
+        downloadLink.download = doc.fileName;
+        downloadLink.style.display = 'none';
+        
+        // Add to DOM, click, then remove
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
+        
+        // Continue with next download after delay
+        setTimeout(() => downloadWithDelay(index + 1), 500);
+    };
+    
+    // Start downloads
+    downloadWithDelay(0);
+}
+
 // Enhanced Data Export System
 class DataExporter {
     constructor() {
