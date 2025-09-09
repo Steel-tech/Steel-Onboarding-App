@@ -1480,6 +1480,14 @@ function markVideoComplete(button) {
     // Update UI
     button.innerHTML = '<i class="fas fa-check-circle"></i> Video Completed!';
     button.classList.add('completed');
+    
+    // Update documents access now that video is complete
+    updateDocumentsAccess();
+    
+    // Show notification about next step
+    setTimeout(() => {
+        showNotification('Great! You can now access the Documents section to download training materials.', 'success');
+    }, 1000);
     button.disabled = true;
     
     // Show completion status
