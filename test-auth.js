@@ -30,7 +30,7 @@ async function testDatabaseTables() {
         console.log('2️⃣ Testing database table access...');
         
         // Test user_profiles table access
-        const { data, error } = await window.supabase
+        const { error } = await window.supabase
             .from('user_profiles')
             .select('count')
             .limit(1);
