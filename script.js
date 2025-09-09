@@ -953,7 +953,7 @@ function downloadDocument(documentName) {
 
 // Check if video is completed (prerequisite for documents)
 function isVideoCompleted() {
-    return appState.completedModules && appState.completedModules.includes('video');
+    return appState.completedModules?.includes('video') || false;
 }
 
 // Check if all required documents are downloaded (prerequisite for completion)
