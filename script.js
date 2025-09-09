@@ -1011,6 +1011,21 @@ function updateDocumentsAccess() {
     }
 }
 
+// Restore form completion states from appState
+function restoreFormCompletions() {
+    if (!appState.formCompletions) {
+        appState.formCompletions = {};
+        return;
+    }
+    
+    // Update form status displays for completed forms
+    Object.keys(appState.formCompletions).forEach(formType => {
+        updateFormStatus(formType, 'completed');
+    });
+    
+    console.log(`[FSW Forms] Restored ${Object.keys(appState.formCompletions).length} completed forms`);
+}
+
 // Update completion buttons based on document prerequisite
 function updateCompletionButtons() {
     const allDocumentsDownloaded = areAllDocumentsDownloaded();
