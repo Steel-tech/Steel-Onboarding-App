@@ -366,9 +366,20 @@
                             
                             <div class="form-field">
                                 <label for="emp-position">Position/Role *</label>
-                                <input type="text" id="emp-position" name="position" placeholder="Your job title" 
-                                       aria-required="true" aria-describedby="position-help" required maxlength="100">
-                                <div id="position-help" class="field-help sr-only">Enter your job title or role at Flawless Steel Welding</div>
+                                <select id="emp-position" name="position" aria-required="true" aria-describedby="position-help" required>
+                                    <option value="">Select your position</option>
+                                    <option value="Ironworker">Ironworker</option>
+                                    <option value="Welder">Welder</option>
+                                    <option value="Fabricator">Fabricator</option>
+                                    <option value="Shop Foreman">Shop Foreman</option>
+                                    <option value="Project Manager">Project Manager</option>
+                                    <option value="Crane Operator">Crane Operator</option>
+                                    <option value="Quality Inspector">Quality Inspector</option>
+                                    <option value="Safety Coordinator">Safety Coordinator</option>
+                                    <option value="Office Administrator">Office Administrator</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                                <div id="position-help" class="field-help sr-only">Select your position or role at Flawless Steel Welding</div>
                             </div>
                             
                             <div class="form-field">
