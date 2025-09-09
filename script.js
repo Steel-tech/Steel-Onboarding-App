@@ -325,11 +325,13 @@ function initializeEventListeners() {
         });
     }
 
-    // Safety module completion buttons
-    document.querySelectorAll('.complete-btn').forEach(btn => {
+    // Safety module completion buttons - include both selectors
+    document.querySelectorAll('.complete-btn, .modern-button[data-module]').forEach(btn => {
         btn.addEventListener('click', function() {
             const module = this.getAttribute('data-module');
-            completeModule(module, this);
+            if (module && module !== 'video') { // Skip video button, has its own handler
+                completeModule(module, this);
+            }
         });
     });
 
