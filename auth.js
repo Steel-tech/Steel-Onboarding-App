@@ -84,7 +84,7 @@ class SupabaseAuthManager {
             // Get or create user profile
             let profile;
             try {
-                profile = await profileHelpers.getProfile(user.id);
+                profile = await window.profileHelpers.getProfile(user.id);
             } catch (error) {
                 if (error.message.includes('No rows')) {
                     console.log('[FSW Auth] Profile not found, user needs to complete registration');
@@ -362,7 +362,7 @@ class SupabaseAuthManager {
             registerBtn.disabled = true;
             
             // Sign up with Supabase
-            const { user, session } = await authHelpers.signUp(
+            const { user, session } = await window.authHelpers.signUp(
                 userData.email, 
                 userData.password, 
                 {
@@ -506,7 +506,7 @@ class SupabaseAuthManager {
     
     async logout() {
         try {
-            await authHelpers.signOut();
+            await window.authHelpers.signOut();
             console.log('[FSW Auth] Logout successful');
         } catch (error) {
             console.error('[FSW Auth] Logout failed:', error);
