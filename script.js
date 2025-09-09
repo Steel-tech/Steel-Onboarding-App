@@ -53,7 +53,33 @@ let appState = {
 document.addEventListener('DOMContentLoaded', function() {
     showLoadingScreen();
     
-    // Wait for authentication to be ready
+    // TEMPORARY: Skip authentication for testing
+    console.log('[FSW App] DEVELOPMENT MODE: Skipping authentication');
+    setTimeout(() => {
+        DOM_CACHE.init();
+        loadState();
+        initializeEventListeners();
+        initializeSimpleVideoTracking();
+        updateProgress();
+        personalizeWelcomeSection();
+        showTab(appState.currentTab);
+        initializePerformanceOptimizations();
+        initializeAnalytics();
+        
+        // Hide loading screen
+        const loadingScreen = document.getElementById('loadingScreen');
+        if (loadingScreen) {
+            loadingScreen.style.opacity = '0';
+            setTimeout(() => {
+                loadingScreen.style.display = 'none';
+                document.body.classList.remove('loading');
+            }, 500);
+        }
+        
+        trackAnalyticsEvent('app_initialized');
+    }, 1500);
+    
+    // Keep original auth listener for when you want to re-enable
     window.addEventListener('authReady', function(event) {
         const user = event.detail.user;
         console.log('[FSW App] Authentication ready, initializing app for:', user.name);
@@ -71,7 +97,7 @@ document.addEventListener('DOMContentLoaded', function() {
             initializeAnalytics();
             
             trackAnalyticsEvent('app_initialized');
-        }, 500); // Shorter delay since auth is already complete
+        }, 500);
     });
 });
 
