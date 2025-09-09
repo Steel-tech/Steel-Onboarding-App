@@ -10,11 +10,23 @@ async function initializeSupabase() {
   try {
     console.log('[Supabase] Loading configuration...');
     
-    // Your actual Supabase configuration
-    supabaseConfig = {
-      supabaseUrl: 'https://sfsswfzgrdctiyukhczj.supabase.co',
-      supabaseAnonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNmc3N3ZnpncmRjdGl5dWtoY3pqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTcyOTg3MDgsImV4cCI6MjA3Mjg3NDcwOH0.u2oVMOCziHVlzFFlP7b8v_M5tHnGuW1Uwm65bJu3dVw'
-    };
+    // Try to fetch configuration from server first, fallback to hardcoded
+    try {
+      const response = await fetch('/api/config');
+      if (response.ok) {
+        supabaseConfig = await response.json();
+        console.log('[Supabase] Configuration loaded from server');
+      } else {
+        throw new Error('Server config not available');
+      }
+    } catch (configError) {
+      console.warn('[Supabase] Using fallback configuration:', configError.message);
+      // Fallback to environment-based configuration
+      supabaseConfig = {
+        supabaseUrl: 'https://sfsswfzgrdctiyukhczj.supabase.co',
+        supabaseAnonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNmc3N3ZnpncmRjdGl5dWtoY3pqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTcyOTg3MDgsImV4cCI6MjA3Mjg3NDcwOH0.u2oVMOCziHVlzFFlP7b8v_M5tHnGuW1Uwm65bJu3dVw'
+      };
+    }
     
     // Create Supabase client
     supabase = window.supabase.createClient(supabaseConfig.supabaseUrl, supabaseConfig.supabaseAnonKey, {
