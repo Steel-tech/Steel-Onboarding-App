@@ -403,71 +403,28 @@
                 
                 <div class="welcome-grid">
                     <div class="welcome-card">
-                        <i class="fas fa-hard-hat"></i>
-                        <h3>Employee Information</h3>
-                        <form id="employeeForm" role="form" aria-labelledby="employee-form-heading" aria-describedby="form-instructions">
-                            <h4 id="employee-form-heading" class="sr-only">Employee Information Form</h4>
-                            <div id="form-instructions" class="sr-only">Please fill out all required fields marked with asterisk. Use Tab to navigate between fields.</div>
-                            
-                            <div class="form-field">
-                                <label for="emp-name">Full Name *</label>
-                                <input type="text" id="emp-name" name="name" placeholder="Enter your full legal name" 
-                                       aria-required="true" aria-describedby="name-help" required maxlength="50">
-                                <div id="name-help" class="field-help sr-only">Enter your first and last name as it appears on official documents</div>
+                        <i class="fas fa-user-check"></i>
+                        <h3>Your Information</h3>
+                        <div class="employee-summary" style="text-align: left;">
+                            <div style="margin-bottom: 0.75rem;">
+                                <strong>Name:</strong> <span id="summary-name">Loading...</span>
                             </div>
-                            
-                            <div class="form-field">
-                                <label for="emp-email">Email Address *</label>
-                                <input type="email" id="emp-email" name="email" placeholder="your.email@example.com" 
-                                       aria-required="true" aria-describedby="email-help" required>
-                                <div id="email-help" class="field-help sr-only">Enter a valid email address you check regularly</div>
+                            <div style="margin-bottom: 0.75rem;">
+                                <strong>Position:</strong> <span id="summary-position">Loading...</span>
                             </div>
-                            
-                            <div class="form-field">
-                                <label for="emp-phone">Phone Number *</label>
-                                <input type="tel" id="emp-phone" name="phone" placeholder="(555) 123-4567" 
-                                       aria-required="true" aria-describedby="phone-help" required>
-                                <div id="phone-help" class="field-help sr-only">Enter a phone number where we can reach you during business hours</div>
+                            <div style="margin-bottom: 0.75rem;">
+                                <strong>Email:</strong> <span id="summary-email">Loading...</span>
                             </div>
-                            
-                            <div class="form-field">
-                                <label for="emp-position">Position/Role *</label>
-                                <select id="emp-position" name="position" aria-required="true" aria-describedby="position-help" required>
-                                    <option value="">Select your position</option>
-                                    <option value="Ironworker">Ironworker</option>
-                                    <option value="Welder">Welder</option>
-                                    <option value="Fabricator">Fabricator</option>
-                                    <option value="Shop Foreman">Shop Foreman</option>
-                                    <option value="Project Manager">Project Manager</option>
-                                    <option value="Crane Operator">Crane Operator</option>
-                                    <option value="Quality Inspector">Quality Inspector</option>
-                                    <option value="Safety Coordinator">Safety Coordinator</option>
-                                    <option value="Office Administrator">Office Administrator</option>
-                                    <option value="Other">Other</option>
-                                </select>
-                                <div id="position-help" class="field-help sr-only">Select your position or role at Flawless Steel Welding</div>
+                            <div style="margin-bottom: 0.75rem;">
+                                <strong>Start Date:</strong> <span id="summary-start-date">Loading...</span>
                             </div>
-                            
-                            <div class="form-field">
-                                <label for="emp-start-date">Start Date *</label>
-                                <input type="date" id="emp-start-date" name="startDate" 
-                                       aria-required="true" aria-describedby="date-help" required>
-                                <div id="date-help" class="field-help sr-only">Select your first day of employment</div>
+                            <div style="margin-bottom: 1rem;">
+                                <strong>Phone:</strong> <span id="summary-phone">Loading...</span>
                             </div>
-                            
-                            <div class="form-field">
-                                <label for="emp-supervisor">Supervisor Name</label>
-                                <input type="text" id="emp-supervisor" name="supervisor" placeholder="Supervisor's name (if known)" 
-                                       aria-describedby="supervisor-help" maxlength="50">
-                                <div id="supervisor-help" class="field-help sr-only">Enter your supervisor's name if you know it, or leave blank</div>
-                            </div>
-                            
-                            <button type="submit" aria-describedby="submit-help" class="form-submit-btn">
-                                <span class="button-icon" aria-hidden="true">💾</span>
-                                Save Information
+                            <button class="modern-button" onclick="showEmployeeLoginModal()" style="font-size: 0.9rem; padding: 0.5rem 1rem;">
+                                <i class="fas fa-edit"></i> Update Information
                             </button>
-                            <div id="submit-help" class="field-help sr-only">Click to save your information. All required fields must be completed.</div>
-                        </form>
+                        </div>
                     </div>
                     <div class="welcome-card">
                         <i class="fas fa-phone-alt"></i>
