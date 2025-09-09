@@ -174,9 +174,7 @@ function loadState() {
 
 function getCurrentEmployee() {
     // Get current employee from auth manager
-    if (window.authManager && window.authManager.getCurrentUser) {
-        return window.authManager.getCurrentUser();
-    }
+    return window.authManager?.getCurrentUser?.() || null;
     
     // Fallback: try session storage (for backwards compatibility)
     const sessionData = sessionStorage.getItem('fsw_user_session');
