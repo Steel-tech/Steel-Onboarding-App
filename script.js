@@ -334,7 +334,7 @@ async function saveToSupabase(currentUser) {
     console.log('[FSW Debug] Preparing Supabase save...');
     
     // 1. Save/Update user profile
-    if (appState.employeeData && appState.employeeData.name) {
+    if (appState.employeeData?.name) {
         console.log('[FSW Debug] Saving user profile to Supabase...');
         
         const profileResult = await mcp__supabase__execute_sql({
