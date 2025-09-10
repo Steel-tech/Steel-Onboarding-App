@@ -1232,8 +1232,29 @@ function handleEmployeeLogin(event) {
         return;
     }
     
-    // Save employee data
-    appState.employeeData = employeeData;
+    // Generate unique user ID if not exists
+    const userId = `user_${employeeData.email.replace('@', '_').replace(/\./g, '_')}_${Date.now()}`;
+    
+    // Save employee data with user ID
+    appState.employeeData = {
+        ...employeeData,
+        employeeId: `EMP_${Date.now()}`,
+        userId: userId
+    };
+    
+    // Create user session for getCurrentEmployee()
+    const userSession = {
+        id: userId,
+        name: employeeData.name,
+        email: employeeData.email,
+        employeeId: appState.employeeData.employeeId
+    };
+    
+    // Store session
+    sessionStorage.setItem('fsw_user_session', JSON.stringify(userSession));
+    
+    console.log('[FSW Debug] Created user session:', userSession);
+    
     saveStateAsync();
     
     // Close modal
