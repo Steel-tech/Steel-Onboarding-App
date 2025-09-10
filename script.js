@@ -377,7 +377,7 @@ async function saveToSupabase(currentUser) {
         
         for (const moduleName of appState.completedModules) {
             const progressData = {
-                user_id: currentUser.id || `user_${Date.now()}`,
+                user_id: currentUser.id || crypto.randomUUID(),
                 employee_id: appState.employeeData.employeeId || `EMP_${Date.now()}`,
                 module_name: moduleName,
                 progress_data: JSON.stringify({ 
