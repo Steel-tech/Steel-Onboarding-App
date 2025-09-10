@@ -469,10 +469,24 @@ function completeModule(moduleName, button) {
         updateProgress();
         showNotification(`${moduleName.toUpperCase()} module completed!`);
         
-        // Check if all modules are completed
-        if (appState.completedModules.length === CONSTANTS.TOTAL_SAFETY_MODULES) {
+        // Check if all safety and equipment training modules are completed
+        const safetyModules = ['ppe', 'hazards', 'emergency', 'crane'];
+        const equipmentModules = ['welding-equipment', 'cutting-tools', 'lifting-equipment', 'measuring-tools', 'fabrication-machinery', 'field-equipment'];
+        
+        const safetyCompleted = safetyModules.every(module => appState.completedModules.includes(module));
+        const equipmentCompleted = equipmentModules.every(module => appState.completedModules.includes(module));
+        
+        if (safetyCompleted && equipmentCompleted) {
             setTimeout(() => {
-                showCompletionModal('All safety modules completed! Great job!');
+                showCompletionModal('Congratulations! You have completed all required safety training and equipment training. You are now ready for final sign-off!');
+            }, 500);
+        } else if (safetyCompleted && !equipmentCompleted) {
+            setTimeout(() => {
+                showNotification('All safety modules completed! Please complete equipment training modules to finish.', 'info');
+            }, 500);
+        } else if (equipmentCompleted && !safetyCompleted) {
+            setTimeout(() => {
+                showNotification('All equipment training completed! Please complete safety training modules to finish.', 'info');
             }, 500);
         }
     }
