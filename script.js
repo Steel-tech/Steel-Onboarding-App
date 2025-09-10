@@ -1055,7 +1055,7 @@ function trackDocumentDownload(documentName) {
     // Add to downloaded list if not already there
     if (!appState.downloadedDocuments.includes(documentName)) {
         appState.downloadedDocuments.push(documentName);
-        saveState();
+        saveStateAsync();
         
         // Check if all required documents have been downloaded
         const requiredDocs = [
@@ -1072,7 +1072,7 @@ function trackDocumentDownload(documentName) {
         
         if (allRequiredDownloaded && !appState.completedModules.includes('required-documents')) {
             appState.completedModules.push('required-documents');
-            saveState();
+            saveStateAsync();
             updateProgress();
             showNotification('All required documents have been downloaded!');
         } else {
@@ -1162,7 +1162,7 @@ function checkEmployeeLogin() {
             startDate: new Date().toISOString().split('T')[0],
             supervisor: 'HR Team'
         };
-        saveState();
+        saveStateAsync();
     }
     // Update the summary with employee data
     updateEmployeeSummary();
@@ -1360,7 +1360,7 @@ function downloadAllDocuments() {
                 }
             });
             
-            saveState();
+            saveStateAsync();
             updateProgress();
             showNotification('All documents downloaded successfully! 📁');
             
@@ -1915,7 +1915,7 @@ function startProgressTracking() {
 function completeVideoModule() {
     if (!appState.completedModules.includes('video')) {
         appState.completedModules.push('video');
-        saveState();
+        saveStateAsync();
         updateProgress();
         updateDocumentsAccess();
         
@@ -1952,7 +1952,7 @@ function markVideoComplete(button) {
     // Mark module as completed
     if (!appState.completedModules.includes('video')) {
         appState.completedModules.push('video');
-        saveState();
+        saveStateAsync();
         updateProgress();
     }
     
@@ -2486,7 +2486,7 @@ function initializeProcedureAcknowledgments() {
             };
             
             updateProcedureProgress();
-            saveState();
+            saveStateAsync();
             
             logger.info('Procedure acknowledgment updated', {
                 procedure: procedure,
