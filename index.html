@@ -450,53 +450,39 @@
             <!-- Video Orientation Section -->
             <section id="video" class="tab-content modern-section">
                 <h2 class="gradient-header">Employee Orientation Video</h2>
-                <p class="modern-subtitle">Welcome to Flawless Steel Welding! Please watch this important orientation video to learn about our company culture, safety standards, and what makes us Denver's premier steel welding company.</p>
+                <p class="modern-subtitle">Please watch this important orientation video to learn about our company culture, safety standards, and workplace expectations.</p>
                 
                 <div class="modern-content-block">
-                    <p>This video is required viewing for all new employees and provides essential information about working at Flawless Steel Welding.</p>
+                    <p><strong>Required viewing for all new employees.</strong> Duration: 15-20 minutes</p>
                 </div>
 
-                <!-- Video Access Card -->
-                <div class="modern-card video-access-card">
-                    <div class="video-hero">
-                        <i class="fas fa-play-circle" style="font-size: 4rem; color: var(--accent-color); margin-bottom: 1rem;"></i>
-                        <h3>Watch Your Orientation Video</h3>
-                        <p>Watch your required orientation video below. Use the video controls to play, pause, and adjust volume as needed.</p>
-                    </div>
-                    
-                    <!-- Primary Video Player -->
-                    <div class="video-player-section">
-                        <div id="youtubeVideoContainer" style="position: relative; width: 100%; max-width: 800px; margin: 0 auto;">
-                            <!-- YouTube iframe will be inserted here by JavaScript -->
-                            <div id="videoPlaceholder" style="width: 100%; height: 450px; background: linear-gradient(135deg, var(--primary-color), var(--accent-color)); display: flex; align-items: center; justify-content: center; border-radius: 8px; color: white; text-align: center;">
-                                <div>
-                                    <i class="fas fa-upload" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.8;"></i>
-                                    <h4 style="margin-bottom: 0.5rem;">Video Setup Required</h4>
-                                    <p style="margin: 0; opacity: 0.9;">Follow the YouTube setup instructions to enable the orientation video</p>
-                                </div>
+                <!-- Video Player -->
+                <div class="video-player-container">
+                    <div id="youtubeVideoContainer">
+                        <!-- YouTube iframe will be inserted here by JavaScript -->
+                        <div id="videoPlaceholder" class="video-placeholder">
+                            <div class="placeholder-content">
+                                <i class="fas fa-play-circle"></i>
+                                <h4>Loading Orientation Video...</h4>
+                                <p>Please wait while we load your orientation video</p>
                             </div>
                         </div>
-                        <p class="video-note" style="text-align: center; margin-top: 1rem; color: #666;">Duration: 15-20 minutes</p>
                     </div>
-
-                    <!-- Alternative Options -->
-                    <div class="video-alternatives">
-                        <h4><i class="fas fa-list"></i> Alternative Options:</h4>
-                        <div class="alternative-links">
-                            <button class="alt-link-btn" onclick="handleDocumentDownload('orientation-video.mp4', 'Orientation Video', this)">
-                                <i class="fas fa-download"></i> Download Video File
-                            </button>
-                            <button class="alt-link-btn" onclick="this.textContent='Contacting HR...'; setTimeout(() => window.location.href='tel:+17206387289', 1000);">
-                                <i class="fas fa-phone"></i> Request Live Session
-                            </button>
+                    
+                    <!-- Video Progress Indicator -->
+                    <div class="video-progress-section" id="videoProgressSection" style="display: none;">
+                        <div class="progress-bar-container">
+                            <div class="video-progress-bar">
+                                <div class="video-progress-fill" id="videoProgressFill"></div>
+                            </div>
+                            <span class="progress-text" id="videoProgressText">0% watched</span>
                         </div>
                     </div>
 
-                    <!-- Completion Tracking -->
+                    <!-- Completion Button -->
                     <div class="video-completion-section">
-                        <p><strong>After watching the video:</strong></p>
-                        <button class="modern-button completion-btn" data-module="video" onclick="markVideoComplete(this)">
-                            <i class="fas fa-check-circle"></i> Mark Video as Completed
+                        <button class="modern-button completion-btn disabled" data-module="video" id="videoCompletionBtn" disabled>
+                            <i class="fas fa-lock"></i> Complete Video First (90% required)
                         </button>
                         <div class="completion-status" id="videoCompletionStatus" style="display: none;">
                             <i class="fas fa-check-circle" style="color: var(--success-color);"></i>
