@@ -1861,20 +1861,6 @@ function markVideoComplete(button) {
         timestamp: Date.now(),
         completionMethod: 'manual_button_click'
     });
-    
-    // Show completion status
-    const completionStatus = document.getElementById('videoCompletionStatus');
-    if (completionStatus) {
-        completionStatus.style.display = 'block';
-    }
-    
-    // Track completion
-    trackAnalyticsEvent('video_completed', {
-        timestamp: Date.now(),
-        method: 'manual_mark'
-    });
-    
-    showNotification('Great! Orientation video marked as completed.');
 }
 
 // Add animation styles
