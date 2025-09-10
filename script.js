@@ -571,7 +571,7 @@ function completeModule(moduleName, button) {
         // Track module completion
         trackModuleCompletion(moduleName);
         
-        saveState();
+        saveState().catch(error => console.error('[FSW] Save state error in completeModule:', error));
         updateProgress();
         showNotification(`${moduleName.toUpperCase()} module completed!`);
         
