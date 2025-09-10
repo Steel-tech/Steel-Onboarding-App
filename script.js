@@ -1120,7 +1120,7 @@ function handleEmployeeLogin(event) {
     personalizeWelcomeSection();
     
     // Show success message
-    showNotification(`Welcome to Flawless Steel Welding, ${employeeData.name}!`, 'success');
+    showNotification(`Welcome to Flawless Steel Welding, ${employeeData.name || 'New Employee'}!`, 'success');
     
     // Update progress
     updateProgress();
