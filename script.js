@@ -127,61 +127,148 @@ function initializeApp(user) {
     // This triggers the authReady event handled above
 }
 
-// Load saved state from localStorage
-function loadState() {
+// Load saved state from Supabase with localStorage fallback
+async function loadState() {
     try {
         // Get current employee session
         const currentUser = getCurrentEmployee();
         if (!currentUser) {
-            console.warn('No employee session found, using default state');
+            console.warn('[FSW State] No employee session found, using default state');
             return;
         }
 
-        // Load employee-specific state
-        const stateKey = `fsw_onboarding_${currentUser.email}`;
-        const savedState = localStorage.getItem(stateKey);
-        
-        if (savedState) {
-            const parsedState = JSON.parse(savedState);
-            // Validate the loaded state structure
-            if (parsedState && typeof parsedState === 'object') {
-                appState = {
-                    ...appState, // Keep defaults
-                    ...parsedState, // Override with saved data
-                    employeeData: currentUser // Always use current session employee data
-                };
-                restoreCheckboxStates();
-                setTimeout(markDownloadedDocuments, 100);
-                console.log(`[FSW State] Loaded progress for ${currentUser.name}`);
+        console.log('[FSW Debug] Loading state for user:', currentUser.name);
+
+        // Try loading from Supabase first
+        if (window.supabase) {
+            try {
+                await loadFromSupabase(currentUser);
+                console.log('[FSW State] ✅ State loaded from Supabase successfully');
+                return;
+            } catch (supabaseError) {
+                console.warn('[FSW State] ⚠️ Supabase load failed, trying localStorage fallback:', supabaseError.message);
             }
-        } else {
-            // First time for this employee - set up fresh state with their info
-            appState.employeeData = currentUser;
-            console.log(`[FSW State] Fresh start for ${currentUser.name}`);
         }
+
+        // Fallback to localStorage
+        loadFromLocalStorage(currentUser);
+        
     } catch (error) {
-        console.error('Failed to load saved state:', error);
-        // Reset to default state if loading fails
-        const currentUser = getCurrentEmployee();
-        appState = {
-            currentTab: 'welcome',
-            progress: 0,
-            completedModules: [],
-            employeeData: currentUser || {},
-            checklistItems: {},
-            procedureAcknowledgments: {},
-            formCompletions: {},
-            digitalSignatures: {},
-            analytics: {
-                sessionStart: Date.now(),
-                timeSpentPerTab: {},
-                totalTimeSpent: 0,
-                completionTimes: {},
-                interactions: [],
-                lastActivity: Date.now()
-            }
-        };
+        console.error('[FSW State] Failed to load state:', error);
+        // If all loading fails, fall back to default state
+        resetToDefaultState();
     }
+}
+
+// Load data from Supabase
+async function loadFromSupabase(currentUser) {
+    console.log('[FSW Debug] Loading from Supabase...');
+    
+    // Load user profile
+    const { data: profile, error: profileError } = await window.supabase
+        .from('user_profiles')
+        .select('*')
+        .eq('user_id', currentUser.id)
+        .single();
+
+    if (profileError && profileError.code !== 'PGRST116') { // PGRST116 = not found
+        throw profileError;
+    }
+
+    if (profile) {
+        appState.employeeData = {
+            name: profile.name,
+            email: profile.email,
+            position: profile.position,
+            startDate: profile.start_date,
+            phone: profile.phone,
+            supervisor: profile.supervisor,
+            employeeId: profile.employee_id,
+            userId: profile.user_id
+        };
+        console.log('[FSW Debug] Profile loaded:', profile.name);
+    }
+
+    // Load progress data
+    const { data: progress, error: progressError } = await window.supabase
+        .from('onboarding_progress')
+        .select('*')
+        .eq('user_id', currentUser.id);
+
+    if (progressError) {
+        console.warn('[FSW Debug] Progress load error (continuing):', progressError.message);
+    } else if (progress && progress.length > 0) {
+        appState.completedModules = progress.map(p => p.module_name);
+        console.log('[FSW Debug] Loaded completed modules:', appState.completedModules);
+    }
+
+    // Load form submissions
+    const { data: forms, error: formsError } = await window.supabase
+        .from('form_submissions')
+        .select('*')
+        .eq('user_id', currentUser.id);
+
+    if (formsError) {
+        console.warn('[FSW Debug] Forms load error (continuing):', formsError.message);
+    } else if (forms && forms.length > 0) {
+        appState.formCompletions = {};
+        forms.forEach(form => {
+            appState.formCompletions[form.form_type] = JSON.parse(form.form_data);
+        });
+        console.log('[FSW Debug] Loaded form completions:', Object.keys(appState.formCompletions));
+    }
+
+    // Restore UI state
+    restoreCheckboxStates();
+    setTimeout(markDownloadedDocuments, 100);
+}
+
+// Load from localStorage (fallback)
+function loadFromLocalStorage(currentUser) {
+    console.log('[FSW State] Loading from localStorage fallback');
+    
+    const stateKey = `fsw_onboarding_${currentUser.email}`;
+    const savedState = localStorage.getItem(stateKey);
+    
+    if (savedState) {
+        const parsedState = JSON.parse(savedState);
+        if (parsedState && typeof parsedState === 'object') {
+            appState = {
+                ...appState,
+                ...parsedState,
+                employeeData: currentUser
+            };
+            restoreCheckboxStates();
+            setTimeout(markDownloadedDocuments, 100);
+            console.log(`[FSW State] 💾 Loaded from localStorage for ${currentUser.name}`);
+        }
+    } else {
+        appState.employeeData = currentUser;
+        console.log(`[FSW State] Fresh start for ${currentUser.name}`);
+    }
+}
+
+// Reset to default state
+function resetToDefaultState() {
+    const currentUser = getCurrentEmployee();
+    appState = {
+        currentTab: 'welcome',
+        progress: 0,
+        completedModules: [],
+        employeeData: currentUser || {},
+        checklistItems: {},
+        procedureAcknowledgments: {},
+        formCompletions: {},
+        digitalSignatures: {},
+        analytics: {
+            sessionStart: Date.now(),
+            timeSpentPerTab: {},
+            totalTimeSpent: 0,
+            completionTimes: {},
+            interactions: [],
+            lastActivity: Date.now()
+        }
+    };
 }
 
 function getCurrentEmployee() {
