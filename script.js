@@ -402,7 +402,16 @@ async function saveToSupabase(currentUser) {
                     ) VALUES ($1, $2, $3, $4, $5, $6, $7)
                     ON CONFLICT (user_id, form_type) DO UPDATE SET 
                         form_data = $4, digital_signature = $5, submitted_at = $6
-                    RETURNING id`
+                    RETURNING id`,
+                    params: [
+                        currentUser.id || `user_${Date.now()}`, // user_id
+                        appState.employeeData.employeeId || `EMP_${Date.now()}`, // employee_id
+                        formType, // form_type
+                        JSON.stringify(formData), // form_data
+                        appState.digitalSignatures?.[formType] || null, // digital_signature
+                        new Date().toISOString(), // submitted_at
+                        'browser_session' // ip_address placeholder
+                    ]
                 });
                 
                 console.log(`[FSW Debug] Form '${formType}' saved:`, formResult);
