@@ -329,37 +329,44 @@ async function saveState() {
     }
 }
 
-// Save data to Supabase using MCP
+// Save data to Supabase using direct client calls
 async function saveToSupabase(currentUser) {
     console.log('[FSW Debug] Preparing Supabase save...');
+    
+    // Check if Supabase client is available
+    if (!window.supabase) {
+        throw new Error('Supabase client not available');
+    }
     
     // 1. Save/Update user profile
     if (appState.employeeData?.name) {
         console.log('[FSW Debug] Saving user profile to Supabase...');
         
-        const profileResult = await mcp__supabase__execute_sql({
-            query: `INSERT INTO user_profiles (
-                user_id, name, email, position, start_date, phone, supervisor, 
-                employee_id, onboarding_completed, updated_at
-            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
-            ON CONFLICT (user_id) DO UPDATE SET 
-                name = $2, email = $3, position = $4, start_date = $5, 
-                phone = $6, supervisor = $7, employee_id = $8, 
-                onboarding_completed = $9, updated_at = $10
-            RETURNING id`,
-            params: [
-                currentUser.id || `user_${Date.now()}`, // user_id
-                appState.employeeData.name || currentUser.name, // name
-                appState.employeeData.email || currentUser.email, // email
-                appState.employeeData.position || 'Employee', // position
-                appState.employeeData.startDate || new Date().toISOString().split('T')[0], // start_date
-                appState.employeeData.phone || null, // phone
-                appState.employeeData.supervisor || 'HR Team', // supervisor
-                appState.employeeData.employeeId || `EMP_${Date.now()}`, // employee_id
-                appState.progress >= 100, // onboarding_completed
-                new Date().toISOString() // updated_at
-            ]
-        });
+        const profileData = {
+            user_id: currentUser.id || `user_${Date.now()}`,
+            name: appState.employeeData.name || currentUser.name,
+            email: appState.employeeData.email || currentUser.email,
+            position: appState.employeeData.position || 'Employee',
+            start_date: appState.employeeData.startDate || new Date().toISOString().split('T')[0],
+            phone: appState.employeeData.phone || null,
+            supervisor: appState.employeeData.supervisor || 'HR Team',
+            employee_id: appState.employeeData.employeeId || `EMP_${Date.now()}`,
+            onboarding_completed: appState.progress >= 100,
+            updated_at: new Date().toISOString()
+        };
+        
+        const { data: profileResult, error: profileError } = await window.supabase
+            .from('user_profiles')
+            .upsert(profileData, { 
+                onConflict: 'user_id',
+                ignoreDuplicates: false 
+            })
+            .select();
+        
+        if (profileError) {
+            console.error('[FSW Debug] Profile save error:', profileError);
+            throw profileError;
+        }
         
         console.log('[FSW Debug] User profile saved:', profileResult);
     }
@@ -369,21 +376,31 @@ async function saveToSupabase(currentUser) {
         console.log('[FSW Debug] Saving module progress to Supabase...');
         
         for (const moduleName of appState.completedModules) {
-            const progressResult = await mcp__supabase__execute_sql({
-                query: `INSERT INTO onboarding_progress (
-                    user_id, employee_id, module_name, progress_data, completed_at
-                ) VALUES ($1, $2, $3, $4, $5)
-                ON CONFLICT (user_id, module_name) DO UPDATE SET 
-                    progress_data = $4, completed_at = $5
-                RETURNING id`,
-                params: [
-                    currentUser.id || `user_${Date.now()}`, // user_id
-                    appState.employeeData.employeeId || `EMP_${Date.now()}`, // employee_id
-                    moduleName, // module_name
-                    JSON.stringify({ module: moduleName, progress: appState.progress, completedAt: new Date().toISOString() }), // progress_data
-                    new Date().toISOString() // completed_at
-                ]
-            });
+            const progressData = {
+                user_id: currentUser.id || `user_${Date.now()}`,
+                employee_id: appState.employeeData.employeeId || `EMP_${Date.now()}`,
+                module_name: moduleName,
+                progress_data: JSON.stringify({ 
+                    module: moduleName, 
+                    progress: appState.progress, 
+                    completedAt: new Date().toISOString() 
+                }),
+                completed_at: new Date().toISOString()
+            };
+            
+            const { data: progressResult, error: progressError } = await window.supabase
+                .from('onboarding_progress')
+                .upsert(progressData, { 
+                    onConflict: 'user_id,module_name',
+                    ignoreDuplicates: false 
+                })
+                .select();
+            
+            if (progressError) {
+                console.error(`[FSW Debug] Progress save error for ${moduleName}:`, progressError);
+                // Continue with other modules even if one fails
+                continue;
+            }
             
             console.log(`[FSW Debug] Module '${moduleName}' progress saved:`, progressResult);
         }
@@ -395,24 +412,28 @@ async function saveToSupabase(currentUser) {
         
         for (const [formType, formData] of Object.entries(appState.formCompletions)) {
             if (formData.completed) {
-                const formResult = await mcp__supabase__execute_sql({
-                    query: `INSERT INTO form_submissions (
-                        user_id, employee_id, form_type, form_data, 
-                        digital_signature, submitted_at, ip_address
-                    ) VALUES ($1, $2, $3, $4, $5, $6, $7)
-                    ON CONFLICT (user_id, form_type) DO UPDATE SET 
-                        form_data = $4, digital_signature = $5, submitted_at = $6
-                    RETURNING id`,
-                    params: [
-                        currentUser.id || `user_${Date.now()}`, // user_id
-                        appState.employeeData.employeeId || `EMP_${Date.now()}`, // employee_id
-                        formType, // form_type
-                        JSON.stringify(formData), // form_data
-                        appState.digitalSignatures?.[formType] || null, // digital_signature
-                        new Date().toISOString(), // submitted_at
-                        'browser_session' // ip_address placeholder
-                    ]
-                });
+                const submissionData = {
+                    user_id: currentUser.id || `user_${Date.now()}`,
+                    employee_id: appState.employeeData.employeeId || `EMP_${Date.now()}`,
+                    form_type: formType,
+                    form_data: JSON.stringify(formData),
+                    digital_signature: appState.digitalSignatures?.[formType] || null,
+                    submitted_at: new Date().toISOString(),
+                    ip_address: 'browser_session'
+                };
+                
+                const { data: formResult, error: formError } = await window.supabase
+                    .from('form_submissions')
+                    .upsert(submissionData, { 
+                        onConflict: 'user_id,form_type',
+                        ignoreDuplicates: false 
+                    })
+                    .select();
+                
+                if (formError) {
+                    console.error(`[FSW Debug] Form save error for ${formType}:`, formError);
+                    continue;
+                }
                 
                 console.log(`[FSW Debug] Form '${formType}' saved:`, formResult);
             }
