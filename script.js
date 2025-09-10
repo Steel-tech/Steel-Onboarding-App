@@ -1562,7 +1562,15 @@ function generateCompletionReport() {
 function showCompletionModal(message) {
     const modal = document.getElementById('completionModal');
     const modalContent = modal.querySelector('p:nth-of-type(1)');
+    const employeeNameSpan = document.getElementById('completionEmployeeName');
+    
     modalContent.textContent = message;
+    
+    // Update employee name from sign-in data
+    if (employeeNameSpan && appState.employeeData && appState.employeeData.name) {
+        employeeNameSpan.textContent = appState.employeeData.name;
+    }
+    
     modal.style.display = 'block';
 }
 
