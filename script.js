@@ -557,7 +557,7 @@ function showTab(tabName) {
 
     // Save state
     appState.currentTab = tabName;
-    saveState();
+    saveState().catch(error => console.error('[FSW] Save state error in showTab:', error));
 }
 
 // Complete safety module with analytics
