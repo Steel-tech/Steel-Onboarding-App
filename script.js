@@ -1012,15 +1012,21 @@ function updateDocumentsAccess() {
 
 // Employee Login Functions
 function checkEmployeeLogin() {
+    // Skip login modal - go straight to onboarding (restored from 10:49:13 AM version)
+    // Set default employee data if none exists
     if (!appState.employeeData || Object.keys(appState.employeeData).length === 0 || !appState.employeeData.name) {
-        // No employee data, show login modal
-        setTimeout(() => {
-            showEmployeeLoginModal();
-        }, 500);
-    } else {
-        // Employee data exists, update the summary
-        updateEmployeeSummary();
+        appState.employeeData = {
+            name: 'New Employee',
+            email: 'employee@flawlesssteel.com',
+            phone: '(720) 638-7289',
+            position: 'Team Member',
+            startDate: new Date().toISOString().split('T')[0],
+            supervisor: 'HR Team'
+        };
+        saveState();
     }
+    // Update the summary with employee data
+    updateEmployeeSummary();
 }
 
 function showEmployeeLoginModal() {

@@ -55,6 +55,71 @@
         </div>
     </div>
 
+    <!-- Employee Login Modal -->
+    <div id="employeeLoginModal" class="modal" style="display: none; z-index: 10000;">
+        <div class="modal-content" style="max-width: 600px; margin: 5% auto;">
+            <div class="modal-header">
+                <h2 style="color: var(--primary-color); margin-bottom: 0.5rem;">
+                    <i class="fas fa-user-circle"></i> Employee Sign-In
+                </h2>
+                <p style="color: #666; margin-bottom: 1.5rem;">Please provide your information to begin the onboarding process</p>
+            </div>
+            
+            <form id="employeeLoginForm" style="padding: 0 1rem;">
+                <div class="form-field">
+                    <label for="login-name">Full Name *</label>
+                    <input type="text" id="login-name" name="name" placeholder="Enter your full legal name" 
+                           required maxlength="50">
+                </div>
+                
+                <div class="form-field">
+                    <label for="login-email">Email Address *</label>
+                    <input type="email" id="login-email" name="email" placeholder="your.email@fsw-denver.com" 
+                           required>
+                </div>
+                
+                <div class="form-field">
+                    <label for="login-phone">Phone Number *</label>
+                    <input type="tel" id="login-phone" name="phone" placeholder="(555) 123-4567" 
+                           required>
+                </div>
+                
+                <div class="form-field">
+                    <label for="login-position">Position/Role *</label>
+                    <select id="login-position" name="position" required>
+                        <option value="">Select your position</option>
+                        <option value="Ironworker">Ironworker</option>
+                        <option value="Welder">Welder</option>
+                        <option value="Fabricator">Fabricator</option>
+                        <option value="Shop Foreman">Shop Foreman</option>
+                        <option value="Project Manager">Project Manager</option>
+                        <option value="Crane Operator">Crane Operator</option>
+                        <option value="Quality Inspector">Quality Inspector</option>
+                        <option value="Safety Coordinator">Safety Coordinator</option>
+                        <option value="Office Administrator">Office Administrator</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                
+                <div class="form-field">
+                    <label for="login-start-date">Start Date *</label>
+                    <input type="date" id="login-start-date" name="startDate" required>
+                </div>
+                
+                <div class="form-field">
+                    <label for="login-supervisor">Supervisor Name</label>
+                    <input type="text" id="login-supervisor" name="supervisor" placeholder="Supervisor's name (if known)" 
+                           maxlength="50">
+                </div>
+                
+                <div style="text-align: center; margin-top: 2rem;">
+                    <button type="submit" class="modern-button" style="background: linear-gradient(135deg, #2c3e50, #3498db); font-size: 1.1rem; padding: 1rem 2rem; min-width: 200px;">
+                        <i class="fas fa-sign-in-alt"></i> Begin Onboarding
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
     <div class="app-container">
         <!-- Header -->
         <header class="app-header">
@@ -401,21 +466,15 @@
                     <div class="video-hero">
                         <i class="fas fa-play-circle" style="font-size: 4rem; color: var(--accent-color); margin-bottom: 1rem;"></i>
                         <h3>Watch Your Orientation Video</h3>
-                        <p>Watch your required orientation video below. Use the video controls to play, pause, and adjust volume as needed.</p>
+                        <p>Click the button below to access your required orientation video. This will open in a new tab for the best viewing experience.</p>
                     </div>
                     
                     <!-- Primary Video Player -->
                     <div class="video-player-section">
-                        <div id="youtubeVideoContainer" style="position: relative; width: 100%; max-width: 800px; margin: 0 auto;">
-                            <!-- YouTube iframe will be inserted here by JavaScript -->
-                            <div id="videoPlaceholder" style="width: 100%; height: 450px; background: linear-gradient(135deg, var(--primary-color), var(--accent-color)); display: flex; align-items: center; justify-content: center; border-radius: 8px; color: white; text-align: center;">
-                                <div>
-                                    <i class="fas fa-upload" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.8;"></i>
-                                    <h4 style="margin-bottom: 0.5rem;">Video Setup Required</h4>
-                                    <p style="margin: 0; opacity: 0.9;">Follow the YouTube setup instructions to enable the orientation video</p>
-                                </div>
-                            </div>
-                        </div>
+                        <video id="orientationVideo" controls preload="metadata" style="width: 100%; max-width: 800px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                            <source src="orientation-video.mp4" type="video/mp4">
+                            <p>Your browser doesn't support HTML5 video. You can <a href="orientation-video.mp4" download>download the video</a> instead.</p>
+                        </video>
                         <p class="video-note" style="text-align: center; margin-top: 1rem; color: #666;">Duration: 15-20 minutes</p>
                     </div>
 
