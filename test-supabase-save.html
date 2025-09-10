@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Supabase Save Function</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 10px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #0056b3; }
+        button:disabled { background: #6c757d; cursor: not-allowed; }
+        #console-output {
+            background: #000;
+            color: #0f0;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Supabase Save Function Test</h1>
+    
+    <div class="test-container">
+        <h2>Test Setup</h2>
+        <div id="setup-status" class="status info">Initializing test environment...</div>
+        <button onclick="runTest()" id="test-btn" disabled>Run Save Test</button>
+        <button onclick="checkDatabase()" id="db-btn" disabled>Check Database</button>
+        <button onclick="clearLogs()" id="clear-btn">Clear Console</button>
+    </div>
+
+    <div class="test-container">
+        <h2>Console Output</h2>
+        <div id="console-output">Waiting for test to start...\n</div>
+    </div>
+
+    <div class="test-container">
+        <h2>Database Results</h2>
+        <div id="database-results">
+            <p>Click "Check Database" after running the test to see if data was saved to Supabase.</p>
+        </div>
+    </div>
+
+    <!-- Include MCP functions -->
+    <script>
+        // Mock MCP function for testing if not available
+        if (typeof window.mcp__supabase__execute_sql === 'undefined') {
+            window.mcp__supabase__execute_sql = async function(options) {
+                log('[MOCK MCP] Would execute SQL:', options.query);
+                log('[MOCK MCP] With params:', JSON.stringify(options.params));
+                return { rows: [{ id: Math.floor(Math.random() * 1000) }] };
+            };
+        }
+
+        // Mock current user for testing
+        window.getCurrentEmployee = function() {
+            return {
+                id: 'test_user_123',
+                name: 'John Test',
+                email: 'john.test@flawlesssteelwelding.com'
+            };
+        };
+
+        // Test app state
+        let appState = {
+            employeeData: {
+                name: 'John Test',
+                email: 'john.test@flawlesssteelwelding.com',
+                position: 'Welder',
+                startDate: '2025-01-10',
+                phone: '(720) 555-0123',
+                supervisor: 'Mike Johnson',
+                employeeId: 'EMP_TEST_001'
+            },
+            completedModules: ['ppe', 'safety-basics'],
+            formCompletions: {
+                'employee-form': { completed: true, completedAt: new Date().toISOString() },
+                'safety-quiz': { completed: true, score: 95 }
+            },
+            digitalSignatures: {
+                'employee-form': 'signature_data_123'
+            },
+            progress: 45
+        };
+
+        function log(message) {
+            const output = document.getElementById('console-output');
+            const timestamp = new Date().toLocaleTimeString();
+            output.textContent += `[${timestamp}] ${message}\n`;
+            output.scrollTop = output.scrollHeight;
+        }
+
+        function clearLogs() {
+            document.getElementById('console-output').textContent = '';
+        }
+
+        function setStatus(message, type = 'info') {
+            const statusEl = document.getElementById('setup-status');
+            statusEl.textContent = message;
+            statusEl.className = `status ${type}`;
+        }
+
+        // Copy the saveToSupabase function from script.js
+        async function saveToSupabase(currentUser) {
+            log('[FSW Debug] Preparing Supabase save...');
+            
+            // 1. Save/Update user profile
+            if (appState.employeeData?.name) {
+                log('[FSW Debug] Saving user profile to Supabase...');
+                
+                const profileResult = await mcp__supabase__execute_sql({
+                    query: `INSERT INTO user_profiles (
+                        user_id, name, email, position, start_date, phone, supervisor, 
+                        employee_id, onboarding_completed, updated_at
+                    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+                    ON CONFLICT (user_id) DO UPDATE SET 
+                        name = $2, email = $3, position = $4, start_date = $5, 
+                        phone = $6, supervisor = $7, employee_id = $8, 
+                        onboarding_completed = $9, updated_at = $10
+                    RETURNING id`,
+                    params: [
+                        currentUser.id || `user_${Date.now()}`,
+                        appState.employeeData.name || currentUser.name,
+                        appState.employeeData.email || currentUser.email,
+                        appState.employeeData.position || 'Employee',
+                        appState.employeeData.startDate || new Date().toISOString().split('T')[0],
+                        appState.employeeData.phone || null,
+                        appState.employeeData.supervisor || 'HR Team',
+                        appState.employeeData.employeeId || `EMP_${Date.now()}`,
+                        appState.progress >= 100,
+                        new Date().toISOString()
+                    ]
+                });
+                
+                log('[FSW Debug] User profile saved: ' + JSON.stringify(profileResult));
+            }
+            
+            // 2. Save module progress
+            if (appState.completedModules && appState.completedModules.length > 0) {
+                log('[FSW Debug] Saving module progress to Supabase...');
+                
+                for (const moduleName of appState.completedModules) {
+                    const progressResult = await mcp__supabase__execute_sql({
+                        query: `INSERT INTO onboarding_progress (
+                            user_id, employee_id, module_name, progress_data, completed_at
+                        ) VALUES ($1, $2, $3, $4, $5)
+                        ON CONFLICT (user_id, module_name) DO UPDATE SET 
+                            progress_data = $4, completed_at = $5
+                        RETURNING id`,
+                        params: [
+                            currentUser.id || `user_${Date.now()}`,
+                            appState.employeeData.employeeId || `EMP_${Date.now()}`,
+                            moduleName,
+                            JSON.stringify({ module: moduleName, progress: appState.progress, completedAt: new Date().toISOString() }),
+                            new Date().toISOString()
+                        ]
+                    });
+                    
+                    log(`[FSW Debug] Module '${moduleName}' progress saved: ` + JSON.stringify(progressResult));
+                }
+            }
+            
+            log('[FSW Debug] ✅ All data successfully saved to Supabase');
+        }
+
+        async function runTest() {
+            try {
+                setStatus('Running save test...', 'info');
+                log('🧪 Starting Supabase save test...');
+                
+                const currentUser = getCurrentEmployee();
+                log('Test user: ' + JSON.stringify(currentUser));
+                log('App state: ' + JSON.stringify(appState, null, 2));
+                
+                await saveToSupabase(currentUser);
+                
+                setStatus('✅ Save test completed successfully!', 'success');
+                log('🎉 Test completed successfully!');
+                
+                document.getElementById('db-btn').disabled = false;
+                
+            } catch (error) {
+                setStatus('❌ Save test failed: ' + error.message, 'error');
+                log('💥 Test failed with error: ' + error.message);
+                log('Error details: ' + error.stack);
+            }
+        }
+
+        async function checkDatabase() {
+            try {
+                log('🔍 Checking database for saved data...');
+                
+                const userCheck = await mcp__supabase__execute_sql({
+                    query: "SELECT * FROM user_profiles WHERE user_id = $1",
+                    params: ['test_user_123']
+                });
+                
+                const progressCheck = await mcp__supabase__execute_sql({
+                    query: "SELECT * FROM onboarding_progress WHERE user_id = $1",
+                    params: ['test_user_123']
+                });
+                
+                const resultsDiv = document.getElementById('database-results');
+                resultsDiv.innerHTML = `
+                    <h3>User Profile Results:</h3>
+                    <pre>${JSON.stringify(userCheck, null, 2)}</pre>
+                    <h3>Progress Results:</h3>
+                    <pre>${JSON.stringify(progressCheck, null, 2)}</pre>
+                `;
+                
+                log('📊 Database check completed - see results above');
+                
+            } catch (error) {
+                log('💥 Database check failed: ' + error.message);
+                document.getElementById('database-results').innerHTML = 
+                    `<div class="status error">Database check failed: ${error.message}</div>`;
+            }
+        }
+
+        // Initialize
+        window.addEventListener('DOMContentLoaded', function() {
+            setStatus('✅ Test environment ready', 'success');
+            document.getElementById('test-btn').disabled = false;
+            log('🚀 Test environment initialized and ready');
+        });
+    </script>
+</body>
+</html>
