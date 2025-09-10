@@ -1232,8 +1232,8 @@ function handleEmployeeLogin(event) {
         return;
     }
     
-    // Generate unique user ID if not exists
-    const userId = `user_${employeeData.email.replace('@', '_').replace(/\./g, '_')}_${Date.now()}`;
+    // Generate UUID for user ID (Supabase expects UUID format)
+    const userId = crypto.randomUUID();
     
     // Save employee data with user ID
     appState.employeeData = {
