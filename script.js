@@ -95,9 +95,9 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('[FSW App] Authentication ready, initializing app for:', user.name);
         
         // Initialize app with authenticated user
-        setTimeout(() => {
+        setTimeout(async () => {
             DOM_CACHE.init();
-            loadState();
+            await loadState();
             initializeEventListeners();
             initializeVideoPlayer();
             updateProgress();
