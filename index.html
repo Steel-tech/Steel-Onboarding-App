@@ -1200,150 +1200,6 @@
 
                 </div>
 
-                <div class="doc-category">
-                    <h3><i class="fas fa-file-signature"></i> Complete Required Forms with Digital Signatures</h3>
-                    <div class="acknowledgment-summary">
-                        <div class="forms-intro">
-                            <p><strong>REQUIRED:</strong> All forms below must be completed and digitally signed to complete your onboarding process. Each form confirms your understanding of critical safety, policy, and training requirements.</p>
-                            <div class="forms-notice">
-                                <i class="fas fa-exclamation-triangle"></i>
-                                <span>Digital signatures are legally binding and required for employment verification</span>
-                            </div>
-                        </div>
-                        
-                        <div class="required-forms">
-                            <div class="form-item" data-form="handbook">
-                                <div class="form-icon">
-                                    <i class="fas fa-book"></i>
-                                </div>
-                                <div class="form-info">
-                                    <h5>Employee Handbook Acknowledgment</h5>
-                                    <p>Acknowledge receipt and understanding of company policies, procedures, benefits, and workplace expectations</p>
-                                    <div class="form-details">
-                                        <span class="form-type">Legal Document</span>
-                                        <span class="form-time">Est. 3-5 minutes</span>
-                                    </div>
-                                    <span class="form-status" id="handbook-status">Not Completed</span>
-                                </div>
-                                <button class="fill-form-btn" onclick="openFillableForm('handbook')">
-                                    <i class="fas fa-edit"></i> Complete Form
-                                </button>
-                            </div>
-                            
-                            <div class="form-item" data-form="health-safety">
-                                <div class="form-icon">
-                                    <i class="fas fa-hard-hat"></i>
-                                </div>
-                                <div class="form-info">
-                                    <h5>Health & Safety Manual Acknowledgment</h5>
-                                    <p>Confirm understanding of OSHA compliance, safety protocols, and emergency procedures for steel fabrication work</p>
-                                    <div class="form-details">
-                                        <span class="form-type">Safety Critical</span>
-                                        <span class="form-time">Est. 5-7 minutes</span>
-                                    </div>
-                                    <span class="form-status" id="health-safety-status">Not Completed</span>
-                                </div>
-                                <button class="fill-form-btn" onclick="openFillableForm('health-safety')">
-                                    <i class="fas fa-edit"></i> Complete Form
-                                </button>
-                            </div>
-                            
-                            <div class="form-item" data-form="new-hire-orientation">
-                                <div class="form-icon">
-                                    <i class="fas fa-graduation-cap"></i>
-                                </div>
-                                <div class="form-info">
-                                    <h5>New Hire Orientation Acknowledgment</h5>
-                                    <p>Verify completion of orientation training covering your first 30 days and integration into our team</p>
-                                    <div class="form-details">
-                                        <span class="form-type">Training Record</span>
-                                        <span class="form-time">Est. 2-3 minutes</span>
-                                    </div>
-                                    <span class="form-status" id="new-hire-orientation-status">Not Completed</span>
-                                </div>
-                                <button class="fill-form-btn" onclick="openFillableForm('new-hire-orientation')">
-                                    <i class="fas fa-edit"></i> Complete Form
-                                </button>
-                            </div>
-                            
-                            <div class="form-item" data-form="steel-erection">
-                                <div class="form-icon">
-                                    <i class="fas fa-industry"></i>
-                                </div>
-                                <div class="form-info">
-                                    <h5>Steel Erection Safety Training Acknowledgment</h5>
-                                    <p>Acknowledge specialized training for steel erection procedures, rigging safety, and fall protection requirements</p>
-                                    <div class="form-details">
-                                        <span class="form-type">Technical Certification</span>
-                                        <span class="form-time">Est. 4-6 minutes</span>
-                                    </div>
-                                    <span class="form-status" id="steel-erection-status">Not Completed</span>
-                                </div>
-                                <button class="fill-form-btn" onclick="openFillableForm('steel-erection')">
-                                    <i class="fas fa-edit"></i> Complete Form
-                                </button>
-                            </div>
-                            
-                            <div class="form-item" data-form="welding-procedures">
-                                <div class="form-icon">
-                                    <i class="fas fa-fire"></i>
-                                </div>
-                                <div class="form-info">
-                                    <h5>Welding Procedures Training Acknowledgment</h5>
-                                    <p>Confirm understanding of Welding Procedure Specifications (WPS), quality standards, and certification requirements</p>
-                                    <div class="form-details">
-                                        <span class="form-type">Technical Certification</span>
-                                        <span class="form-time">Est. 3-4 minutes</span>
-                                    </div>
-                                    <span class="form-status" id="welding-procedures-status">Not Completed</span>
-                                </div>
-                                <button class="fill-form-btn" onclick="openFillableForm('welding-procedures')">
-                                    <i class="fas fa-edit"></i> Complete Form
-                                </button>
-                            </div>
-
-                            <div class="form-item" data-form="equipment-training">
-                                <div class="form-icon">
-                                    <i class="fas fa-cogs"></i>
-                                </div>
-                                <div class="form-info">
-                                    <h5>Equipment & Tools Training Acknowledgment</h5>
-                                    <p>Verify training completion on all shop and field equipment including cranes, fabrication machinery, and precision tools</p>
-                                    <div class="form-details">
-                                        <span class="form-type">Equipment Certification</span>
-                                        <span class="form-time">Est. 3-5 minutes</span>
-                                    </div>
-                                    <span class="form-status" id="equipment-training-status">Not Completed</span>
-                                </div>
-                                <button class="fill-form-btn" onclick="openFillableForm('equipment-training')">
-                                    <i class="fas fa-edit"></i> Complete Form
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <div class="acknowledgment-progress">
-                            <div class="progress-header">
-                                <h4>Form Completion Progress</h4>
-                                <p>Complete all forms to finish your onboarding process</p>
-                            </div>
-                            <div class="progress-summary">
-                                <span class="progress-label">Forms Completed:</span>
-                                <span class="progress-count" id="acknowledgment-count">0 of 6</span>
-                            </div>
-                            <div class="acknowledgment-progress-bar">
-                                <div class="acknowledgment-progress-fill" id="acknowledgment-progress" style="width: 0%"></div>
-                            </div>
-                            <div class="progress-actions">
-                                <button class="bulk-action-btn" onclick="downloadAllCompletedForms()">
-                                    <i class="fas fa-download"></i> Download Completed Forms
-                                </button>
-                                <button class="bulk-action-btn" onclick="emailFormsToHR()">
-                                    <i class="fas fa-envelope"></i> Send to HR
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </section>
 
             <!-- Checklist Section -->
@@ -1686,6 +1542,152 @@
                                         <i class="fas fa-list-alt"></i> System Logs
                                     </button>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Complete Required Forms with Digital Signatures -->
+                <div class="doc-category">
+                    <h3><i class="fas fa-file-signature"></i> Complete Required Forms with Digital Signatures</h3>
+                    <div class="acknowledgment-summary">
+                        <div class="forms-intro">
+                            <p><strong>REQUIRED:</strong> All forms below must be completed and digitally signed to complete your onboarding process. Each form confirms your understanding of critical safety, policy, and training requirements.</p>
+                            <div class="forms-notice">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <span>Digital signatures are legally binding and required for employment verification</span>
+                            </div>
+                        </div>
+                        
+                        <div class="required-forms">
+                            <div class="form-item" data-form="handbook">
+                                <div class="form-icon">
+                                    <i class="fas fa-book"></i>
+                                </div>
+                                <div class="form-info">
+                                    <h5>Employee Handbook Acknowledgment</h5>
+                                    <p>Acknowledge receipt and understanding of company policies, procedures, benefits, and workplace expectations</p>
+                                    <div class="form-details">
+                                        <span class="form-type">Legal Document</span>
+                                        <span class="form-time">Est. 3-5 minutes</span>
+                                    </div>
+                                    <span class="form-status" id="handbook-status">Not Completed</span>
+                                </div>
+                                <button class="fill-form-btn" onclick="openFillableForm('handbook')">
+                                    <i class="fas fa-edit"></i> Complete Form
+                                </button>
+                            </div>
+                            
+                            <div class="form-item" data-form="health-safety">
+                                <div class="form-icon">
+                                    <i class="fas fa-hard-hat"></i>
+                                </div>
+                                <div class="form-info">
+                                    <h5>Health & Safety Manual Acknowledgment</h5>
+                                    <p>Confirm understanding of OSHA compliance, safety protocols, and emergency procedures for steel fabrication work</p>
+                                    <div class="form-details">
+                                        <span class="form-type">Safety Critical</span>
+                                        <span class="form-time">Est. 5-7 minutes</span>
+                                    </div>
+                                    <span class="form-status" id="health-safety-status">Not Completed</span>
+                                </div>
+                                <button class="fill-form-btn" onclick="openFillableForm('health-safety')">
+                                    <i class="fas fa-edit"></i> Complete Form
+                                </button>
+                            </div>
+                            
+                            <div class="form-item" data-form="new-hire-orientation">
+                                <div class="form-icon">
+                                    <i class="fas fa-graduation-cap"></i>
+                                </div>
+                                <div class="form-info">
+                                    <h5>New Hire Orientation Acknowledgment</h5>
+                                    <p>Verify completion of orientation training covering your first 30 days and integration into our team</p>
+                                    <div class="form-details">
+                                        <span class="form-type">Training Record</span>
+                                        <span class="form-time">Est. 2-3 minutes</span>
+                                    </div>
+                                    <span class="form-status" id="new-hire-orientation-status">Not Completed</span>
+                                </div>
+                                <button class="fill-form-btn" onclick="openFillableForm('new-hire-orientation')">
+                                    <i class="fas fa-edit"></i> Complete Form
+                                </button>
+                            </div>
+                            
+                            <div class="form-item" data-form="steel-erection">
+                                <div class="form-icon">
+                                    <i class="fas fa-industry"></i>
+                                </div>
+                                <div class="form-info">
+                                    <h5>Steel Erection Safety Training Acknowledgment</h5>
+                                    <p>Acknowledge specialized training for steel erection procedures, rigging safety, and fall protection requirements</p>
+                                    <div class="form-details">
+                                        <span class="form-type">Technical Certification</span>
+                                        <span class="form-time">Est. 4-6 minutes</span>
+                                    </div>
+                                    <span class="form-status" id="steel-erection-status">Not Completed</span>
+                                </div>
+                                <button class="fill-form-btn" onclick="openFillableForm('steel-erection')">
+                                    <i class="fas fa-edit"></i> Complete Form
+                                </button>
+                            </div>
+                            
+                            <div class="form-item" data-form="welding-procedures">
+                                <div class="form-icon">
+                                    <i class="fas fa-fire"></i>
+                                </div>
+                                <div class="form-info">
+                                    <h5>Welding Procedures Training Acknowledgment</h5>
+                                    <p>Confirm understanding of Welding Procedure Specifications (WPS), quality standards, and certification requirements</p>
+                                    <div class="form-details">
+                                        <span class="form-type">Technical Certification</span>
+                                        <span class="form-time">Est. 3-4 minutes</span>
+                                    </div>
+                                    <span class="form-status" id="welding-procedures-status">Not Completed</span>
+                                </div>
+                                <button class="fill-form-btn" onclick="openFillableForm('welding-procedures')">
+                                    <i class="fas fa-edit"></i> Complete Form
+                                </button>
+                            </div>
+
+                            <div class="form-item" data-form="equipment-training">
+                                <div class="form-icon">
+                                    <i class="fas fa-cogs"></i>
+                                </div>
+                                <div class="form-info">
+                                    <h5>Equipment & Tools Training Acknowledgment</h5>
+                                    <p>Verify training completion on all shop and field equipment including cranes, fabrication machinery, and precision tools</p>
+                                    <div class="form-details">
+                                        <span class="form-type">Equipment Certification</span>
+                                        <span class="form-time">Est. 3-5 minutes</span>
+                                    </div>
+                                    <span class="form-status" id="equipment-training-status">Not Completed</span>
+                                </div>
+                                <button class="fill-form-btn" onclick="openFillableForm('equipment-training')">
+                                    <i class="fas fa-edit"></i> Complete Form
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="acknowledgment-progress">
+                            <div class="progress-header">
+                                <h4>Form Completion Progress</h4>
+                                <p>Complete all forms to finish your onboarding process</p>
+                            </div>
+                            <div class="progress-summary">
+                                <span class="progress-label">Forms Completed:</span>
+                                <span class="progress-count" id="acknowledgment-count">0 of 6</span>
+                            </div>
+                            <div class="acknowledgment-progress-bar">
+                                <div class="acknowledgment-progress-fill" id="acknowledgment-progress" style="width: 0%"></div>
+                            </div>
+                            <div class="progress-actions">
+                                <button class="bulk-action-btn" onclick="downloadAllCompletedForms()">
+                                    <i class="fas fa-download"></i> Download Completed Forms
+                                </button>
+                                <button class="bulk-action-btn" onclick="emailFormsToHR()">
+                                    <i class="fas fa-envelope"></i> Send to HR
+                                </button>
                             </div>
                         </div>
                     </div>
