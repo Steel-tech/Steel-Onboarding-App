@@ -1213,7 +1213,7 @@ function handleEmployeeLogin(event) {
     
     // Save employee data
     appState.employeeData = employeeData;
-    saveState();
+    saveStateAsync();
     
     // Close modal
     document.getElementById('employeeLoginModal').style.display = 'none';
@@ -2433,7 +2433,7 @@ window.addEventListener('beforeunload', (event) => {
     clearInterval(progressUpdateTimer);
     
     // Save final state
-    saveState();
+    saveStateAsync();
     
     // Check if there are unsaved changes
     const hasUnsavedChanges = checkUnsavedChanges();
@@ -2807,7 +2807,7 @@ function handleFormSubmission(event) {
         completedAt: new Date().toISOString()
     });
     
-    saveState();
+    saveStateAsync();
 }
 
 // Validate form
@@ -2972,7 +2972,7 @@ function saveSignature() {
         employeeName: appState.employeeData.name
     });
     
-    saveState();
+    saveStateAsync();
 }
 
 // Check if canvas is blank
@@ -3101,7 +3101,7 @@ function handleEmployeeSignin(event) {
     
     // Update app state
     appState.employeeData = employeeData;
-    saveState();
+    saveStateAsync();
     
     // Update the main employee welcome card
     updateEmployeeSummary();
