@@ -1125,7 +1125,7 @@ function handleEmployeeLogin(event) {
     // Update progress
     updateProgress();
     
-    console.log('[FSW Login] Employee logged in:', employeeData.name);
+    console.log('[FSW Login] Employee logged in:', employeeData.name || 'Unknown');
 }
 
 function updateEmployeeSummary() {
