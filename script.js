@@ -675,7 +675,7 @@ function saveEmployeeData() {
             supervisor: supervisor.replace(/\s+/g, ' ') // Normalize whitespace
         };
         
-        saveState();
+        saveState().catch(error => console.error('[FSW] Save state error in employee form:', error));
         showNotification('Employee information saved successfully!', 'success');
         updateProgress();
         
