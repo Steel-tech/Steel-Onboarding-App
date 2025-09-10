@@ -422,6 +422,11 @@ async function saveToSupabase(currentUser) {
     console.log('[FSW Debug] ✅ All data successfully saved to Supabase');
 }
 
+// Helper function for fire-and-forget saving
+function saveStateAsync() {
+    saveState().catch(error => console.error('[FSW] Save state error:', error));
+}
+
 // Initialize all event listeners
 function initializeEventListeners() {
     // Tab navigation
