@@ -1830,16 +1830,37 @@ function markVideoComplete(button) {
     
     // Update UI
     button.innerHTML = '<i class="fas fa-check-circle"></i> Video Completed!';
-    button.classList.add('completed');
+    button.classList.remove('disabled');
+    button.disabled = true;
+    
+    // Show completion status
+    const completionStatus = document.getElementById('videoCompletionStatus');
+    if (completionStatus) {
+        completionStatus.style.display = 'block';
+    }
+    
+    // Update progress to 100%
+    updateVideoProgress(100);
+    
+    // Stop progress tracking
+    if (progressInterval) {
+        clearInterval(progressInterval);
+        progressInterval = null;
+    }
     
     // Update documents access now that video is complete
     updateDocumentsAccess();
     
     // Show notification about next step
     setTimeout(() => {
-        showNotification('Great! You can now access the Documents section to download training materials.', 'success');
+        showNotification('Great! You can now access the Safety Training and Documents sections.', 'success');
     }, 1000);
-    button.disabled = true;
+    
+    // Track completion
+    trackAnalyticsEvent('video_completed', {
+        timestamp: Date.now(),
+        completionMethod: 'manual_button_click'
+    });
     
     // Show completion status
     const completionStatus = document.getElementById('videoCompletionStatus');
