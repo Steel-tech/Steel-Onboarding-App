@@ -1281,7 +1281,8 @@ function handleEmployeeLogin(event) {
     personalizeWelcomeSection();
     
     // Show success message
-    showNotification(`Welcome to Flawless Steel Welding, ${employeeData.name || 'New Employee'}!`, 'success');
+    const employeeName = employeeData.name ? String(employeeData.name) : 'New Employee';
+    showNotification(`Welcome to Flawless Steel Welding, ${employeeName}!`, 'success');
     
     // Update progress
     updateProgress();
