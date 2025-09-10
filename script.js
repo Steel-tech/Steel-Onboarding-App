@@ -346,7 +346,19 @@ async function saveToSupabase(currentUser) {
                 name = $2, email = $3, position = $4, start_date = $5, 
                 phone = $6, supervisor = $7, employee_id = $8, 
                 onboarding_completed = $9, updated_at = $10
-            RETURNING id`
+            RETURNING id`,
+            params: [
+                currentUser.id || `user_${Date.now()}`, // user_id
+                appState.employeeData.name || currentUser.name, // name
+                appState.employeeData.email || currentUser.email, // email
+                appState.employeeData.position || 'Employee', // position
+                appState.employeeData.startDate || new Date().toISOString().split('T')[0], // start_date
+                appState.employeeData.phone || null, // phone
+                appState.employeeData.supervisor || 'HR Team', // supervisor
+                appState.employeeData.employeeId || `EMP_${Date.now()}`, // employee_id
+                appState.progress >= 100, // onboarding_completed
+                new Date().toISOString() // updated_at
+            ]
         });
         
         console.log('[FSW Debug] User profile saved:', profileResult);
