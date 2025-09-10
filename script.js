@@ -2877,3 +2877,105 @@ function showDocumentContent(documentId, buttonElement) {
         buttonElement.classList.remove('active');
     }
 }
+
+// Floating Employee Sign-In Form Functions
+function initializeFloatingSigninForm() {
+    // Check if employee is already signed in
+    if (appState.employeeData && appState.employeeData.name && appState.employeeData.name !== 'New Employee') {
+        showEmployeeInfo();
+        hideSigninForm();
+    } else {
+        hideEmployeeInfo();
+        showSigninForm();
+    }
+    
+    // Set today's date as default start date
+    const startDateInput = document.getElementById('signinStartDate');
+    if (startDateInput) {
+        startDateInput.value = new Date().toISOString().split('T')[0];
+    }
+}
+
+function handleEmployeeSignin(event) {
+    event.preventDefault();
+    
+    const formData = new FormData(event.target);
+    const employeeData = {
+        name: formData.get('name'),
+        email: formData.get('email'),
+        phone: formData.get('phone'),
+        position: formData.get('position'),
+        startDate: formData.get('startDate'),
+        supervisor: formData.get('supervisor')
+    };
+    
+    // Validate required fields
+    if (!employeeData.name || !employeeData.email || !employeeData.position) {
+        showNotification('Please fill in all required fields', 'error');
+        return;
+    }
+    
+    // Update app state
+    appState.employeeData = employeeData;
+    saveState();
+    
+    // Update the main employee welcome card
+    updateEmployeeSummary();
+    
+    // Show employee info in bottom left
+    showEmployeeInfo();
+    
+    // Hide the floating sign-in form
+    hideSigninForm();
+    
+    // Add signed-in class to body for styling
+    document.body.classList.add('employee-signed-in');
+    
+    // Show success notification
+    showNotification(`Welcome, ${employeeData.name}! You can now proceed with your onboarding.`, 'success');
+    
+    // Track analytics
+    trackAnalyticsEvent('employee_signin', { 
+        position: employeeData.position,
+        timestamp: Date.now()
+    });
+}
+
+function showEmployeeInfo() {
+    const employeeInfoDisplay = document.getElementById('employeeInfoDisplay');
+    if (employeeInfoDisplay && appState.employeeData) {
+        // Update content
+        document.getElementById('displayName').textContent = appState.employeeData.name || 'Unknown';
+        document.getElementById('displayPosition').textContent = appState.employeeData.position || 'Not specified';
+        document.getElementById('displayStartDate').textContent = 
+            appState.employeeData.startDate ? 
+            new Date(appState.employeeData.startDate).toLocaleDateString() : 
+            'Not specified';
+        
+        // Show the display
+        employeeInfoDisplay.style.display = 'block';
+    }
+}
+
+function hideEmployeeInfo() {
+    const employeeInfoDisplay = document.getElementById('employeeInfoDisplay');
+    if (employeeInfoDisplay) {
+        employeeInfoDisplay.style.display = 'none';
+    }
+}
+
+function showSigninForm() {
+    const signinContainer = document.getElementById('floatingSigninContainer');
+    if (signinContainer) {
+        signinContainer.style.display = 'block';
+    }
+    document.body.classList.remove('employee-signed-in');
+}
+
+function hideSigninForm() {
+    const signinContainer = document.getElementById('floatingSigninContainer');
+    if (signinContainer) {
+        signinContainer.style.display = 'none';
+    }
+    document.body.classList.add('employee-signed-in');
+}
