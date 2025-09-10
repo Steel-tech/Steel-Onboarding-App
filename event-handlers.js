@@ -21,11 +21,37 @@ function toggleDocumentContent(documentId, buttonElement) {
 
 // Form opening handlers
 function openHandbookForm() {
-    openFillableForm('handbook');
+    // Check if the main openFillableForm function is available
+    if (typeof openFillableForm === 'function') {
+        openFillableForm('handbook');
+    } else {
+        console.error('openFillableForm function not available. Trying alternative approach...');
+        // Alternative: delay execution until script.js is loaded
+        setTimeout(() => {
+            if (typeof openFillableForm === 'function') {
+                openFillableForm('handbook');
+            } else {
+                alert('System error: Form functionality not available. Please refresh the page and try again.');
+            }
+        }, 100);
+    }
 }
 
 function openHealthSafetyForm() {
-    openFillableForm('health-safety');
+    // Check if the main openFillableForm function is available
+    if (typeof openFillableForm === 'function') {
+        openFillableForm('health-safety');
+    } else {
+        console.error('openFillableForm function not available. Trying alternative approach...');
+        // Alternative: delay execution until script.js is loaded
+        setTimeout(() => {
+            if (typeof openFillableForm === 'function') {
+                openFillableForm('health-safety');
+            } else {
+                alert('System error: Form functionality not available. Please refresh the page and try again.');
+            }
+        }, 100);
+    }
 }
 
 function openNewHireOrientationForm() {
@@ -46,15 +72,54 @@ function openNewHireOrientationForm() {
 }
 
 function openSteelErectionForm() {
-    openFillableForm('steel-erection');
+    // Check if the main openFillableForm function is available
+    if (typeof openFillableForm === 'function') {
+        openFillableForm('steel-erection');
+    } else {
+        console.error('openFillableForm function not available. Trying alternative approach...');
+        // Alternative: delay execution until script.js is loaded
+        setTimeout(() => {
+            if (typeof openFillableForm === 'function') {
+                openFillableForm('steel-erection');
+            } else {
+                alert('System error: Form functionality not available. Please refresh the page and try again.');
+            }
+        }, 100);
+    }
 }
 
 function openWeldingProceduresForm() {
-    openFillableForm('welding-procedures');
+    // Check if the main openFillableForm function is available
+    if (typeof openFillableForm === 'function') {
+        openFillableForm('welding-procedures');
+    } else {
+        console.error('openFillableForm function not available. Trying alternative approach...');
+        // Alternative: delay execution until script.js is loaded
+        setTimeout(() => {
+            if (typeof openFillableForm === 'function') {
+                openFillableForm('welding-procedures');
+            } else {
+                alert('System error: Form functionality not available. Please refresh the page and try again.');
+            }
+        }, 100);
+    }
 }
 
 function openEquipmentTrainingForm() {
-    openFillableForm('equipment-training');
+    // Check if the main openFillableForm function is available
+    if (typeof openFillableForm === 'function') {
+        openFillableForm('equipment-training');
+    } else {
+        console.error('openFillableForm function not available. Trying alternative approach...');
+        // Alternative: delay execution until script.js is loaded
+        setTimeout(() => {
+            if (typeof openFillableForm === 'function') {
+                openFillableForm('equipment-training');
+            } else {
+                alert('System error: Form functionality not available. Please refresh the page and try again.');
+            }
+        }, 100);
+    }
 }
 
 // Bulk action handlers
