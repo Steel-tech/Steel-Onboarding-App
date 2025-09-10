@@ -343,7 +343,7 @@ async function saveToSupabase(currentUser) {
         console.log('[FSW Debug] Saving user profile to Supabase...');
         
         const profileData = {
-            user_id: currentUser.id || `user_${Date.now()}`,
+            user_id: currentUser.id || crypto.randomUUID(),
             name: appState.employeeData.name || currentUser.name,
             email: appState.employeeData.email || currentUser.email,
             position: appState.employeeData.position || 'Employee',
