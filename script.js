@@ -405,6 +405,15 @@ function initializeEventListeners() {
 
     // Proactively remove inline onclick attributes for CSP compatibility
     document.querySelectorAll('.fill-form-btn[onclick]').forEach(btn => btn.removeAttribute('onclick'));
+
+    // Floating Employee Sign-In Form
+    const signinForm = document.getElementById('employeeSigninForm');
+    if (signinForm) {
+        signinForm.addEventListener('submit', handleEmployeeSignin);
+    }
+
+    // Initialize floating form state
+    initializeFloatingSigninForm();
 }
 // Tab navigation with analytics
 function showTab(tabName) {
