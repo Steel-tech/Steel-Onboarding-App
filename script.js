@@ -292,31 +292,106 @@ function updateWelcomeMessage(employee, progress) {
     welcomeCard.appendChild(statusElement);
 }
 
-// Save state to localStorage
-function saveState() {
+// Save state to Supabase database with localStorage fallback
+async function saveState() {
     try {
         // Get current employee session
         const currentUser = getCurrentEmployee();
         if (!currentUser) {
-            console.warn('No employee session found, cannot save state');
+            console.warn('[FSW State] No employee session found, cannot save state');
             return;
         }
 
-        // Save employee-specific state
-        const stateKey = `fsw_onboarding_${currentUser.email}`;
-        const stateToSave = {
-            ...appState,
-            lastSaved: Date.now()
-        };
+        console.log('[FSW Debug] Starting saveState for user:', currentUser.name);
         
-        localStorage.setItem(stateKey, JSON.stringify(stateToSave));
-        console.log(`[FSW State] Progress saved for ${currentUser.name}`);
+        // Try saving to Supabase first
+        try {
+            await saveToSupabase(currentUser);
+            console.log(`[FSW State] ✅ Progress saved to Supabase for ${currentUser.name}`);
+        } catch (supabaseError) {
+            console.error('[FSW State] ❌ Supabase save failed, using localStorage fallback:', supabaseError);
+            
+            // Fallback to localStorage if Supabase fails
+            const stateKey = `fsw_onboarding_${currentUser.email}`;
+            const stateToSave = {
+                ...appState,
+                lastSaved: Date.now(),
+                savedTo: 'localStorage_fallback'
+            };
+            
+            localStorage.setItem(stateKey, JSON.stringify(stateToSave));
+            console.log(`[FSW State] 💾 Progress saved to localStorage (fallback) for ${currentUser.name}`);
+        }
         
     } catch (error) {
-        console.error('Failed to save state to localStorage:', error);
-        // Show user notification if save fails
-        showNotification('Warning: Progress could not be saved. Please ensure you have sufficient browser storage.');
+        console.error('[FSW State] Critical save error:', error);
+        showNotification('Warning: Progress could not be saved. Please try again.', 'error');
     }
+}
+
+// Save data to Supabase using MCP
+async function saveToSupabase(currentUser) {
+    console.log('[FSW Debug] Preparing Supabase save...');
+    
+    // 1. Save/Update user profile
+    if (appState.employeeData && appState.employeeData.name) {
+        console.log('[FSW Debug] Saving user profile to Supabase...');
+        
+        const profileResult = await mcp__supabase__execute_sql({
+            query: `INSERT INTO user_profiles (
+                user_id, name, email, position, start_date, phone, supervisor, 
+                employee_id, onboarding_completed, updated_at
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+            ON CONFLICT (user_id) DO UPDATE SET 
+                name = $2, email = $3, position = $4, start_date = $5, 
+                phone = $6, supervisor = $7, employee_id = $8, 
+                onboarding_completed = $9, updated_at = $10
+            RETURNING id`
+        });
+        
+        console.log('[FSW Debug] User profile saved:', profileResult);
+    }
+    
+    // 2. Save module progress
+    if (appState.completedModules && appState.completedModules.length > 0) {
+        console.log('[FSW Debug] Saving module progress to Supabase...');
+        
+        for (const moduleName of appState.completedModules) {
+            const progressResult = await mcp__supabase__execute_sql({
+                query: `INSERT INTO onboarding_progress (
+                    user_id, employee_id, module_name, progress_data, completed_at
+                ) VALUES ($1, $2, $3, $4, $5)
+                ON CONFLICT (user_id, module_name) DO UPDATE SET 
+                    progress_data = $4, completed_at = $5
+                RETURNING id`
+            });
+            
+            console.log(`[FSW Debug] Module '${moduleName}' progress saved:`, progressResult);
+        }
+    }
+    
+    // 3. Save form submissions
+    if (appState.formCompletions && Object.keys(appState.formCompletions).length > 0) {
+        console.log('[FSW Debug] Saving form submissions to Supabase...');
+        
+        for (const [formType, formData] of Object.entries(appState.formCompletions)) {
+            if (formData.completed) {
+                const formResult = await mcp__supabase__execute_sql({
+                    query: `INSERT INTO form_submissions (
+                        user_id, employee_id, form_type, form_data, 
+                        digital_signature, submitted_at, ip_address
+                    ) VALUES ($1, $2, $3, $4, $5, $6, $7)
+                    ON CONFLICT (user_id, form_type) DO UPDATE SET 
+                        form_data = $4, digital_signature = $5, submitted_at = $6
+                    RETURNING id`
+                });
+                
+                console.log(`[FSW Debug] Form '${formType}' saved:`, formResult);
+            }
+        }
+    }
+    
+    console.log('[FSW Debug] ✅ All data successfully saved to Supabase');
 }
 
 // Initialize all event listeners
