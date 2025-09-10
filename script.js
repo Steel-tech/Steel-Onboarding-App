@@ -413,7 +413,7 @@ async function saveToSupabase(currentUser) {
         for (const [formType, formData] of Object.entries(appState.formCompletions)) {
             if (formData.completed) {
                 const submissionData = {
-                    user_id: currentUser.id || `user_${Date.now()}`,
+                    user_id: currentUser.id || crypto.randomUUID(),
                     employee_id: appState.employeeData.employeeId || `EMP_${Date.now()}`,
                     form_type: formType,
                     form_data: JSON.stringify(formData),
