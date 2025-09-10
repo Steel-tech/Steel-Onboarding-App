@@ -1645,16 +1645,30 @@ function initializeYouTubePlayer() {
 
 // YouTube player ready callback
 function onPlayerReady(event) {
+    // Show video progress section
+    const progressSection = document.getElementById('videoProgressSection');
+    if (progressSection) {
+        progressSection.style.display = 'block';
+    }
+    
     // Check if video was previously completed
     const videoCompleted = appState.completedModules.includes('video');
     const completionStatus = document.getElementById('videoCompletionStatus');
+    const completionBtn = document.getElementById('videoCompletionBtn');
     
-    if (videoCompleted && completionStatus) {
-        completionStatus.style.display = 'block';
-        const completionBtn = document.querySelector('[data-module="video"]');
+    if (videoCompleted) {
+        if (completionStatus) completionStatus.style.display = 'block';
         if (completionBtn) {
             completionBtn.innerHTML = '<i class="fas fa-check-circle"></i> Video Completed!';
-            completionBtn.classList.add('completed');
+            completionBtn.classList.remove('disabled');
+            completionBtn.disabled = false;
+        }
+        updateVideoProgress(100);
+    } else {
+        // Ensure button starts disabled
+        if (completionBtn) {
+            completionBtn.innerHTML = '<i class="fas fa-lock"></i> Complete Video First (90% required)';
+            completionBtn.classList.add('disabled');
             completionBtn.disabled = true;
         }
     }
