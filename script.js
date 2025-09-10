@@ -420,114 +420,113 @@ async function saveState() {
 async function saveToSupabase(currentUser) {
     console.log('[FSW Debug] Preparing Supabase save...');
     
-    // Check if Supabase client is available
     if (!window.supabase) {
         throw new Error('Supabase client not available');
     }
     
-    // 1. Save/Update user profile
-    if (appState.employeeData?.name) {
-        console.log('[FSW Debug] Saving user profile to Supabase...');
-        
-        const profileData = {
-            user_id: currentUser.id || crypto.randomUUID(),
-            name: appState.employeeData.name || currentUser.name,
-            email: appState.employeeData.email || currentUser.email,
-            position: appState.employeeData.position || 'Employee',
-            start_date: appState.employeeData.startDate || new Date().toISOString().split('T')[0],
-            phone: appState.employeeData.phone || null,
-            supervisor: appState.employeeData.supervisor || 'HR Team',
-            employee_id: appState.employeeData.employeeId || `EMP_${Date.now()}`,
-            onboarding_completed: appState.progress >= 100,
-            updated_at: new Date().toISOString()
-        };
-        
-        const { data: profileResult, error: profileError } = await window.supabase
-            .from('user_profiles')
-            .upsert(profileData, { 
-                onConflict: 'user_id',
-                ignoreDuplicates: false 
-            })
-            .select();
-        
-        if (profileError) {
-            console.error('[FSW Debug] Profile save error:', profileError);
-            throw profileError;
-        }
-        
-        console.log('[FSW Debug] User profile saved:', profileResult);
-    }
-    
-    // 2. Save module progress
-    if (appState.completedModules && appState.completedModules.length > 0) {
-        console.log('[FSW Debug] Saving module progress to Supabase...');
-        
-        for (const moduleName of appState.completedModules) {
-            const progressData = {
-                user_id: currentUser.id || crypto.randomUUID(),
-                employee_id: appState.employeeData.employeeId || `EMP_${Date.now()}`,
-                module_name: moduleName,
-                progress_data: JSON.stringify({ 
-                    module: moduleName, 
-                    progress: appState.progress, 
-                    completedAt: new Date().toISOString() 
-                }),
-                completed_at: new Date().toISOString()
-            };
-            
-            const { data: progressResult, error: progressError } = await window.supabase
-                .from('onboarding_progress')
-                .upsert(progressData, { 
-                    onConflict: 'user_id,module_name',
-                    ignoreDuplicates: false 
-                })
-                .select();
-            
-            if (progressError) {
-                console.error(`[FSW Debug] Progress save error for ${moduleName}:`, progressError);
-                // Continue with other modules even if one fails
-                continue;
-            }
-            
-            console.log(`[FSW Debug] Module '${moduleName}' progress saved:`, progressResult);
-        }
-    }
-    
-    // 3. Save form submissions
-    if (appState.formCompletions && Object.keys(appState.formCompletions).length > 0) {
-        console.log('[FSW Debug] Saving form submissions to Supabase...');
-        
-        for (const [formType, formData] of Object.entries(appState.formCompletions)) {
-            if (formData.completed) {
-                const submissionData = {
-                    user_id: currentUser.id || crypto.randomUUID(),
-                    employee_id: appState.employeeData.employeeId || `EMP_${Date.now()}`,
-                    form_type: formType,
-                    form_data: JSON.stringify(formData),
-                    digital_signature: appState.digitalSignatures?.[formType] || null,
-                    submitted_at: new Date().toISOString(),
-                    ip_address: 'browser_session'
-                };
-                
-                const { data: formResult, error: formError } = await window.supabase
-                    .from('form_submissions')
-                    .upsert(submissionData, { 
-                        onConflict: 'user_id,form_type',
-                        ignoreDuplicates: false 
-                    })
-                    .select();
-                
-                if (formError) {
-                    console.error(`[FSW Debug] Form save error for ${formType}:`, formError);
-                    continue;
-                }
-                
-                console.log(`[FSW Debug] Form '${formType}' saved:`, formResult);
-            }
-        }
-    }
+    await saveUserProfile(currentUser);
+    await saveModuleProgress(currentUser);
+    await saveFormSubmissions(currentUser);
     
     console.log('[FSW Debug] ✅ All data successfully saved to Supabase');
+}
+
+// Save user profile to Supabase
+async function saveUserProfile(currentUser) {
+    if (!appState.employeeData?.name) return;
+    
+    console.log('[FSW Debug] Saving user profile to Supabase...');
+    
+    const profileData = {
+        user_id: currentUser.id || crypto.randomUUID(),
+        name: appState.employeeData.name || currentUser.name,
+        email: appState.employeeData.email || currentUser.email,
+        position: appState.employeeData.position || 'Employee',
+        start_date: appState.employeeData.startDate || new Date().toISOString().split('T')[0],
+        phone: appState.employeeData.phone || null,
+        supervisor: appState.employeeData.supervisor || 'HR Team',
+        employee_id: appState.employeeData.employeeId || `EMP_${Date.now()}`,
+        onboarding_completed: appState.progress >= 100,
+        updated_at: new Date().toISOString()
+    };
+    
+    const { data: profileResult, error: profileError } = await window.supabase
+        .from('user_profiles')
+        .upsert(profileData, { onConflict: 'user_id', ignoreDuplicates: false })
+        .select();
+    
+    if (profileError) {
+        console.error('[FSW Debug] Profile save error:', profileError);
+        throw profileError;
+    }
+    
+    console.log('[FSW Debug] User profile saved:', profileResult);
+}
+
+// Save module progress to Supabase
+async function saveModuleProgress(currentUser) {
+    if (!appState.completedModules?.length) return;
+    
+    console.log('[FSW Debug] Saving module progress to Supabase...');
+    
+    for (const moduleName of appState.completedModules) {
+        const progressData = {
+            user_id: currentUser.id || crypto.randomUUID(),
+            employee_id: appState.employeeData.employeeId || `EMP_${Date.now()}`,
+            module_name: moduleName,
+            progress_data: JSON.stringify({ 
+                module: moduleName, 
+                progress: appState.progress, 
+                completedAt: new Date().toISOString() 
+            }),
+            completed_at: new Date().toISOString()
+        };
+        
+        const { data: progressResult, error: progressError } = await window.supabase
+            .from('onboarding_progress')
+            .upsert(progressData, { onConflict: 'user_id,module_name', ignoreDuplicates: false })
+            .select();
+        
+        if (progressError) {
+            console.error(`[FSW Debug] Progress save error for ${moduleName}:`, progressError);
+            continue;
+        }
+        
+        console.log(`[FSW Debug] Module '${moduleName}' progress saved:`, progressResult);
+    }
+}
+
+// Save form submissions to Supabase
+async function saveFormSubmissions(currentUser) {
+    if (!appState.formCompletions || !Object.keys(appState.formCompletions).length) return;
+    
+    console.log('[FSW Debug] Saving form submissions to Supabase...');
+    
+    for (const [formType, formData] of Object.entries(appState.formCompletions)) {
+        if (!formData.completed) continue;
+        
+        const submissionData = {
+            user_id: currentUser.id || crypto.randomUUID(),
+            employee_id: appState.employeeData.employeeId || `EMP_${Date.now()}`,
+            form_type: formType,
+            form_data: JSON.stringify(formData),
+            digital_signature: appState.digitalSignatures?.[formType] || null,
+            submitted_at: new Date().toISOString(),
+            ip_address: 'browser_session'
+        };
+        
+        const { data: formResult, error: formError } = await window.supabase
+            .from('form_submissions')
+            .upsert(submissionData, { onConflict: 'user_id,form_type', ignoreDuplicates: false })
+            .select();
+        
+        if (formError) {
+            console.error(`[FSW Debug] Form save error for ${formType}:`, formError);
+            continue;
+        }
+        
+        console.log(`[FSW Debug] Form '${formType}' saved:`, formResult);
+    }
 }
 
 // Helper function for fire-and-forget saving
