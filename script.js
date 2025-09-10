@@ -2942,25 +2942,27 @@ function handleEmployeeSignin(event) {
 }
 
 function showEmployeeInfo() {
-    const employeeInfoDisplay = document.getElementById('employeeInfoDisplay');
-    if (employeeInfoDisplay && appState.employeeData) {
-        // Update content
-        document.getElementById('displayName').textContent = appState.employeeData.name || 'Unknown';
-        document.getElementById('displayPosition').textContent = appState.employeeData.position || 'Not specified';
-        document.getElementById('displayStartDate').textContent = 
+    const yourInfoDisplay = document.getElementById('yourInformationDisplay');
+    if (yourInfoDisplay && appState.employeeData) {
+        // Update content with all employee information
+        document.getElementById('infoDisplayName').textContent = appState.employeeData.name || 'Unknown';
+        document.getElementById('infoDisplayPosition').textContent = appState.employeeData.position || 'Not specified';
+        document.getElementById('infoDisplayEmail').textContent = appState.employeeData.email || 'Not specified';
+        document.getElementById('infoDisplayPhone').textContent = appState.employeeData.phone || 'Not specified';
+        document.getElementById('infoDisplayStartDate').textContent = 
             appState.employeeData.startDate ? 
             new Date(appState.employeeData.startDate).toLocaleDateString() : 
             'Not specified';
         
         // Show the display
-        employeeInfoDisplay.style.display = 'block';
+        yourInfoDisplay.style.display = 'block';
     }
 }
 
 function hideEmployeeInfo() {
-    const employeeInfoDisplay = document.getElementById('employeeInfoDisplay');
-    if (employeeInfoDisplay) {
-        employeeInfoDisplay.style.display = 'none';
+    const yourInfoDisplay = document.getElementById('yourInformationDisplay');
+    if (yourInfoDisplay) {
+        yourInfoDisplay.style.display = 'none';
     }
 }
 
