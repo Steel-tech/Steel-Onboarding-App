@@ -4394,12 +4394,11 @@ video::-webkit-media-controls-fullscreen-button {
 
 /* Floating Employee Sign-In Form */
 .floating-signin-container {
-    position: fixed;
-    top: 120px;
-    right: 20px;
+    position: relative;
+    margin: 2rem auto;
     z-index: 1000;
-    max-width: 400px;
-    width: 90%;
+    max-width: 500px;
+    width: 100%;
 }
 
 .floating-signin-form {
