@@ -710,7 +710,7 @@ function handleCheckboxChange(checkbox) {
         }
     }
     
-    saveState();
+    saveState().catch(error => console.error('[FSW] Save state error in checklist:', error));
     updateProgress();
     updateChecklistStats();
 }
