@@ -55,9 +55,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // TEMPORARY: Skip authentication for testing
     console.log('[FSW App] DEVELOPMENT MODE: Skipping authentication');
-    setTimeout(() => {
+    setTimeout(async () => {
         DOM_CACHE.init();
-        loadState();
+        await loadState();
         initializeEventListeners();
         initializeVideoPlayer();
         updateProgress();
