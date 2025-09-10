@@ -3157,8 +3157,29 @@ function handleEmployeeSignin(event) {
         return;
     }
     
-    // Update app state
-    appState.employeeData = employeeData;
+    // Generate UUID for user ID (Supabase expects UUID format)
+    const userId = crypto.randomUUID();
+    
+    // Save employee data with user ID
+    appState.employeeData = {
+        ...employeeData,
+        employeeId: `EMP_${Date.now()}`,
+        userId: userId
+    };
+    
+    // Create user session for getCurrentEmployee()
+    const userSession = {
+        id: userId,
+        name: employeeData.name,
+        email: employeeData.email,
+        employeeId: appState.employeeData.employeeId
+    };
+    
+    // Store session
+    sessionStorage.setItem('fsw_user_session', JSON.stringify(userSession));
+    
+    console.log('[FSW Debug] Created user session from welcome signin:', userSession);
+    
     saveStateAsync();
     
     // Update the main employee welcome card
