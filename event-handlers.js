@@ -29,7 +29,20 @@ function openHealthSafetyForm() {
 }
 
 function openNewHireOrientationForm() {
-    openFillableForm('new-hire-orientation');
+    // Check if the main openFillableForm function is available
+    if (typeof openFillableForm === 'function') {
+        openFillableForm('new-hire-orientation');
+    } else {
+        console.error('openFillableForm function not available. Trying alternative approach...');
+        // Alternative: delay execution until script.js is loaded
+        setTimeout(() => {
+            if (typeof openFillableForm === 'function') {
+                openFillableForm('new-hire-orientation');
+            } else {
+                alert('System error: Form functionality not available. Please refresh the page and try again.');
+            }
+        }, 100);
+    }
 }
 
 function openSteelErectionForm() {
