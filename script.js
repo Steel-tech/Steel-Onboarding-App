@@ -412,6 +412,16 @@ function initializeEventListeners() {
         signinForm.addEventListener('submit', handleEmployeeSignin);
     }
 
+    // Video Completion Button
+    const videoCompletionBtn = document.getElementById('videoCompletionBtn');
+    if (videoCompletionBtn) {
+        videoCompletionBtn.addEventListener('click', function() {
+            if (!this.disabled) {
+                markVideoComplete(this);
+            }
+        });
+    }
+
     // Initialize floating form state
     initializeFloatingSigninForm();
 }
