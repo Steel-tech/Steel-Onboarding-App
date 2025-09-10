@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supabase Debug Tool</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .debug-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .info { background: #d1ecf1; color: #0c5460; }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #0056b3; }
+        pre {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-size: 12px;
+        }
+        .console-output {
+            background: #000;
+            color: #0f0;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔧 Supabase Connection Debug Tool</h1>
+    
+    <div class="debug-section">
+        <h2>1. Supabase Client Check</h2>
+        <div id="client-status" class="status info">Checking...</div>
+        <button onclick="checkSupabaseClient()">Test Supabase Client</button>
+        <pre id="client-details"></pre>
+    </div>
+
+    <div class="debug-section">
+        <h2>2. Authentication State</h2>
+        <div id="auth-status" class="status info">Checking...</div>
+        <button onclick="checkAuthState()">Check Auth State</button>
+        <pre id="auth-details"></pre>
+    </div>
+
+    <div class="debug-section">
+        <h2>3. Database Connection Test</h2>
+        <div id="db-status" class="status info">Ready to test</div>
+        <button onclick="testDatabaseConnection()">Test Database</button>
+        <pre id="db-details"></pre>
+    </div>
+
+    <div class="debug-section">
+        <h2>4. Insert Test Data</h2>
+        <div id="insert-status" class="status info">Ready to test</div>
+        <button onclick="insertTestData()">Insert Test Record</button>
+        <pre id="insert-details"></pre>
+    </div>
+
+    <div class="debug-section">
+        <h2>5. Live Console Output</h2>
+        <div id="console-output" class="console-output">Debug output will appear here...\n</div>
+        <button onclick="clearConsole()">Clear Console</button>
+    </div>
+
+    <!-- Include Supabase CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <script>
+        function log(message) {
+            const output = document.getElementById('console-output');
+            const timestamp = new Date().toLocaleTimeString();
+            output.textContent += `[${timestamp}] ${message}\n`;
+            output.scrollTop = output.scrollHeight;
+        }
+
+        function clearConsole() {
+            document.getElementById('console-output').textContent = 'Console cleared...\n';
+        }
+
+        function setStatus(elementId, message, type = 'info') {
+            const el = document.getElementById(elementId);
+            el.textContent = message;
+            el.className = `status ${type}`;
+        }
+
+        // Supabase configuration
+        const supabaseUrl = 'https://sfsswfzgrdctiyukhczj.supabase.co';
+        const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNmc3N3ZnpncmRjdGl5dWtoY3pqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTcyOTg3MDgsImV4cCI6MjA3Mjg3NDcwOH0.u2oVMOCziHVlzFFlP7b8v_M5tHnGuW1Uwm65bJu3dVw';
+
+        let supabase;
+
+        async function checkSupabaseClient() {
+            log('🔍 Checking Supabase client initialization...');
+            
+            try {
+                if (typeof window.supabase === 'undefined') {
+                    throw new Error('Supabase library not loaded');
+                }
+
+                supabase = window.supabase.createClient(supabaseUrl, supabaseAnonKey);
+                
+                setStatus('client-status', '✅ Supabase client initialized successfully', 'success');
+                document.getElementById('client-details').textContent = `
+URL: ${supabaseUrl}
+Key: ${supabaseAnonKey.substring(0, 20)}...
+Client: ${typeof supabase}
+                `;
+                log('✅ Supabase client created successfully');
+                
+            } catch (error) {
+                setStatus('client-status', '❌ Supabase client failed: ' + error.message, 'error');
+                document.getElementById('client-details').textContent = error.stack;
+                log('❌ Supabase client error: ' + error.message);
+            }
+        }
+
+        async function checkAuthState() {
+            if (!supabase) {
+                setStatus('auth-status', '❌ Create Supabase client first', 'error');
+                return;
+            }
+
+            log('🔍 Checking authentication state...');
+
+            try {
+                const { data: { session }, error } = await supabase.auth.getSession();
+                
+                if (error) throw error;
+
+                setStatus('auth-status', session ? '✅ User authenticated' : '⚠️ No active session', session ? 'success' : 'info');
+                document.getElementById('auth-details').textContent = JSON.stringify({
+                    session: session ? 'Active' : 'None',
+                    user: session?.user?.email || 'Anonymous',
+                    expires: session?.expires_at || 'N/A'
+                }, null, 2);
+
+                log(session ? `✅ Auth session found for: ${session.user.email}` : '⚠️ No active authentication session');
+
+            } catch (error) {
+                setStatus('auth-status', '❌ Auth check failed: ' + error.message, 'error');
+                document.getElementById('auth-details').textContent = error.stack;
+                log('❌ Auth check error: ' + error.message);
+            }
+        }
+
+        async function testDatabaseConnection() {
+            if (!supabase) {
+                setStatus('db-status', '❌ Create Supabase client first', 'error');
+                return;
+            }
+
+            log('🔍 Testing database connection...');
+
+            try {
+                // Test simple query
+                const { data, error } = await supabase
+                    .from('user_profiles')
+                    .select('count')
+                    .limit(1);
+
+                if (error) throw error;
+
+                setStatus('db-status', '✅ Database connection successful', 'success');
+                document.getElementById('db-details').textContent = `
+Connection: Success
+Query: SELECT count FROM user_profiles LIMIT 1
+Result: ${JSON.stringify(data, null, 2)}
+                `;
+                log('✅ Database connection test successful');
+
+            } catch (error) {
+                setStatus('db-status', '❌ Database connection failed: ' + error.message, 'error');
+                document.getElementById('db-details').textContent = `
+Error: ${error.message}
+Details: ${error.details || 'No details'}
+Hint: ${error.hint || 'No hint'}
+Code: ${error.code || 'No code'}
+                `;
+                log('❌ Database connection error: ' + error.message);
+            }
+        }
+
+        async function insertTestData() {
+            if (!supabase) {
+                setStatus('insert-status', '❌ Create Supabase client first', 'error');
+                return;
+            }
+
+            log('🔍 Attempting to insert test data...');
+
+            try {
+                const testData = {
+                    user_id: crypto.randomUUID(),
+                    name: 'Debug Test User',
+                    email: 'debug@test.com',
+                    position: 'Test Position',
+                    start_date: new Date().toISOString().split('T')[0],
+                    employee_id: 'TEST_' + Date.now(),
+                    onboarding_completed: false
+                };
+
+                log('Test data: ' + JSON.stringify(testData, null, 2));
+
+                const { data, error } = await supabase
+                    .from('user_profiles')
+                    .insert(testData)
+                    .select();
+
+                if (error) throw error;
+
+                setStatus('insert-status', '✅ Test data inserted successfully!', 'success');
+                document.getElementById('insert-details').textContent = `
+Inserted: ${JSON.stringify(data, null, 2)}
+                `;
+                log('✅ Test data inserted successfully: ' + JSON.stringify(data));
+
+                // Clean up test data
+                setTimeout(async () => {
+                    const { error: deleteError } = await supabase
+                        .from('user_profiles')
+                        .delete()
+                        .eq('email', 'debug@test.com');
+                    
+                    if (!deleteError) {
+                        log('🧹 Test data cleaned up');
+                    }
+                }, 2000);
+
+            } catch (error) {
+                setStatus('insert-status', '❌ Insert failed: ' + error.message, 'error');
+                document.getElementById('insert-details').textContent = `
+Error: ${error.message}
+Details: ${error.details || 'No details'}
+Hint: ${error.hint || 'No hint'}
+Code: ${error.code || 'No code'}
+                `;
+                log('❌ Insert error: ' + error.message);
+            }
+        }
+
+        // Auto-start basic checks
+        window.addEventListener('DOMContentLoaded', function() {
+            log('🚀 Debug tool initialized');
+            setTimeout(checkSupabaseClient, 500);
+        });
+    </script>
+</body>
+</html>
