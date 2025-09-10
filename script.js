@@ -375,7 +375,14 @@ async function saveToSupabase(currentUser) {
                 ) VALUES ($1, $2, $3, $4, $5)
                 ON CONFLICT (user_id, module_name) DO UPDATE SET 
                     progress_data = $4, completed_at = $5
-                RETURNING id`
+                RETURNING id`,
+                params: [
+                    currentUser.id || `user_${Date.now()}`, // user_id
+                    appState.employeeData.employeeId || `EMP_${Date.now()}`, // employee_id
+                    moduleName, // module_name
+                    JSON.stringify({ module: moduleName, progress: appState.progress, completedAt: new Date().toISOString() }), // progress_data
+                    new Date().toISOString() // completed_at
+                ]
             });
             
             console.log(`[FSW Debug] Module '${moduleName}' progress saved:`, progressResult);
