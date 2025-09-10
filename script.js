@@ -448,6 +448,22 @@ function saveStateAsync() {
     saveState().catch(error => console.error('[FSW] Save state error:', error));
 }
 
+// Debug function to test saveState manually
+window.testSaveState = async function() {
+    console.log('[FSW Debug] Manual save test initiated...');
+    console.log('[FSW Debug] Current user:', getCurrentEmployee());
+    console.log('[FSW Debug] App state:', JSON.stringify(appState, null, 2));
+    
+    try {
+        await saveState();
+        console.log('[FSW Debug] ✅ Manual save test completed successfully!');
+        return 'SUCCESS: Data saved to Supabase';
+    } catch (error) {
+        console.error('[FSW Debug] ❌ Manual save test failed:', error);
+        return 'ERROR: ' + error.message;
+    }
+};
+
 // Initialize all event listeners
 function initializeEventListeners() {
     // Tab navigation
