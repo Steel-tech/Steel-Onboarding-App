@@ -1726,6 +1726,27 @@ function onPlayerStateChange(event) {
 // Progress tracking for YouTube video
 let progressInterval = null;
 
+function updateVideoProgress(percentage) {
+    const progressFill = document.getElementById('videoProgressFill');
+    const progressText = document.getElementById('videoProgressText');
+    const completionBtn = document.getElementById('videoCompletionBtn');
+    
+    if (progressFill) {
+        progressFill.style.width = percentage + '%';
+    }
+    
+    if (progressText) {
+        progressText.textContent = Math.round(percentage) + '% watched';
+    }
+    
+    // Enable completion button at 90%
+    if (completionBtn && percentage >= 90) {
+        completionBtn.innerHTML = '<i class="fas fa-check-circle"></i> Mark Video as Completed';
+        completionBtn.classList.remove('disabled');
+        completionBtn.disabled = false;
+    }
+}
+
 function startProgressTracking() {
     if (progressInterval) clearInterval(progressInterval);
     
@@ -1737,15 +1758,19 @@ function startProgressTracking() {
         const videoCompleted = appState.completedModules.includes('video');
         
         if (duration && !videoCompleted) {
-            const watchedPercentage = currentTime / duration;
+            const watchedPercentage = (currentTime / duration) * 100;
+            updateVideoProgress(watchedPercentage);
             
-            // Auto-complete when 90% watched
-            if (watchedPercentage >= 0.9) {
-                completeVideoModule();
-                clearInterval(progressInterval);
+            // Auto-complete when 90% watched (but don't auto-mark, let user click)
+            if (watchedPercentage >= 90) {
+                // Button is already enabled by updateVideoProgress
+                trackAnalyticsEvent('video_90_percent_reached', {
+                    timestamp: Date.now(),
+                    watchTime: currentTime
+                });
             }
         }
-    }, 2000); // Check every 2 seconds
+    }, 1000); // Check every second for smooth progress
 }
 
 // Complete video module function
