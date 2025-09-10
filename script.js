@@ -678,13 +678,8 @@ function updateProgress() {
         progressText.textContent = percentage + '% Complete';
     }
     
-    // Check for 100% completion
-    if (percentage === 100 && !appState.completionShown) {
-        appState.completionShown = true;
-        setTimeout(() => {
-            showCompletionModal('Congratulations! You have completed all onboarding tasks!');
-        }, 500);
-    }
+    // Note: Completion modal is now triggered only by safety and equipment training completion
+    // not by overall progress percentage
 }
 
 // Calculate total items
