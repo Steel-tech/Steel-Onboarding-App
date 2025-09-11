@@ -718,7 +718,7 @@ function completeModule(moduleName, button) {
         
         if (safetyCompleted && equipmentCompleted) {
             setTimeout(() => {
-                showCompletionModal('Congratulations! You have completed all required safety training and equipment training. You are now ready for final sign-off!');
+                showNotification('All safety and equipment training completed! Please complete remaining onboarding steps.', 'info');
             }, 500);
         } else if (safetyCompleted && !equipmentCompleted) {
             setTimeout(() => {
