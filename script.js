@@ -2093,7 +2093,7 @@ function startProgressTracking() {
     if (progressInterval) clearInterval(progressInterval);
     
     progressInterval = setInterval(() => {
-        if (!youtubePlayer || !youtubePlayer.getDuration) return;
+        if (!youtubePlayer?.getDuration) return;
         
         const currentTime = youtubePlayer.getCurrentTime();
         const duration = youtubePlayer.getDuration();
