@@ -1893,7 +1893,7 @@ function showCompletionModal(message) {
     modalContent.textContent = message;
     
     // Update employee name from sign-in data
-    if (employeeNameSpan && appState.employeeData && appState.employeeData.name) {
+    if (employeeNameSpan && appState.employeeData?.name) {
         employeeNameSpan.textContent = appState.employeeData.name;
     }
     
