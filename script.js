@@ -3211,6 +3211,9 @@ function openSignaturePad() {
     // Show signature modal
     document.getElementById('signatureModal').style.display = 'block';
     
+    // Add escape key listener
+    document.addEventListener('keydown', handleSignatureEscape);
+    
     // Initialize signature pad
     setTimeout(initializeSignaturePad, 100);
 }
