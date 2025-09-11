@@ -915,8 +915,14 @@ function updateProgress() {
         progressText.textContent = percentage + '% Complete';
     }
     
-    // Note: Completion modal is now triggered only by safety and equipment training completion
-    // not by overall progress percentage
+    // Check for 100% completion and show final congratulations modal
+    if (percentage === 100 && !appState.finalCompletionShown) {
+        appState.finalCompletionShown = true;
+        saveStateAsync();
+        setTimeout(() => {
+            showCompletionModal('🎉 Congratulations, New Employee!\n\nCongratulations! You have completed all required safety training and equipment training. You are now ready for final sign-off!\n\nWelcome to the Flawless Steel Welding team!');
+        }, 1000);
+    }
 }
 
 // Calculate total items
