@@ -3380,6 +3380,15 @@ function isCanvasBlank(canvas) {
 // Close signature modal
 function closeSignature() {
     document.getElementById('signatureModal').style.display = 'none';
+    // Remove any event listeners we added
+    document.removeEventListener('keydown', handleSignatureEscape);
+}
+
+// Handle escape key in signature modal
+function handleSignatureEscape(event) {
+    if (event.key === 'Escape') {
+        closeSignature();
+    }
 }
 
 // Update form status
