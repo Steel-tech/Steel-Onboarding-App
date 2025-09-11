@@ -999,19 +999,84 @@ function showTrainingModal(equipmentType) {
 function handleDocumentDownload(fileName, documentName, buttonElement) {
     logger.info('Document download requested', { fileName, documentName });
     
-    // Create a simple download link and click it immediately
-    const downloadLink = document.createElement('a');
-    downloadLink.href = fileName;
-    downloadLink.download = fileName;
-    downloadLink.style.display = 'none';
+    // Check video prerequisite first
+    if (!isVideoCompleted()) {
+        showNotification('Please complete the orientation video first before downloading documents.', 'warning');
+        showTab('video');
+        return;
+    }
     
-    // Add to DOM, click, then remove
-    document.body.appendChild(downloadLink);
-    downloadLink.click();
-    document.body.removeChild(downloadLink);
-    
-    // Mark as downloaded and show success
-    markDocumentAsDownloaded(fileName, documentName, buttonElement);
+    try {
+        // Create a proper download link with MIME type hints
+        const downloadLink = document.createElement('a');
+        downloadLink.href = fileName;
+        downloadLink.download = fileName;
+        downloadLink.style.display = 'none';
+        
+        // Add proper attributes to force download and avoid Java Air
+        downloadLink.setAttribute('target', '_blank');
+        downloadLink.setAttribute('rel', 'noopener noreferrer');
+        
+        // Set proper MIME type based on file extension
+        const fileExtension = fileName.split('.').pop().toLowerCase();
+        let mimeType = 'application/octet-stream'; // default
+        
+        switch (fileExtension) {
+            case 'pdf':
+                mimeType = 'application/pdf';
+                break;
+            case 'ppt':
+            case 'pptx':
+                mimeType = 'application/vnd.ms-powerpoint';
+                break;
+            case 'doc':
+            case 'docx':
+                mimeType = 'application/msword';
+                break;
+        }
+        
+        // Try blob download method for better browser compatibility
+        fetch(fileName)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                return response.blob();
+            })
+            .then(blob => {
+                const url = window.URL.createObjectURL(new Blob([blob], { type: mimeType }));
+                downloadLink.href = url;
+                
+                // Add to DOM, click, then cleanup
+                document.body.appendChild(downloadLink);
+                downloadLink.click();
+                document.body.removeChild(downloadLink);
+                
+                // Cleanup blob URL
+                setTimeout(() => window.URL.revokeObjectURL(url), 100);
+                
+                // Mark as downloaded and show success
+                markDocumentAsDownloaded(fileName, documentName, buttonElement);
+                showNotification(`${documentName} downloaded successfully!`, 'success');
+            })
+            .catch(error => {
+                console.warn('Blob download failed, trying direct link:', error);
+                
+                // Fallback to direct link method
+                downloadLink.href = fileName;
+                document.body.appendChild(downloadLink);
+                downloadLink.click();
+                document.body.removeChild(downloadLink);
+                
+                // Mark as downloaded and show success
+                markDocumentAsDownloaded(fileName, documentName, buttonElement);
+                showNotification(`${documentName} download initiated!`, 'success');
+            });
+            
+    } catch (error) {
+        logger.error('Document download failed', { fileName, error: error.message });
+        showNotification(`Failed to download ${documentName}. Please try again.`, 'error');
+    }
     showNotification(`${documentName} download started!`, 'success');
     
     // Track the download
