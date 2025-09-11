@@ -2855,6 +2855,25 @@ const formTemplates = {
                 ]
             }
         ]
+    },
+    'equipment-training': {
+        title: 'Equipment & Tools Training Acknowledgment',
+        sections: [
+            {
+                title: 'Equipment Training Completion',
+                content: `I acknowledge that I have completed the Equipment & Tools Training and understand the safe operation of all shop and field equipment. I have been trained on welding equipment, cutting tools, lifting equipment, measuring tools, fabrication machinery, and field equipment. I understand proper safety procedures, maintenance requirements, and operational parameters for all equipment I am authorized to operate.`,
+                fields: [
+                    { name: 'weldingEquipment', label: 'I am trained on welding equipment operation and safety', type: 'checkbox', required: true },
+                    { name: 'cuttingTools', label: 'I am trained on cutting tools and safety procedures', type: 'checkbox', required: true },
+                    { name: 'liftingEquipment', label: 'I am trained on lifting equipment and rigging safety', type: 'checkbox', required: true },
+                    { name: 'measuringTools', label: 'I am trained on precision measuring and layout tools', type: 'checkbox', required: true },
+                    { name: 'fabricationMachinery', label: 'I am trained on fabrication machinery operation (authorized personnel only)', type: 'checkbox', required: true },
+                    { name: 'fieldEquipment', label: 'I am trained on field equipment and site-specific tools', type: 'checkbox', required: true },
+                    { name: 'maintenanceUnderstanding', label: 'I understand equipment maintenance and inspection requirements', type: 'checkbox', required: true },
+                    { name: 'safetyCompliance', label: 'I will follow all equipment safety procedures and report any issues immediately', type: 'checkbox', required: true }
+                ]
+            }
+        ]
     }
 };
 
