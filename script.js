@@ -1932,7 +1932,7 @@ let youtubePlayer = null;
 
 // Load YouTube API
 function loadYouTubeAPI() {
-    if (window.YT && window.YT.Player) {
+    if (window.YT?.Player) {
         initializeYouTubePlayer();
         return;
     }
