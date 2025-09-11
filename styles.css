@@ -4045,7 +4045,11 @@ video::-webkit-media-controls-fullscreen-button {
 .signature-modal-content {
     width: 90%;
     max-width: 600px;
+    max-height: 90vh;
+    margin: 5% auto;
+    overflow-y: auto;
     text-align: center;
+    position: relative;
 }
 
 .signature-container {
