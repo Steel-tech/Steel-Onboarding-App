@@ -831,9 +831,89 @@ function saveEmployeeData() {
 }
 
 
-// Handle checkbox changes
+// Checklist dependency system - defines which items must be completed before others
+const CHECKLIST_DEPENDENCIES = {
+    // Orientation items depend on employee form
+    'day1-orientation-video': ['day1-employee-form'],
+    'day1-company-info': ['day1-employee-form'],
+    'day1-contacts': ['day1-employee-form'],
+    'day1-handbook': ['day1-employee-form'],
+    
+    // Safety training depends on safety manual
+    'day1-ppe-training': ['day1-safety-manual'],
+    'day1-emergency-procedures': ['day1-safety-manual'],
+    'day2-hazard-recognition': ['day1-safety-manual'],
+    'day2-crane-safety': ['day1-safety-manual'],
+    
+    // PPE fitting requires safety training completion
+    'day1-ppe-fitting': ['day1-ppe-training', 'day1-emergency-procedures'],
+    
+    // Equipment training requires basic safety completion
+    'day4-welding-equipment': ['day2-hazard-recognition', 'day2-crane-safety'],
+    'day4-cutting-tools': ['day2-hazard-recognition', 'day2-crane-safety'],
+    'day4-lifting-equipment': ['day2-crane-safety'],
+    'day4-measuring-tools': ['day2-hazard-recognition'],
+    
+    // Advanced training requires equipment familiarity
+    'day4-skills-assessment': ['day4-welding-equipment', 'day4-cutting-tools', 'day4-measuring-tools'],
+    'day5-job-site': ['day4-skills-assessment'],
+    
+    // ClockShark training requires basic setup completion
+    'day4-clockshark': ['day1-orientation-video', 'day1-contacts'],
+    
+    // Advanced week 1 items require basic completion
+    'week1-timekeeping': ['day4-clockshark'],
+    'week1-leave-requests': ['day4-clockshark'],
+    
+    // Week 2 technical training requires safety and equipment completion
+    'week2-material-inspection': ['day4-welding-equipment', 'day2-hazard-recognition'],
+    'week2-weld-inspection': ['day4-welding-equipment'],
+    'week2-hot-work': ['day4-welding-equipment', 'day4-cutting-tools'],
+    'week2-hands-on': ['week2-material-inspection', 'week2-weld-inspection'],
+    
+    // Final acknowledgment forms require training completion
+    'week4-handbook-ack': ['day1-handbook'],
+    'week4-safety-ack': ['day1-safety-manual', 'day2-hazard-recognition'],
+    'week4-orientation-ack': ['day1-orientation-video', 'week2-hands-on']
+};
+
+// Check if all dependencies for a checklist item are satisfied
+function checkDependencies(itemId) {
+    const dependencies = CHECKLIST_DEPENDENCIES[itemId];
+    if (!dependencies) return true; // No dependencies means it's always available
+    
+    return dependencies.every(depId => appState.checklistItems[depId] === true);
+}
+
+// Get missing dependencies for a checklist item
+function getMissingDependencies(itemId) {
+    const dependencies = CHECKLIST_DEPENDENCIES[itemId];
+    if (!dependencies) return [];
+    
+    return dependencies.filter(depId => !appState.checklistItems[depId]);
+}
+
+// Handle checkbox changes with dependency validation
 function handleCheckboxChange(checkbox) {
     const id = checkbox.id || Math.random().toString(36).substring(2, 11);
+    
+    // If trying to check the box, validate dependencies first
+    if (checkbox.checked && !checkDependencies(id)) {
+        // Prevent checking and show warning
+        checkbox.checked = false;
+        const missingDeps = getMissingDependencies(id);
+        const missingNames = missingDeps.map(depId => {
+            const depElement = document.getElementById(depId);
+            return depElement ? depElement.closest('label').textContent.trim().replace(/^\s*/, '') : depId;
+        });
+        
+        showNotification(
+            `Please complete these items first: ${missingNames.join(', ')}`, 
+            'warning'
+        );
+        return;
+    }
+    
     appState.checklistItems[id] = checkbox.checked;
     
     // Update visual state
@@ -846,9 +926,33 @@ function handleCheckboxChange(checkbox) {
         }
     }
     
+    // Update dependency visual states for all checkboxes
+    updateChecklistDependencyStates();
+    
     saveState().catch(error => console.error('[FSW] Save state error in checklist:', error));
     updateProgress();
     updateChecklistStats();
+}
+
+// Update visual states of all checklist items based on dependencies
+function updateChecklistDependencyStates() {
+    document.querySelectorAll('.checklist-checkbox').forEach(checkbox => {
+        const id = checkbox.id;
+        const isAvailable = checkDependencies(id);
+        const parent = checkbox.closest('label, .checklist-item');
+        
+        if (parent) {
+            if (isAvailable) {
+                parent.classList.remove('locked');
+                checkbox.disabled = false;
+                parent.style.opacity = '1';
+            } else {
+                parent.classList.add('locked');
+                checkbox.disabled = true;
+                parent.style.opacity = '0.5';
+            }
+        }
+    });
 }
 
 // Mark downloaded documents
