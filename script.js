@@ -116,6 +116,9 @@ document.addEventListener('DOMContentLoaded', function() {
             // Restore form completion states
             restoreFormCompletions();
             
+            // Initialize procedure acknowledgments and forms
+            initializeProceduresAndForms();
+            
             // Check if employee info exists, show login modal if not
             checkEmployeeLogin();
             
