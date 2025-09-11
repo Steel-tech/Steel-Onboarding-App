@@ -2008,13 +2008,11 @@ function onPlayerReady(event) {
             completionBtn.disabled = false;
         }
         updateVideoProgress(100);
-    } else {
+    } else if (completionBtn) {
         // Ensure button starts disabled
-        if (completionBtn) {
-            completionBtn.innerHTML = '<i class="fas fa-lock"></i> Complete Video First (90% required)';
-            completionBtn.classList.add('disabled');
-            completionBtn.disabled = true;
-        }
+        completionBtn.innerHTML = '<i class="fas fa-lock"></i> Complete Video First (90% required)';
+        completionBtn.classList.add('disabled');
+        completionBtn.disabled = true;
     }
     
     trackAnalyticsEvent('youtube_player_ready', {
