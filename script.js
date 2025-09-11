@@ -1077,10 +1077,6 @@ function handleDocumentDownload(fileName, documentName, buttonElement) {
         logger.error('Document download failed', { fileName, error: error.message });
         showNotification(`Failed to download ${documentName}. Please try again.`, 'error');
     }
-    showNotification(`${documentName} download started!`, 'success');
-    
-    // Track the download
-    trackDocumentDownload(documentName);
 }
 
 // Simple function to mark document as downloaded in UI
