@@ -2044,9 +2044,11 @@ function startProgressTracking() {
             const watchedPercentage = (currentTime / duration) * 100;
             updateVideoProgress(watchedPercentage);
             
-            // Auto-complete when 90% watched (but don't auto-mark, let user click)
+            // Auto-complete when 90% watched
             if (watchedPercentage >= 90) {
-                // Button is already enabled by updateVideoProgress
+                // Auto-complete the video module
+                completeVideoModule();
+                
                 trackAnalyticsEvent('video_90_percent_reached', {
                     timestamp: Date.now(),
                     watchTime: currentTime
