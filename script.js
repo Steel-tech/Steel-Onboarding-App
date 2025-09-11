@@ -1481,6 +1481,14 @@ function updateCompletionButtons() {
         // Skip video completion button - no prerequisites for that
         if (module === 'video') return;
         
+        // Skip safety training and equipment buttons - they should always be accessible
+        const safetyEquipmentModules = [
+            'ppe', 'hazards', 'emergency', 'crane', 
+            'welding-equipment', 'cutting-tools', 'lifting-equipment', 
+            'measuring-tools', 'fabrication-machinery', 'field-equipment'
+        ];
+        if (safetyEquipmentModules.includes(module)) return;
+        
         // Skip if already completed
         if (appState.completedModules?.includes(module)) return;
         
