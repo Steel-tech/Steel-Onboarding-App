@@ -3386,9 +3386,11 @@ function isCanvasBlank(canvas) {
 
 // Close signature modal
 function closeSignature() {
-    document.getElementById('signatureModal').style.display = 'none';
+    const modal = document.getElementById('signatureModal');
+    modal.style.display = 'none';
     // Remove any event listeners we added
     document.removeEventListener('keydown', handleSignatureEscape);
+    modal.removeEventListener('click', handleModalBackdropClick);
 }
 
 // Handle escape key in signature modal
