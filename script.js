@@ -3319,7 +3319,7 @@ function showDocumentContent(documentId, buttonElement) {
 // Floating Employee Sign-In Form Functions
 function initializeFloatingSigninForm() {
     // Check if employee is already signed in
-    if (appState.employeeData && appState.employeeData.name && appState.employeeData.name !== 'New Employee') {
+    if (appState.employeeData?.name && appState.employeeData.name !== 'New Employee') {
         showEmployeeInfo();
         hideSigninForm();
     } else {
