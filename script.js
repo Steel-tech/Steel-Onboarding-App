@@ -1502,7 +1502,7 @@ function updateCompletionButtons() {
             const originalText = btn.innerHTML;
             if (!originalText.includes('I have understood this procedure.')) {
                 btn.setAttribute('data-original-text', originalText);
-                btn.innerHTML = '<i class="fas fa-lock"></i> I have read and understand this procedure.';
+                btn.innerHTML = '<i class="fas fa-lock"></i> I have understood this procedure.';
             }
             
             // Add click handler to show warning
