@@ -4109,8 +4109,9 @@ video::-webkit-media-controls-fullscreen-button {
     .form-modal-content,
     .signature-modal-content {
         width: 95%;
-        margin: 5% auto;
+        margin: 2% auto;
         padding: 1rem;
+        max-height: 95vh;
     }
     
     .form-item {
