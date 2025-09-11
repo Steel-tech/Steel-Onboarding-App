@@ -3398,6 +3398,14 @@ function handleSignatureEscape(event) {
     }
 }
 
+// Handle modal backdrop click
+function handleModalBackdropClick(event) {
+    // Only close if clicking the modal backdrop (not the content)
+    if (event.target.id === 'signatureModal') {
+        closeSignature();
+    }
+}
+
 // Update form status
 function updateFormStatus(formType, status) {
     const statusElement = document.getElementById(`${formType}-status`);
