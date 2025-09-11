@@ -3088,7 +3088,7 @@ function clearSignature() {
 }
 
 // Save signature
-function saveSignature() {
+async function saveSignature() {
     const canvas = document.getElementById('signaturePad');
     
     // Check if signature is drawn
@@ -3098,14 +3098,29 @@ function saveSignature() {
     }
     
     // Save signature data
-    appState.digitalSignatures[currentFormType] = {
+    const signatureData = {
         dataURL: canvas.toDataURL(),
         timestamp: Date.now(),
         employeeName: appState.employeeData.name || 'Unknown'
     };
     
-    // Update UI
-    document.getElementById('signatureStatus').style.display = 'block';
+    appState.digitalSignatures[currentFormType] = signatureData;
+    
+    // Mark form as completed
+    appState.formCompletions[currentFormType] = {
+        completed: true,
+        completedAt: new Date().toISOString(),
+        signature: signatureData.dataURL
+    };
+    
+    // Update form status UI
+    updateFormStatus(currentFormType, 'completed');
+    
+    // Update acknowledgment progress
+    updateAcknowledmentProgress();
+    
+    // Update overall progress
+    updateProgress();
     
     // Close signature modal
     closeSignature();
@@ -3117,7 +3132,28 @@ function saveSignature() {
         employeeName: appState.employeeData.name
     });
     
+    // Save state to localStorage
     saveStateAsync();
+    
+    // Submit form to Supabase if API client is available
+    if (window.apiClient && navigator.onLine) {
+        try {
+            // Get form data from the fillable form if it exists
+            const formData = appState.formCompletions[currentFormType];
+            
+            await window.apiClient.submitForm(
+                currentFormType,
+                formData,
+                signatureData.dataURL
+            );
+            
+            showNotification('Form successfully submitted to server!', 'success');
+            
+        } catch (error) {
+            console.warn('Failed to submit to server, saved locally:', error);
+            showNotification('Form saved locally. Will sync when online.', 'info');
+        }
+    }
 }
 
 // Check if canvas is blank
