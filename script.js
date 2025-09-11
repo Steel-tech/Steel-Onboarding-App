@@ -3391,7 +3391,7 @@ function handleEmployeeSignin(event) {
     document.body.classList.add('employee-signed-in');
     
     // Show success notification
-    showNotification(`Welcome, ${employeeData.name}! You can now proceed with your onboarding.`, 'success');
+    showNotification(`Welcome, ${String(employeeData.name)}! You can now proceed with your onboarding.`, 'success');
     
     // Track analytics
     trackAnalyticsEvent('employee_signin', { 
