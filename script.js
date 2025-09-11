@@ -71,6 +71,9 @@ document.addEventListener('DOMContentLoaded', function() {
         updateDocumentsAccess();
         updateCompletionButtons();
         
+        // Initialize checklist dependency states
+        updateChecklistDependencyStates();
+        
         // Restore form completion states
         restoreFormCompletions();
         
