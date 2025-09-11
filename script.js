@@ -1500,7 +1500,7 @@ function updateCompletionButtons() {
             
             // Update button text to show requirement
             const originalText = btn.innerHTML;
-            if (!originalText.includes('I have read and understand this procedure.')) {
+            if (!originalText.includes('I have understood this procedure.')) {
                 btn.setAttribute('data-original-text', originalText);
                 btn.innerHTML = '<i class="fas fa-lock"></i> I have read and understand this procedure.';
             }
