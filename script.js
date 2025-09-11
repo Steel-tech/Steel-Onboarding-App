@@ -37,6 +37,7 @@ let appState = {
     employeeData: {},
     checklistItems: {},
     procedureAcknowledgments: {},
+    finalCompletionShown: false,
     formCompletions: {},
     digitalSignatures: {},
     analytics: {
