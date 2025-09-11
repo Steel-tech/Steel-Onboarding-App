@@ -3279,8 +3279,6 @@ function showDocumentContent(documentId, buttonElement) {
         return;
     }
     
-    const icon = buttonElement.querySelector('i');
-    
     if (contentDiv.style.display === 'none' || !contentDiv.style.display) {
         // Show content
         logger.info('Showing document content', { documentId });
