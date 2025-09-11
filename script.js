@@ -265,6 +265,7 @@ function resetToDefaultState() {
         employeeData: currentUser || {},
         checklistItems: {},
         procedureAcknowledgments: {},
+        finalCompletionShown: false,
         formCompletions: {},
         digitalSignatures: {},
         analytics: {
