@@ -3209,10 +3209,14 @@ function openSignaturePad() {
     document.getElementById('signatureFormType').textContent = formTemplates[currentFormType].title;
     
     // Show signature modal
-    document.getElementById('signatureModal').style.display = 'block';
+    const modal = document.getElementById('signatureModal');
+    modal.style.display = 'block';
     
     // Add escape key listener
     document.addEventListener('keydown', handleSignatureEscape);
+    
+    // Add backdrop click listener
+    modal.addEventListener('click', handleModalBackdropClick);
     
     // Initialize signature pad
     setTimeout(initializeSignaturePad, 100);
