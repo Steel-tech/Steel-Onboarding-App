@@ -992,6 +992,9 @@ function restoreCheckboxStates() {
         }
     });
     
+    // Update dependency states after restoring checkboxes
+    updateChecklistDependencyStates();
+    
     // Restore completed modules
     appState.completedModules.forEach(module => {
         const btn = document.querySelector(`[data-module="${module}"]`);
