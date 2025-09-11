@@ -1467,7 +1467,7 @@ function restoreFormCompletions() {
 // Update completion buttons based on document prerequisite
 function updateCompletionButtons() {
     const allDocumentsDownloaded = areAllDocumentsDownloaded();
-    const completionButtons = document.querySelectorAll('.complete-btn, .modern-button[data-module]');
+    const completionButtons = document.querySelectorAll('.complete-btn, .modern-button[data-module]:not(.procedure-checkbox):not([class*="understanding"])');
     
     completionButtons.forEach(btn => {
         const module = btn.getAttribute('data-module');
