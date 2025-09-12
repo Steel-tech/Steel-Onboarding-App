@@ -129,7 +129,7 @@ async function setupDatabase() {
                 const insertUsers = `
                     INSERT INTO users (username, password_hash, role, name, email) VALUES
                     ('admin', ?, 'admin', 'System Administrator', 'admin@fsw-denver.com'),
-                    ('hr', ?, 'hr', 'HR Administrator', 'hr@fsw-denver.com'),
+                    ('hr', ?, 'hr', 'HR Administrator', 'tasha@fsw-denver.com'),
                     ('employee', ?, 'employee', 'New Employee', 'employee@fsw-denver.com');
                 `;
                 
@@ -199,7 +199,7 @@ EMAIL_USER=your-email@fsw-denver.com
 EMAIL_PASS=your-app-password
 
 # Notification Recipients
-HR_EMAIL=hr@fsw-denver.com
+HR_EMAIL=tasha@fsw-denver.com
 ADMIN_EMAIL=admin@fsw-denver.com
 
 # Frontend Configuration
