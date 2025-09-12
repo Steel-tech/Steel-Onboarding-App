@@ -493,26 +493,67 @@ When modifying the founder story sections, maintain these patterns:
 
 ## Troubleshooting
 
+### Backend Server Issues
+
+```bash
+# Check if server is running
+curl http://localhost:3001/api/health
+
+# Verify environment variables
+node -e "console.log(process.env.DATABASE_URL ? 'DB configured' : 'Missing DB_URL')"
+
+# Check database connection
+node -e "require('./database.js').then(db => console.log('DB connected')).catch(console.error)"
+```
+
+### Database Connection Problems
+
+```javascript
+// Check Supabase connection in browser console
+supabase.from('users').select('count').then(console.log).catch(console.error);
+
+// Verify authentication
+console.log('Auth user:', supabase.auth.getUser());
+
+// Test API connectivity
+fetch('/api/health').then(r => r.json()).then(console.log);
+```
+
+### Authentication Issues
+
+```bash
+# Test JWT authentication
+curl -X POST http://localhost:3001/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"username":"admin","password":"admin2025!"}'
+
+# Check token validation
+curl -H "Authorization: Bearer YOUR_TOKEN" http://localhost:3001/api/employee/data
+```
+
 ### Progress Not Saving
 
 ```javascript
-// Check localStorage in console
-console.log(localStorage.getItem('onboardingAppState'));
-// Clear corrupted state if needed
+// Check both localStorage and database sync
+console.log('Local state:', localStorage.getItem('onboardingAppState'));
+console.log('API client status:', window.apiClient?.healthCheck());
+
+// Force database sync
+window.apiClient?.syncOfflineData().then(console.log);
+
+// Clear corrupted state
 localStorage.clear();
+await supabase.auth.signOut();
 ```
-
-### Video Not Playing
-
-- Check file exists: `orientation-video.mp4`
-- Verify browser supports MP4
-- Check console for CORS errors if hosted
 
 ### Forms Not Submitting
 
-- Verify JavaScript is enabled
-- Check browser console for errors
-- Ensure all required fields have values
+- **Check backend server** is running on port 3001
+- **Verify database connection** via Supabase dashboard
+- **Check authentication tokens** are valid and not expired
+- **Review network tab** in browser dev tools for API errors
+- **Validate environment variables** match Supabase configuration
+- **Check rate limiting** - may be temporarily blocked for too many requests
 
 ## Design Philosophy and Maintenance Guidelines
 
