@@ -96,7 +96,7 @@ EMAIL_HOST=smtp.gmail.com
 EMAIL_PORT=587
 EMAIL_USER=your-email@gmail.com
 EMAIL_PASS=your-app-password
-HR_EMAIL=hr@fsw-denver.com
+HR_EMAIL=tasha@fsw-denver.com
 ADMIN_EMAIL=admin@fsw-denver.com
 
 # Frontend URL
@@ -227,6 +227,6 @@ echo ""
 echo "For detailed setup instructions, see:"
 echo "${GREEN}COMPLETE-SETUP-GUIDE.md${NC}"
 echo ""
-echo "Support: (720) 638-7289 | hr@fsw-denver.com"
+echo "Support: (720) 638-7289 | tasha@fsw-denver.com"
 echo ""
 print_status "Deployment script completed successfully!"
