@@ -417,11 +417,14 @@ Minimum supported browsers:
 
 Key JavaScript features used:
 
-- ES6 arrow functions
-- Template literals
-- LocalStorage API
-- querySelector/querySelectorAll
-- Fetch API (for potential future enhancements)
+- ES6 arrow functions and async/await
+- Template literals and destructuring
+- Fetch API for backend communication
+- querySelector/querySelectorAll for DOM manipulation
+- LocalStorage API for offline state management
+- WebSocket connections via Supabase real-time
+- JWT token handling and validation
+- PostgreSQL integration via Supabase client
 
 ## Common Modifications
 
