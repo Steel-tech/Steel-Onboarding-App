@@ -585,85 +585,153 @@ Permissions-Policy: geolocation=(), microphone=(), camera=()
 
 ## Database Schema
 
+### PostgreSQL Implementation via Supabase
+The application uses PostgreSQL as the primary database, accessed through Supabase with connection pooling optimized for serverless deployment.
+
+### Connection Configuration
+```javascript
+// PostgreSQL Pool Settings (database.js)
+const pool = new Pool({
+    connectionString: process.env.DATABASE_URL,
+    ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+    max: 5,  // Reduced for serverless
+    min: 0,  // Allow scaling to zero
+    idleTimeoutMillis: 10000,
+    connectionTimeoutMillis: 10000,
+    acquireTimeoutMillis: 8000
+});
+```
+
 ### Core Tables
 
 #### users
 ```sql
-CREATE TABLE users (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    username TEXT UNIQUE NOT NULL,
-    password_hash TEXT NOT NULL,
-    role TEXT NOT NULL DEFAULT 'employee',
-    name TEXT NOT NULL,
-    email TEXT,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    last_login DATETIME,
-    is_active BOOLEAN DEFAULT 1
+CREATE TABLE IF NOT EXISTS users (
+    id SERIAL PRIMARY KEY,
+    username VARCHAR(255) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    role VARCHAR(50) NOT NULL DEFAULT 'employee',
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    last_login TIMESTAMP,
+    is_active BOOLEAN DEFAULT TRUE
 );
 ```
 
 #### employee_data
 ```sql
-CREATE TABLE employee_data (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id INTEGER NOT NULL,
-    employee_id TEXT UNIQUE,
-    name TEXT NOT NULL,
-    email TEXT NOT NULL,
-    phone TEXT,
-    position TEXT NOT NULL,
+CREATE TABLE IF NOT EXISTS employee_data (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL REFERENCES users(id),
+    employee_id VARCHAR(50) UNIQUE,
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    phone VARCHAR(20),
+    position VARCHAR(255) NOT NULL,
     start_date DATE NOT NULL,
-    supervisor TEXT,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users (id)
+    supervisor VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 ```
 
 #### onboarding_progress
 ```sql
-CREATE TABLE onboarding_progress (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id INTEGER NOT NULL,
-    employee_id TEXT NOT NULL,
-    module_name TEXT NOT NULL,
-    completed_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+CREATE TABLE IF NOT EXISTS onboarding_progress (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL REFERENCES users(id),
+    employee_id VARCHAR(50) NOT NULL,
+    module_name VARCHAR(255) NOT NULL,
+    completed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     progress_data TEXT, -- JSON blob
-    FOREIGN KEY (user_id) REFERENCES users (id),
     UNIQUE(user_id, module_name)
 );
 ```
 
 #### form_submissions
 ```sql
-CREATE TABLE form_submissions (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id INTEGER NOT NULL,
-    employee_id TEXT NOT NULL,
-    form_type TEXT NOT NULL,
+CREATE TABLE IF NOT EXISTS form_submissions (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL REFERENCES users(id),
+    employee_id VARCHAR(50) NOT NULL,
+    form_type VARCHAR(255) NOT NULL,
     form_data TEXT NOT NULL, -- JSON blob
     digital_signature TEXT, -- Base64 data
-    submitted_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    ip_address TEXT,
+    submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    ip_address VARCHAR(45),
     user_agent TEXT,
-    FOREIGN KEY (user_id) REFERENCES users (id),
     UNIQUE(user_id, form_type)
 );
 ```
 
 #### audit_logs
 ```sql
-CREATE TABLE audit_logs (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id INTEGER,
-    employee_id TEXT,
-    action TEXT NOT NULL,
+CREATE TABLE IF NOT EXISTS audit_logs (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id),
+    employee_id VARCHAR(50),
+    action VARCHAR(255) NOT NULL,
     details TEXT, -- JSON blob
-    ip_address TEXT,
+    ip_address VARCHAR(45),
     user_agent TEXT,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users (id)
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+```
+
+#### hr_notifications
+```sql
+CREATE TABLE IF NOT EXISTS hr_notifications (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL REFERENCES users(id),
+    employee_id VARCHAR(50) NOT NULL,
+    notification_type VARCHAR(255) NOT NULL,
+    message TEXT NOT NULL,
+    sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    email_sent BOOLEAN DEFAULT FALSE
+);
+```
+
+### Key PostgreSQL Features Used
+
+#### UPSERT Operations
+```sql
+-- Employee data with conflict resolution
+INSERT INTO employee_data (user_id, employee_id, name, email, ...) 
+VALUES ($1, $2, $3, $4, ...)
+ON CONFLICT (employee_id) DO UPDATE SET
+    name = EXCLUDED.name,
+    email = EXCLUDED.email,
+    updated_at = CURRENT_TIMESTAMP;
+```
+
+#### Parameterized Queries
+All database operations use PostgreSQL parameter syntax ($1, $2, etc.) for security:
+```javascript
+await db.query('SELECT * FROM users WHERE username = $1 AND is_active = TRUE', [username]);
+```
+
+#### Transactions
+```sql
+BEGIN;
+-- Multiple operations
+COMMIT; -- or ROLLBACK on error
+```
+
+#### Advanced Aggregations
+```sql
+-- HR Dashboard query with complex JOINs and aggregations
+SELECT 
+    e.employee_id,
+    e.name,
+    e.email,
+    COUNT(DISTINCT p.module_name) as completed_modules,
+    COUNT(DISTINCT f.form_type) as submitted_forms
+FROM employee_data e
+LEFT JOIN onboarding_progress p ON e.user_id = p.user_id
+LEFT JOIN form_submissions f ON e.user_id = f.user_id
+GROUP BY e.employee_id
+ORDER BY e.created_at DESC;
 ```
 
 ## Error Response Format
