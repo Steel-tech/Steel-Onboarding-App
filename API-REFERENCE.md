@@ -169,15 +169,16 @@ Permissions-Policy: geolocation=(), microphone=(), camera=()
   <signature>POST /api/employee/data</signature>
   <purpose>Save or update employee information and generate employee ID</purpose>
   <authentication>Bearer JWT token required</authentication>
-  <rate-limit>100 requests per 15 minutes per IP</rate-limit>
+  <rate-limit>10 requests per 15 minutes per IP (moderateRateLimit)</rate-limit>
+  <middleware>authenticateToken, employeeDataValidation, handleValidationErrors, auditLog('EMPLOYEE_DATA_SAVE')</middleware>
   
   <parameters>
     <param name="name" type="string" required="true">Full name (2-50 chars, letters/spaces/hyphens/apostrophes)</param>
-    <param name="email" type="string" required="true">Email address (valid format, max 254 chars)</param>
-    <param name="phone" type="string" required="false">Phone number (10-15 digits, formatted)</param>
-    <param name="position" type="string" required="true">Job position (2-100 chars)</param>
-    <param name="start_date" type="string" required="true">Start date (ISO 8601 format)</param>
-    <param name="supervisor" type="string" required="false">Supervisor name (max 100 chars)</param>
+    <param name="email" type="string" required="true">Email address (valid format, max 254 chars, normalized to lowercase)</param>
+    <param name="phone" type="string" required="false">Phone number (US format, auto-formatted to (xxx) xxx-xxxx)</param>
+    <param name="position" type="string" required="true">Job position (2-100 chars, alphanumeric + common punctuation)</param>
+    <param name="start_date" type="string" required="true">Start date (ISO 8601 format, within one year of today)</param>
+    <param name="supervisor" type="string" required="false">Supervisor name (max 100 chars, sanitized)</param>
   </parameters>
   
   <request-example>
@@ -209,10 +210,25 @@ Permissions-Policy: geolocation=(), microphone=(), camera=()
     <error type="500">Database error or email service failure</error>
   </errors>
   
+  <validation>
+    <rule field="name">2-50 chars, regex: /^[a-zA-Z\s\-'.]+$/, sanitized</rule>
+    <rule field="email">Valid email format, max 254 chars, normalized to lowercase</rule>
+    <rule field="phone">Optional, US format validation, auto-formatted</rule>
+    <rule field="position">2-100 chars, regex: /^[a-zA-Z0-9\s\-/&.,()]+$/, sanitized</rule>
+    <rule field="start_date">ISO 8601 format, within one year range</rule>
+    <rule field="supervisor">Optional, max 100 chars, sanitized</rule>
+  </validation>
+  
+  <database-operation>
+    <query>INSERT INTO employee_data ... ON CONFLICT (employee_id) DO UPDATE SET ...</query>
+    <description>Uses PostgreSQL UPSERT pattern for idempotent operations</description>
+  </database-operation>
+  
   <side-effects>
-    <effect>Generates unique employee ID (FSW + timestamp suffix)</effect>
+    <effect>Generates unique employee ID (FSW + last 6 digits of timestamp)</effect>
     <effect>Sends HR notification email about onboarding start</effect>
-    <effect>Creates audit log entry</effect>
+    <effect>Creates audit log entry with user_id and employee_id</effect>
+    <effect>Updates updated_at timestamp on conflict</effect>
   </side-effects>
   
   <curl-example>
