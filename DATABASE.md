@@ -262,36 +262,87 @@ Cloud-native PostgreSQL database system deployed on Supabase, supporting user au
 4. Email delivery status updated in email_sent field
 5. Failed notifications logged for retry processing
 
-## Database Setup Procedures
+## Supabase Project Setup
 
-### Initial Database Setup
+### Initial Supabase Configuration
 
-```bash
-node setup-database.js
-```
+1. **Create Supabase Project**
+   - Visit [Supabase Dashboard](https://supabase.com/dashboard)
+   - Create new project with PostgreSQL 15+
+   - Note project URL and API keys
 
-**What this does:**
-- Creates database file and all tables with proper schema
-- Creates indexes for performance optimization
-- Creates default users: admin/admin2025!, hr/hr2025!, employee/fsw2025!
-- Generates environment file template (.env.example)
+2. **Database Initialization**
+   ```bash
+   node setup-database.js
+   ```
+
+   **What this does:**
+   - Connects to PostgreSQL via DATABASE_URL
+   - Creates all tables with proper foreign key constraints
+   - Sets up PostgreSQL-specific indexes and sequences
+   - Creates default admin user: admin/admin2025!
+   - Initializes connection pooling for serverless deployment
+
+3. **Supabase Auth Integration**
+   ```javascript
+   // Client-side authentication via supabase-client.js
+   const { data, error } = await supabase.auth.signUp({
+     email: 'user@example.com',
+     password: 'secure-password',
+     options: { data: { name: 'John Doe', position: 'Welder' } }
+   })
+   ```
 
 ### Environment Configuration
 
-1. Copy `.env.example` to `.env`
-2. Update `JWT_SECRET` with secure random key
-3. Configure SMTP settings for email notifications
-4. Set production database path if needed
-5. Update HR and admin email addresses
+1. **Copy `.env.example` to `.env`**
+2. **Configure Supabase Credentials:**
+   ```bash
+   DATABASE_URL=postgresql://postgres:[password]@db.[project-ref].supabase.co:5432/postgres
+   SUPABASE_URL=https://[project-ref].supabase.co
+   SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+   SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+   ```
+3. **Update Security Settings:**
+   ```bash
+   JWT_SECRET=your-secure-random-key-here
+   BCRYPT_ROUNDS=12
+   ```
+4. **Configure Email Service:**
+   ```bash
+   EMAIL_HOST=smtp.gmail.com
+   EMAIL_PORT=587
+   EMAIL_USER=notifications@fsw-denver.com
+   EMAIL_PASS=your-app-password
+   HR_EMAIL=tasha@fsw-denver.com
+   ```
 
 ### Production Deployment Steps
 
-1. Run `setup-database.js` to initialize production database
-2. Configure `.env` with production settings
-3. Set `NODE_ENV=production`
-4. Configure proper file permissions on database file
-5. Set up database backup procedures
-6. Configure monitoring and health checks
+1. **Supabase Production Setup:**
+   - Upgrade to Supabase Pro plan for production features
+   - Configure custom domain and SSL certificates
+   - Enable database backups and point-in-time recovery
+   - Set up monitoring and alerting
+
+2. **Application Deployment:**
+   ```bash
+   # Initialize production database
+   NODE_ENV=production node setup-database.js
+   
+   # Configure environment
+   NODE_ENV=production
+   DATABASE_URL=[production-postgres-url]
+   
+   # Deploy with connection pooling
+   npm start
+   ```
+
+3. **Security Hardening:**
+   - Enable Row Level Security (RLS) policies
+   - Configure IP restrictions in Supabase dashboard
+   - Set up database connection limits
+   - Enable audit logging and monitoring
 
 ## Backup and Recovery
 
