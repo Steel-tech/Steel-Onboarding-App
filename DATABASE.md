@@ -346,63 +346,114 @@ Cloud-native PostgreSQL database system deployed on Supabase, supporting user au
 
 ## Backup and Recovery
 
-### Backup Strategy
+### Supabase Backup Strategy
 
-**Automated Backups:**
-- Daily SQLite database file backup using file system tools
-- Weekly export of all data via `/api/backup/export` endpoint
-- Real-time audit log export for compliance requirements
+**Automatic Backups (Supabase Pro):**
+- Daily automated PostgreSQL backups with 7-day retention
+- Point-in-time recovery (PITR) for granular data restoration
+- Real-time WAL-E continuous archiving to AWS S3
+- Cross-region backup replication for disaster recovery
+
+**Manual Backup Options:**
+- Application-level data export via `/api/backup/export` endpoint
+- Direct PostgreSQL dumps using `pg_dump`
+- Supabase CLI backup commands
 
 **Backup Locations:**
-- Primary: Local file system backup rotation (7 daily, 4 weekly)
-- Secondary: Cloud storage backup for disaster recovery
-- Compliance: Separate audit log archive for regulatory requirements
+- Primary: Supabase managed backups (AWS infrastructure)
+- Secondary: Manual exports to secure cloud storage
+- Compliance: Audit log archives with immutable storage
 
 ### Recovery Procedures
 
-**Database Corruption:**
-1. Stop application server immediately
-2. Restore latest backup file to production location
-3. Verify database integrity: `sqlite3 onboarding.db "PRAGMA integrity_check;"`
-4. Restart application and verify functionality
-5. Review audit logs for data loss assessment
+**Point-in-Time Recovery:**
+```bash
+# Restore database to specific timestamp
+supabase db reset --db-url "$DATABASE_URL" --time "2025-01-08T14:30:00Z"
+```
 
-**Data Recovery:**
-1. Identify scope of data loss from audit logs
-2. Use backup export JSON files to restore specific records
-3. Manually reconstruct lost data using form submissions backups
-4. Verify user authentication and access controls
-5. Notify affected employees of recovery status
+**Full Database Recovery:**
+1. Access Supabase Dashboard → Database → Backups
+2. Select backup point and initiate restoration
+3. Update DATABASE_URL in application environment
+4. Restart application services
+5. Verify data integrity and user access
+
+**Partial Data Recovery:**
+```sql
+-- Restore specific table from backup export
+COPY employee_data FROM '/path/to/backup.csv' 
+WITH (FORMAT csv, HEADER true);
+
+-- Verify foreign key relationships
+SELECT * FROM employee_data e 
+LEFT JOIN users u ON e.user_id = u.id 
+WHERE u.id IS NULL;
+```
+
+**Connection Recovery:**
+- Automatic reconnection via connection pooling
+- Health checks validate database connectivity
+- Graceful degradation for temporary outages
 
 ## Performance Optimization
 
-### Query Optimization
+### PostgreSQL Query Optimization
 
 **Optimized Query Patterns:**
-- SELECT with indexed columns for user lookups
-- JOIN operations minimized using denormalized employee_id fields
-- Batch INSERT operations for bulk data imports
-- LIMIT clauses on large result sets for pagination
+```sql
+-- Use parameterized queries with proper indexing
+SELECT e.*, COUNT(p.module_name) as completed_modules
+FROM employee_data e
+LEFT JOIN onboarding_progress p ON e.user_id = p.user_id
+WHERE e.user_id = $1
+GROUP BY e.id;
 
-**Index Strategy:**
-- Primary indexes on all foreign key relationships
-- Composite indexes on frequently queried column combinations
-- Time-based indexes on created_at/submitted_at for reporting
-- Unique constraints enforced at database level for data integrity
+-- Efficient pagination with OFFSET/LIMIT
+SELECT * FROM audit_logs 
+ORDER BY created_at DESC 
+OFFSET $1 LIMIT $2;
+```
+
+**PostgreSQL Index Strategy:**
+```sql
+-- Performance indexes for common queries
+CREATE INDEX idx_employee_data_user_id ON employee_data(user_id);
+CREATE INDEX idx_onboarding_progress_user_module ON onboarding_progress(user_id, module_name);
+CREATE INDEX idx_audit_logs_created_at ON audit_logs(created_at DESC);
+CREATE INDEX idx_form_submissions_user_type ON form_submissions(user_id, form_type);
+
+-- Composite indexes for complex queries
+CREATE INDEX idx_progress_employee_completed ON onboarding_progress(employee_id, completed_at);
+```
 
 ### Performance Monitoring
 
-**Key Metrics:**
-- Query execution time monitoring via application logs
-- Database file size growth tracking
-- Connection pool utilization (if using connection pooling)
-- Index usage statistics from SQLite EXPLAIN QUERY PLAN
+**Supabase Monitoring:**
+- Built-in query performance dashboard
+- Real-time connection pool monitoring
+- Database CPU and memory usage tracking
+- Automated slow query identification
 
-**Optimization Triggers:**
-- Response time > 1 second: Review query execution plans
-- Database size > 100MB: Implement archive/purge procedures
-- High CPU usage: Analyze slow queries and add indexes
-- Memory usage growth: Check for connection leaks
+**Key Metrics:**
+```sql
+-- Monitor query performance
+SELECT query, calls, total_time, mean_time
+FROM pg_stat_statements 
+ORDER BY total_time DESC 
+LIMIT 10;
+
+-- Check index usage
+SELECT schemaname, tablename, indexname, idx_tup_read, idx_tup_fetch
+FROM pg_stat_user_indexes 
+WHERE idx_tup_read = 0;
+```
+
+**Connection Pool Optimization:**
+- Monitor active vs idle connections
+- Optimize pool size based on usage patterns
+- Configure connection timeouts for serverless deployment
+- Track connection acquisition times
 
 ## Data Retention Policies
 
@@ -452,31 +503,69 @@ UPDATE users SET is_active = 0 WHERE last_login < date('now', '-90 days');
 
 ## Security Configuration
 
-### Access Control
+### Row Level Security (RLS)
 
-**Role-Based Permissions:**
-- **admin**: Full database access, user management, system configuration
-- **hr**: Employee data access, reporting, notification management
-- **employee**: Personal data only, progress tracking, form submission
+**Supabase RLS Policies:**
+```sql
+-- Enable RLS on all tables
+ALTER TABLE users ENABLE ROW LEVEL SECURITY;
+ALTER TABLE employee_data ENABLE ROW LEVEL SECURITY;
+ALTER TABLE onboarding_progress ENABLE ROW LEVEL SECURITY;
+ALTER TABLE form_submissions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE audit_logs ENABLE ROW LEVEL SECURITY;
+
+-- Employee can only access their own data
+CREATE POLICY "Users can view own data" ON employee_data
+  FOR SELECT USING (user_id = auth.uid());
+
+-- HR role can access all employee data
+CREATE POLICY "HR can view all data" ON employee_data
+  FOR ALL USING (auth.jwt() ->> 'role' = 'hr');
+```
+
+**Role-Based Access Control:**
+- **admin**: Full database access via service role
+- **hr**: Employee data access via RLS policies
+- **employee**: Personal data only via RLS user_id filtering
 
 **Authentication Security:**
-- bcrypt password hashing with 12+ rounds minimum
-- JWT tokens with 8-hour expiration for session management
-- Account lockout after 5 failed login attempts in 15 minutes
-- IP address logging for all authentication events
+- Supabase Auth with email/password and social providers
+- Server-side bcrypt hashing with 12+ rounds
+- JWT tokens with configurable expiration
+- Built-in rate limiting and brute force protection
 
 ### Data Protection
 
-**Encryption at Rest:**
-- Database file encryption using SQLite PRAGMA cipher (if available)
-- Digital signature data encrypted in storage
-- Sensitive form data encrypted with application-level encryption
+**Encryption:**
+- **At Rest**: Supabase provides AES-256 encryption for all data
+- **In Transit**: TLS 1.3 for all client-database connections
+- **Application Level**: Sensitive form fields encrypted before storage
+
+```javascript
+// Application-level encryption for sensitive data
+const crypto = require('crypto');
+const encryptSensitiveData = (data) => {
+  const cipher = crypto.createCipher('aes-256-cbc', process.env.ENCRYPTION_KEY);
+  return cipher.update(data, 'utf8', 'hex') + cipher.final('hex');
+};
+```
 
 **Data Sanitization:**
-- Input validation on all form fields before database storage
-- SQL injection prevention using parameterized queries exclusively
-- XSS protection through output encoding of stored data
-- File upload restrictions and content type validation
+```javascript
+// Parameterized queries prevent SQL injection
+const result = await db.query(
+  'SELECT * FROM users WHERE username = $1 AND is_active = $2',
+  [username.toLowerCase(), true]
+);
+
+// Input validation using express-validator
+const { body, validationResult } = require('express-validator');
+const employeeValidation = [
+  body('email').isEmail().normalizeEmail(),
+  body('name').trim().escape().isLength({ min: 2, max: 100 }),
+  body('position').trim().escape().isIn(['Welder I', 'Welder II', 'Supervisor'])
+];
+```
 
 ### Compliance Features
 
