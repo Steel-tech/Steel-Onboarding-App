@@ -561,7 +561,7 @@ EMAIL_HOST=smtp.gmail.com
 EMAIL_PORT=587
 EMAIL_USER=your-email@company.com
 EMAIL_PASS=your-app-password
-HR_EMAIL=hr@fsw-denver.com
+HR_EMAIL=tasha@fsw-denver.com
 ```
 
 ## Environment Configuration
@@ -579,7 +579,7 @@ EMAIL_HOST=smtp.gmail.com
 EMAIL_PORT=587
 EMAIL_USER=notifications@company.com
 EMAIL_PASS=app-specific-password
-HR_EMAIL=hr@fsw-denver.com
+HR_EMAIL=tasha@fsw-denver.com
 ADMIN_EMAIL=admin@fsw-denver.com
 
 # Security
