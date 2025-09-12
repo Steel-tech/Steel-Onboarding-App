@@ -68,12 +68,15 @@ BCRYPT_ROUNDS=12
 
 ## Security Features
 
-### Input Validation
-- **Sanitization**: All string inputs cleaned of XSS/injection patterns
-- **Schema Validation**: Express-validator middleware on all endpoints
-- **Data Length Limits**: Configurable field length restrictions
+### Input Validation & Sanitization
+- **Express-Validator**: Comprehensive validation chains for all endpoints
+- **SecurityValidator Class**: Custom validation for names, emails, phones, dates
+- **String Sanitization**: Removes HTML tags, JS protocols, data URIs, length limits (1000 chars)
+- **XSS Protection**: Pattern detection for dangerous content (script tags, eval, etc.)
+- **Form Data Validation**: Deep inspection of JSON objects for malicious patterns
+- **Digital Signature Validation**: Base64 data URL validation with size limits (1KB-500KB)
 
-### Security Headers
+### Security Headers (via Helmet)
 ```
 X-Content-Type-Options: nosniff
 X-Frame-Options: DENY
@@ -84,9 +87,17 @@ Permissions-Policy: geolocation=(), microphone=(), camera=()
 
 ### Content Security Policy
 - **Default Source**: 'self' only
-- **Script Source**: 'self' only
-- **Style Source**: 'self' + CDN fonts
-- **Media/Object**: Restricted
+- **Script Source**: 'self' only  
+- **Style Source**: 'self' + 'https://cdnjs.cloudflare.com'
+- **Font Source**: 'self' + 'https://cdnjs.cloudflare.com'
+- **Image Source**: 'self' + 'data:' (for signatures)
+- **Media/Object**: Restricted to 'self' and 'none' respectively
+
+### Database Security
+- **PostgreSQL Connection Pool**: Configurable connection limits for serverless deployment
+- **Parameterized Queries**: All database operations use prepared statements ($1, $2, etc.)
+- **Connection Pooling**: pg.Pool with SSL support for production
+- **Transaction Support**: ACID compliance with BEGIN/COMMIT/ROLLBACK
 
 ## API Endpoints
 
