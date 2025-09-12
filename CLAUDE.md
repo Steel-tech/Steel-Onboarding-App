@@ -79,28 +79,80 @@ real-time subscriptions.
 
 ## Development Commands
 
-### Running the Application
+### Running the Full-Stack Application
 
 ```bash
-# Option 1: Open directly in browser
-open index.html
+# Install dependencies
+npm install
 
-# Option 2: Use Python's simple HTTP server
-python3 -m http.server 8000
-# Then navigate to http://localhost:8000
+# Set up environment variables
+cp .env.example .env
+# Edit .env with your Supabase credentials and configuration
 
-# Option 3: Use Node's http-server (if available)
-npx http-server -p 8000
+# Initialize database (if needed)
+node setup-database.js
+
+# Start the Express.js backend server
+npm start
+# Server runs on http://localhost:3001
+
+# Alternative: Development mode with auto-restart
+npm run dev
 ```
 
-### Testing Changes
+### Environment Setup
 
-Since this is a vanilla JS app, testing is manual:
+Required environment variables in `.env`:
 
-1. Open in browser
-2. Clear localStorage to test fresh state: `localStorage.clear()`
-3. Test responsive design with browser dev tools
-4. Check console for any errors
+```bash
+# Server Configuration
+PORT=3001
+NODE_ENV=development
+
+# Database (Supabase PostgreSQL)
+DATABASE_URL=postgresql://postgres:password@db.project.supabase.co:5432/postgres
+SUPABASE_URL=https://project.supabase.co
+SUPABASE_ANON_KEY=your_anon_key_here
+
+# Authentication & Security
+JWT_SECRET=your_secure_jwt_secret_here
+BCRYPT_ROUNDS=12
+SESSION_TIMEOUT=28800000
+
+# Email Notifications
+EMAIL_HOST=smtp.gmail.com
+EMAIL_PORT=587
+EMAIL_USER=notifications@flawlesssteelwelding.com
+EMAIL_PASS=your_app_password
+HR_EMAIL=tasha@fsw-denver.com
+ADMIN_EMAIL=admin@flawlesssteelwelding.com
+```
+
+### Testing the Application
+
+Full-stack testing approach:
+
+1. **Backend API Testing:**
+   ```bash
+   # Health check
+   curl http://localhost:3001/api/health
+   
+   # Test authentication
+   curl -X POST http://localhost:3001/api/auth/login \
+     -H "Content-Type: application/json" \
+     -d '{"username":"admin","password":"admin2025!"}'
+   ```
+
+2. **Frontend Testing:**
+   - Navigate to http://localhost:3001
+   - Test form submissions and data persistence
+   - Check browser dev tools for API calls
+   - Verify real-time database updates
+
+3. **Database Testing:**
+   - Access Supabase dashboard to verify data
+   - Check audit logs and HR notifications
+   - Test RLS policies and user permissions
 
 ## Key Implementation Patterns
 
