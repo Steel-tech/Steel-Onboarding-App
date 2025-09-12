@@ -1,8 +1,8 @@
-# 🔧 Flawless Steel Welding - New Employee Onboarding Guide
+# Flawless Steel Welding - New Employee Onboarding Guide
 
-## Welcome to Your First Day!
+## Welcome to Your First Day
 
-**Congratulations and welcome to the Flawless Steel Welding family!** This guide will walk you through our digital onboarding process step-by-step. The entire process typically takes 2-3 hours to complete.
+Congratulations and welcome to the Flawless Steel Welding family! This guide will walk you through our digital onboarding process step-by-step. The entire process typically takes 2-3 hours to complete.
 
 ---
 
