@@ -82,13 +82,13 @@ A comprehensive, enterprise-grade **full-stack web application** specifically de
 
 ### Database Schema
 
-**SQLite database with 6 core tables:**
-1. **users** - Authentication and role management
-2. **employee_data** - Personal information and job details
-3. **onboarding_progress** - Module completion tracking
-4. **form_submissions** - Digital forms with signatures
-5. **audit_logs** - Security and activity tracking
-6. **hr_notifications** - HR alert management
+**Supabase PostgreSQL database with 6 core tables:**
+1. **users** - Authentication and role management (SERIAL PRIMARY KEY)
+2. **employee_data** - Personal information and job details (with foreign keys)
+3. **onboarding_progress** - Module completion tracking (composite unique constraints)
+4. **form_submissions** - Digital forms with signatures (UPSERT capabilities)
+5. **audit_logs** - Security and activity tracking (timestamp with timezone)
+6. **hr_notifications** - HR alert management (email delivery status)
 
 ### Security Implementation
 
