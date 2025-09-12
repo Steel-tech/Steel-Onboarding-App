@@ -374,12 +374,37 @@ both cultural onboarding and brand education:
 
 ## Security Considerations
 
-The application includes:
+The application implements comprehensive production-grade security:
 
-- Content Security Policy headers in HTML
-- No external API calls (fully offline-capable)
-- Input validation on all forms
-- XSS protection through proper escaping
+### Backend Security (Express.js)
+- **Helmet middleware** with CSP, XSS protection, and frame options
+- **Rate limiting** (3 attempts/15min for auth, 10 requests/15min general)
+- **bcrypt password hashing** with 12 rounds for user authentication
+- **JWT tokens** with 8-hour expiration and secure signing
+- **Input validation** via express-validator with XSS pattern detection
+- **SQL injection protection** through parameterized queries
+- **CORS configuration** with specific origin restrictions
+
+### Database Security (PostgreSQL/Supabase)
+- **Row Level Security (RLS)** policies for data access control
+- **SSL/TLS encryption** in transit via Supabase
+- **Connection pooling** with timeout and retry mechanisms
+- **Audit logging** for all data modifications and user actions
+- **Encrypted storage** at rest via Supabase infrastructure
+
+### Frontend Security
+- **Content Security Policy** headers preventing XSS attacks
+- **Input sanitization** for all user-generated content
+- **Secure API communication** with authentication tokens
+- **XSS protection** through proper data escaping
+- **CSRF protection** via SameSite cookie attributes
+
+### Authentication Security
+- **Dual authentication** system (Express JWT + Supabase Auth)
+- **Session management** with secure token storage
+- **Password policy** enforcement via validation
+- **Account lockout** mechanisms for failed attempts
+- **Secure password reset** workflows via Supabase Auth
 
 ## Browser Compatibility
 
