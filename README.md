@@ -38,7 +38,8 @@ A comprehensive, enterprise-grade **full-stack web application** specifically de
 
 - **Node.js** - High-performance JavaScript runtime
 - **Express.js** - Robust web application framework
-- **SQLite3** - Embedded database with 6 production tables
+- **Supabase PostgreSQL** - Cloud-native database with 6 production tables
+- **pg (node-postgres)** - PostgreSQL client with connection pooling
 - **JWT Authentication** - Secure token-based authentication
 - **bcrypt** - Password hashing with 12 rounds
 - **Helmet.js** - Security middleware with CSP headers
