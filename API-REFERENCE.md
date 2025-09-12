@@ -781,13 +781,14 @@ HR_EMAIL=tasha@fsw-denver.com
 
 ### Required Environment Variables
 ```bash
-# JWT Configuration
-JWT_SECRET=your-256-bit-secret-key
+# Database Configuration
+DATABASE_URL=postgresql://user:password@host:port/database
+# For Supabase: postgresql://postgres:[PASSWORD]@db.[PROJECT_REF].supabase.co:5432/postgres
 
-# Database
-DB_PATH=/path/to/onboarding.db
+# JWT Configuration (Express.js fallback auth)
+JWT_SECRET=your-256-bit-secret-key-minimum-32-chars
 
-# Email Service
+# Email Service (Nodemailer)
 EMAIL_HOST=smtp.gmail.com
 EMAIL_PORT=587
 EMAIL_USER=notifications@company.com
@@ -795,22 +796,59 @@ EMAIL_PASS=app-specific-password
 HR_EMAIL=tasha@fsw-denver.com
 ADMIN_EMAIL=admin@fsw-denver.com
 
-# Security
+# Security Configuration
 BCRYPT_ROUNDS=12
 SESSION_TIMEOUT=1800000
 FRONTEND_URL=http://localhost:3000
+
+# Supabase Configuration (for client-side auth)
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_ANON_KEY=your-public-anon-key
 ```
 
 ### Optional Configuration
 ```bash
-# Server
+# Server Settings
 PORT=3001
 NODE_ENV=production
 
-# Advanced Security
+# Rate Limiting (uses express-rate-limit)
 RATE_LIMIT_WINDOW=900000
-AUTH_RATE_LIMIT=5
-GENERAL_RATE_LIMIT=100
+AUTH_RATE_LIMIT=3
+GENERAL_RATE_LIMIT=10
+
+# Database Connection Pool Settings
+DB_MAX_CONNECTIONS=5
+DB_MIN_CONNECTIONS=0
+DB_IDLE_TIMEOUT=10000
+DB_CONNECTION_TIMEOUT=10000
+```
+
+### Default User Creation
+The server automatically creates a default admin user on startup:
+```bash
+# Default credentials (change in production!)
+Username: admin
+Password: admin2025!
+Role: hr
+```
+
+### Production Security Checklist
+```bash
+# Generate secure JWT secret
+JWT_SECRET=$(openssl rand -base64 64)
+
+# Use strong database password
+DATABASE_URL=postgresql://postgres:STRONG_PASSWORD@...
+
+# Configure SSL for production
+NODE_ENV=production
+
+# Set appropriate CORS origin
+FRONTEND_URL=https://your-production-domain.com
+
+# Use app-specific email passwords
+EMAIL_PASS=your-gmail-app-password
 ```
 
 ## Audit Logging
