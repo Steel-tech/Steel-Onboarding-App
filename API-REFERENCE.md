@@ -459,7 +459,8 @@ Permissions-Policy: geolocation=(), microphone=(), camera=()
   <signature>GET /api/backup/export</signature>
   <purpose>Export all onboarding data for backup or reporting purposes</purpose>
   <authentication>Bearer JWT token with 'hr' or 'admin' role required</authentication>
-  <rate-limit>100 requests per 15 minutes per IP</rate-limit>
+  <rate-limit>10 requests per 15 minutes per IP (moderateRateLimit)</rate-limit>
+  <middleware>authenticateToken (with role check for hr OR admin)</middleware>
   
   <parameters>
     <param name="none" type="none" required="false">No parameters required</param>
@@ -485,16 +486,31 @@ Permissions-Policy: geolocation=(), microphone=(), camera=()
     <error type="500">Database error</error>
   </errors>
   
+  <authorization>
+    <check>JWT token must be valid and not expired</check>
+    <check>User role must be 'hr' OR 'admin' (req.user.role !== 'hr' && req.user.role !== 'admin')</check>
+    <check>Returns 403 Forbidden if role check fails</check>
+  </authorization>
+  
+  <database-operation>
+    <query>SELECT * FROM employee_data</query>
+    <query>SELECT * FROM onboarding_progress</query>
+    <query>SELECT * FROM form_submissions</query>
+    <query>SELECT * FROM audit_logs WHERE created_at >= CURRENT_DATE - INTERVAL '30 days'</query>
+  </database-operation>
+  
   <data-scope>
     <scope>All employee data (personal information, contact details)</scope>
-    <scope>All progress records (module completions, timestamps)</scope>
-    <scope>All form submissions (including digital signatures)</scope>
-    <scope>Audit logs (last 30 days only for security)</scope>
+    <scope>All progress records (module completions, timestamps, JSON progress_data)</scope>
+    <scope>All form submissions (including digital signatures as base64)</scope>
+    <scope>Audit logs (last 30 days only for security and performance)</scope>
   </data-scope>
   
   <side-effects>
-    <effect>Creates audit log entry for data export</effect>
-    <effect>Sets download headers for file save</effect>
+    <effect>Creates audit log entry for DATA_EXPORTED action with record count</effect>
+    <effect>Sets Content-Disposition header for file download</effect>
+    <effect>Sets Content-Type header to application/json</effect>
+    <effect>Filename includes timestamp for uniqueness</effect>
   </side-effects>
   
   <curl-example>
