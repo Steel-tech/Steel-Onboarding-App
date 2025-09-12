@@ -544,21 +544,29 @@ Update company-specific details in `index.html`:
 #### **Backup Database**
 
 ```bash
-# Create backup
-npm run backup
+# Export data via API endpoint (requires HR/admin role)
+curl -H "Authorization: Bearer <token>" \
+     http://localhost:3001/api/backup/export > backup.json
 
-# Manual backup
-cp onboarding.db backup-$(date +%Y%m%d).db
+# Or use the backup script
+npm run backup
 ```
 
 #### **View Database**
 
+**Option A: Supabase Dashboard**
+1. Go to https://app.supabase.com
+2. Select your project
+3. Go to Table Editor to view and edit data
+4. Use SQL Editor for complex queries
+
+**Option B: PostgreSQL CLI**
 ```bash
-# Install SQLite3 CLI
-sqlite3 onboarding.db
+# Install PostgreSQL client
+psql $DATABASE_URL
 
 # View tables
-.tables
+\dt
 
 # View employee data
 SELECT * FROM employee_data;
