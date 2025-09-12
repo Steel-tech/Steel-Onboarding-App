@@ -21,27 +21,49 @@ The Steel Onboarding App backend provides a secure, production-ready API for man
 
 ## Authentication Flow
 
-### JWT Token Lifecycle
+### Dual Authentication System
+The application supports both Supabase client-side authentication and Express.js JWT backend authentication:
+
+#### Primary: Supabase Authentication
+1. **Registration**: Client-side Supabase auth with email confirmation (optional)
+2. **Login**: Supabase handles authentication and session management
+3. **Profile Creation**: User profile stored in PostgreSQL `profiles` table
+4. **Session Token**: Supabase provides JWT tokens for API access
+
+#### Fallback: Express.js JWT Authentication
 1. **Login**: POST `/api/auth/login` - Obtain JWT token (8-hour expiry)
 2. **Authorization**: Include token in `Authorization: Bearer <token>` header
 3. **Token Validation**: Server validates on each protected endpoint
-4. **Session Management**: Automatic logout after inactivity timeout
+4. **Session Management**: Tokens expire after 8 hours
 
 ### Role-Based Access Control
-- **employee**: Basic onboarding access
+- **employee**: Basic onboarding access (default role)
 - **hr**: Employee management and dashboard access
 - **admin**: Full system access including data export
+
+### Environment Configuration
+```bash
+# Supabase Configuration
+DATABASE_URL=postgresql://user:pass@host:port/dbname
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_ANON_KEY=your-anon-key
+
+# JWT Fallback
+JWT_SECRET=your-256-bit-secret-key
+BCRYPT_ROUNDS=12
+```
 
 ## Rate Limiting
 
 ### Authentication Endpoints (`/api/auth/*`)
 - **Window**: 15 minutes
-- **Limit**: 5 attempts per IP
+- **Limit**: 3 attempts per IP (strictRateLimit)
 - **Headers**: `RateLimit-*` headers included
+- **Handler**: Custom error logging with IP tracking
 
 ### General API Endpoints (`/api/*`)
 - **Window**: 15 minutes
-- **Limit**: 100 requests per IP
+- **Limit**: 10 requests per IP (moderateRateLimit)
 - **Enforcement**: 429 status with retry headers
 
 ## Security Features
