@@ -156,13 +156,25 @@ Full-stack testing approach:
 
 ## Key Implementation Patterns
 
-### Adding New Content Sections
+### Adding New API Endpoints
 
-New tabs require updates in three places:
+New backend functionality requires updates in multiple layers:
+
+1. **Server Routes** (server.js) - Add Express route with middleware
+2. **Database Operations** (database.js) - Add PostgreSQL queries
+3. **Frontend Integration** (script.js) - Add API client calls
+4. **Validation** (validators.js) - Add input validation rules
+5. **Authentication** - Ensure proper JWT/Supabase auth checks
+
+### Adding New Frontend Sections
+
+New tabs require updates across the full stack:
 
 1. **HTML** - Add tab button in navigation and content section
-2. **CSS** - Style the new section if needed
-3. **JavaScript** - No changes needed, tab system is automatic
+2. **CSS** - Style the new section with brand guidelines
+3. **JavaScript** - Add state management and API integration
+4. **Backend** - Add corresponding API endpoints for data persistence
+5. **Database** - Update schema if new data fields needed
 
 ### Company Story CSS Architecture
 
