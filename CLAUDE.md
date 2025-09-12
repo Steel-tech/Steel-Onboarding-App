@@ -7,45 +7,75 @@ in this repository.
 
 ## Project Overview
 
-This is a **vanilla JavaScript/HTML/CSS web application** for employee
-onboarding at Flawless Steel Welding. The application is completely client-side
-with no Node.js dependencies or build process required. The app emphasizes
-**professional company culture** and **founder story storytelling** to create
-an engaging onboarding experience that builds pride and connection to the
-company's mission.
+This is a **production-ready full-stack web application** for employee
+onboarding at Flawless Steel Welding. The application features a Node.js/Express
+backend with PostgreSQL database via Supabase, JWT authentication, and comprehensive
+security middleware. The frontend is a sophisticated single-page application with
+real-time data synchronization. The app emphasizes **professional company culture**
+and **founder story storytelling** to create an engaging onboarding experience that
+builds pride and connection to the company's mission.
 
 ## Core Architecture
 
 ### Application Structure
 
-- **Single-page application** with tab-based navigation
-- **LocalStorage persistence** for saving user progress and form data
-- **No backend required** - runs entirely in the browser
-- **Progressive enhancement** - works without JavaScript but enhanced with it
+- **Full-stack architecture** with React-style frontend and Express.js backend
+- **Supabase PostgreSQL database** with connection pooling and real-time features
+- **Dual authentication system** - Express JWT + Supabase Auth for flexibility
+- **Production security** with rate limiting, input validation, and audit logging
+- **n8n workflow integration** for automated HR processes and notifications
 
-### Key Files
+### Key Backend Files
 
-- `index.html` - Main HTML structure with all content sections
-- `script.js` - Core application logic, state management, and interactivity
-- `styles.css` - All styling and responsive design
-- `fsw-onboarding-processor.js` - n8n Super Code for processing onboarding data
-- `fsw-report-generator.js` - n8n Super Code for generating completion reports
+- `server.js` - Express.js server with JWT auth, security middleware, API routes
+- `database.js` - PostgreSQL connection handling via Supabase with pooling
+- `auth.js` - Authentication system with bcrypt hashing and session management
+- `validators.js` - Input validation, security checks, and rate limiting
+- `api-client.js` - Frontend API client with offline support and error handling
+
+### Key Frontend Files
+
+- `index.html` - Single-page application with security headers and responsive design
+- `script.js` - Complex state management, API integration, and real-time updates
+- `styles.css` - Professional styling with responsive design and brand elements
+- `event-handlers.js` - Modular event handling system for security compliance
+- `supabase-client.js` - Database client with authentication and real-time subscriptions
+
+### Database Architecture
+
+```javascript
+// PostgreSQL schema via Supabase
+Tables: {
+    users: 'Authentication and user roles',
+    employee_data: 'Employee information and onboarding status', 
+    onboarding_progress: 'Module completion tracking',
+    form_submissions: 'Digital forms with signatures',
+    audit_logs: 'Security and compliance tracking',
+    hr_notifications: 'Automated HR workflow triggers'
+}
+```
 
 ### State Management Pattern
 
 ```javascript
-// Central state object in script.js
+// Hybrid state management - frontend + backend
+// Frontend state (script.js)
 appState = {
     currentTab: 'welcome',
     progress: 0,
     completedModules: [],
     employeeData: {},
-    checklistItems: {},
-    analytics: {...}
+    apiClient: new APIClient(),
+    supabaseClient: window.supabase.createClient(...)
 }
+
+// Backend state (server.js + database)
+// - PostgreSQL persistence via Supabase
+// - JWT sessions with 8-hour expiration  
+// - Real-time subscriptions for live updates
 ```
 
-All state changes go through `saveState()` to persist to localStorage.
+All frontend state syncs with PostgreSQL backend via API calls and Supabase real-time subscriptions.
 
 ## Development Commands
 
