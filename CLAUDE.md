@@ -244,34 +244,72 @@ The founder story sections use a sophisticated styling system:
 
 ### Form Data Handling
 
-All forms follow this pattern:
+All forms follow this full-stack pattern:
 
 ```javascript
-// Form submission prevents default
-form.addEventListener('submit', (e) => {
+// Frontend form submission with API integration
+form.addEventListener('submit', async (e) => {
     e.preventDefault();
-    // Process data
-    // Update appState
-    // Call saveState()
+    
+    // Validate data client-side
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData);
+    
+    try {
+        // Submit to backend API with authentication
+        const response = await apiClient.submitForm(formType, data, digitalSignature);
+        
+        // Update local state and sync with database
+        updateAppState(response.data);
+        
+        // Real-time update via Supabase subscriptions
+        await supabaseClient.from('form_submissions').upsert(data);
+        
+        // Trigger HR notification workflow
+        await emailService.sendHRNotification(employeeData, 'FORM_SUBMITTED');
+        
+    } catch (error) {
+        handleApiError(error);
+    }
 });
 ```
 
 ### Progress Tracking
 
-Progress is calculated from:
+Progress is calculated from both frontend and backend:
 
-- Completed safety modules
-- Downloaded documents
-- Checked checklist items
-- Form submissions
+**Frontend Tracking:**
+- Completed safety modules (localStorage + database sync)
+- Downloaded documents (audit logged)
+- Checked checklist items (real-time updates)
+- Form submissions (PostgreSQL persistence)
 
-### Video Player Integration
+**Backend Tracking:**
+- Module completion timestamps in `onboarding_progress` table
+- Form submission audit trail in `form_submissions` table
+- HR notifications triggered via `hr_notifications` table
+- Real-time progress updates via Supabase subscriptions
 
-The orientation video at `orientation-video.mp4` has custom progress tracking:
+### Authentication Integration
 
-- Saves viewing progress to localStorage
-- Marks complete at 90% watched
-- Integrated with overall progress system
+The application uses dual authentication:
+
+```javascript
+// Express.js JWT Authentication
+const token = jwt.sign({ id: user.id, role: user.role }, JWT_SECRET, { expiresIn: '8h' });
+
+// Supabase Authentication
+const { data, error } = await supabase.auth.signInWithPassword({
+    email: email,
+    password: password
+});
+
+// Hybrid session management
+if (expressAuth.success || supabaseAuth.success) {
+    establishUserSession();
+    syncUserData();
+}
+```
 
 ## n8n Integration
 
