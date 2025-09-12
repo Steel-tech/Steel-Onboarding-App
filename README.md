@@ -1241,18 +1241,17 @@ CREATE TABLE users (
 
 ```sql
 CREATE TABLE employee_data (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id INTEGER NOT NULL,
-    employee_id TEXT UNIQUE,
-    name TEXT NOT NULL,
-    email TEXT NOT NULL,
-    phone TEXT,
-    position TEXT NOT NULL,
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL REFERENCES users(id),
+    employee_id VARCHAR(50) UNIQUE,
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    phone VARCHAR(20),
+    position VARCHAR(255) NOT NULL,
     start_date DATE NOT NULL,
-    supervisor TEXT,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users (id)
+    supervisor VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 ```
 
