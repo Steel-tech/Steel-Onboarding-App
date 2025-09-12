@@ -78,7 +78,7 @@ function prepareDraftEmail(data) {
     }
     
     // Try to find recipient
-    let recipient = 'hr@fsw-denver.com'; // Default
+    let recipient = 'tasha@fsw-denver.com'; // Default
     for (const field of possibleRecipientFields) {
         if (sourceData[field]) {
             recipient = sourceData[field];
@@ -202,7 +202,7 @@ function parseAttendees(attendeesInput) {
     
     if (!attendeesInput) {
         // Default attendees
-        attendeesList.push({ email: 'hr@fsw-denver.com' });
+        attendeesList.push({ email: 'tasha@fsw-denver.com' });
         return attendeesList;
     }
     
@@ -227,7 +227,7 @@ function parseAttendees(attendeesInput) {
     
     // Ensure at least one attendee
     if (attendeesList.length === 0) {
-        attendeesList.push({ email: 'hr@fsw-denver.com' });
+        attendeesList.push({ email: 'tasha@fsw-denver.com' });
     }
     
     return attendeesList;
@@ -359,7 +359,7 @@ try {
                 suggestion: 'Check node connections and data format',
                 fallback: {
                     email: {
-                        to: 'hr@fsw-denver.com',
+                        to: 'tasha@fsw-denver.com',
                         subject: 'FSW Master Control - Error Report',
                         body: `An error occurred in the workflow:\n\n${error.message}\n\nPlease check the workflow configuration.`
                     },
