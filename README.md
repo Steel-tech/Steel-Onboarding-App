@@ -353,8 +353,10 @@ Differentiators are maintained in a grid structure that automatically adapts to 
 git clone <repository-url>
 cd steel-onboarding-app
 
-# 2. Install dependencies and setup database
-npm run setup
+# 2. Install dependencies and configure environment
+npm install
+cp .env.example .env
+# Edit .env with your Supabase DATABASE_URL and other settings
 
 # 3. Start the server
 npm start
