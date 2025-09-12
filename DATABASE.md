@@ -782,66 +782,148 @@ echo "SUPABASE_ANON_KEY: ${SUPABASE_ANON_KEY:0:20}..."
 psql $DATABASE_URL -c "SELECT version();"
 ```
 
-#### Form Submission Errors
+#### PostgreSQL Constraint Violations
 
-**Symptom:** Forms fail to save or submit
-**Cause:** Database constraint violations or validation errors
-
-**Solution:**
-1. Check application logs for specific error messages
-2. Verify unique constraints on form_type per user
-3. Validate JSON data format in form_data field
-4. Check for digital signature encoding issues
-
-#### Email Notification Failures
-
-**Symptom:** HR notifications not being sent
-**Cause:** SMTP configuration errors or email service issues
+**Symptom:** `Error: duplicate key value violates unique constraint`
+**Cause:** Attempting to insert duplicate records
 
 **Solution:**
-1. Verify SMTP settings in .env file
-2. Test email service connectivity
-3. Check hr_notifications table for queued messages
-4. Review email service logs for delivery errors
-
-### Diagnostic Queries
-
-#### Check User Accounts
 ```sql
-SELECT username, role, last_login, is_active 
-FROM users 
-ORDER BY created_at;
+-- Use UPSERT operations for idempotent inserts
+INSERT INTO onboarding_progress (user_id, employee_id, module_name, progress_data)
+VALUES ($1, $2, $3, $4)
+ON CONFLICT (user_id, module_name) 
+DO UPDATE SET 
+  progress_data = EXCLUDED.progress_data,
+  completed_at = CURRENT_TIMESTAMP;
 ```
 
-#### Progress Summary Report
+**JSON Validation:**
+```javascript
+// Validate JSON before database insertion
+const validateFormData = (data) => {
+  try {
+    const parsed = JSON.parse(JSON.stringify(data));
+    return typeof parsed === 'object' && parsed !== null;
+  } catch (error) {
+    console.error('Invalid JSON data:', error);
+    return false;
+  }
+};
+```
+
+#### Email and Notification Issues
+
+**Symptom:** HR notifications not delivered
+**Cause:** Email service configuration or Supabase Edge Function errors
+
+**Solution:**
+```javascript
+// Test email configuration
+const testEmailConfig = async () => {
+  const transporter = nodemailer.createTransporter({
+    host: process.env.EMAIL_HOST,
+    port: process.env.EMAIL_PORT,
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS
+    }
+  });
+  
+  try {
+    await transporter.verify();
+    console.log('✅ Email service connected');
+  } catch (error) {
+    console.error('❌ Email service error:', error);
+  }
+};
+```
+
+**Supabase Edge Function Monitoring:**
+- Check function logs in Supabase Dashboard
+- Monitor function execution metrics
+- Test functions with curl or Postman
+- Verify environment variables in function settings
+
+### PostgreSQL Diagnostic Queries
+
+#### Check Connection Status
+```sql
+-- Monitor active connections
+SELECT 
+  datname,
+  usename,
+  application_name,
+  client_addr,
+  state,
+  query_start,
+  state_change
+FROM pg_stat_activity 
+WHERE datname = 'postgres'
+ORDER BY query_start DESC;
+```
+
+#### User Account Status
 ```sql
 SELECT 
+  u.username, 
+  u.role, 
+  u.last_login, 
+  u.is_active,
+  e.employee_id,
+  e.position
+FROM users u
+LEFT JOIN employee_data e ON u.id = e.user_id
+ORDER BY u.created_at;
+```
+
+#### Onboarding Progress Report
+```sql
+SELECT 
+    e.employee_id,
     e.name, 
-    e.position, 
-    COUNT(p.module_name) as completed_modules,
-    COUNT(f.form_type) as submitted_forms
+    e.position,
+    e.start_date,
+    COUNT(DISTINCT p.module_name) as completed_modules,
+    COUNT(DISTINCT f.form_type) as submitted_forms,
+    ROUND(
+      ((COUNT(DISTINCT p.module_name) + COUNT(DISTINCT f.form_type)) * 100.0) / 9, 2
+    ) as completion_percentage
 FROM employee_data e
 LEFT JOIN onboarding_progress p ON e.user_id = p.user_id
 LEFT JOIN form_submissions f ON e.user_id = f.user_id
-GROUP BY e.user_id;
+GROUP BY e.employee_id, e.name, e.position, e.start_date
+ORDER BY completion_percentage DESC;
 ```
 
-#### Recent Activity Review
+#### Performance Analysis
 ```sql
-SELECT action, details, created_at 
-FROM audit_logs 
-ORDER BY created_at DESC 
-LIMIT 20;
-```
-
-#### Notification Delivery Status
-```sql
+-- Identify slow queries
 SELECT 
-    notification_type, 
-    COUNT(*) as total,
-    SUM(email_sent) as sent_successfully
-FROM hr_notifications 
-GROUP BY notification_type;
+  query,
+  calls,
+  total_time,
+  mean_time,
+  rows
+FROM pg_stat_statements 
+WHERE calls > 100
+ORDER BY mean_time DESC 
+LIMIT 10;
+```
+
+#### Database Health Check
+```sql
+-- Check table sizes and index usage
+SELECT 
+  schemaname,
+  tablename,
+  pg_size_pretty(pg_total_relation_size(schemaname||'.'||tablename)) as size,
+  pg_stat_get_numscans(c.oid) as seq_scans,
+  pg_stat_get_tuples_returned(c.oid) as tuples_read
+FROM pg_tables pt
+JOIN pg_class c ON c.relname = pt.tablename
+WHERE schemaname = 'public'
+ORDER BY pg_total_relation_size(schemaname||'.'||tablename) DESC;
 ```
 
 ## Best Practices and Code Patterns
@@ -947,6 +1029,106 @@ const sanitizedData = {
 
 ---
 
-**Last Updated:** 2025-01-08  
-**Database Version:** 1.0  
-**Supported SQLite Version:** 3.35+
+---
+
+## Real-time Features and Advanced Configuration
+
+### Supabase Real-time Subscriptions
+
+```javascript
+// Subscribe to employee progress updates
+const progressSubscription = supabase
+  .channel('onboarding-updates')
+  .on('postgres_changes', {
+    event: 'INSERT',
+    schema: 'public',
+    table: 'onboarding_progress'
+  }, (payload) => {
+    console.log('New progress:', payload.new);
+    updateProgressUI(payload.new);
+  })
+  .on('postgres_changes', {
+    event: 'INSERT', 
+    schema: 'public',
+    table: 'form_submissions'
+  }, (payload) => {
+    console.log('Form submitted:', payload.new);
+    notifyHR(payload.new);
+  })
+  .subscribe();
+```
+
+### Database Functions and Triggers
+
+```sql
+-- Function to auto-generate employee IDs
+CREATE OR REPLACE FUNCTION generate_employee_id()
+RETURNS TRIGGER AS $$
+BEGIN
+  IF NEW.employee_id IS NULL THEN
+    NEW.employee_id := 'FSW' || LPAD(nextval('employee_id_seq')::TEXT, 6, '0');
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Trigger to auto-generate employee IDs
+CREATE TRIGGER auto_employee_id
+  BEFORE INSERT ON employee_data
+  FOR EACH ROW
+  EXECUTE FUNCTION generate_employee_id();
+
+-- Function to calculate completion percentage
+CREATE OR REPLACE FUNCTION calculate_completion_percentage(user_id_param INTEGER)
+RETURNS INTEGER AS $$
+DECLARE
+  module_count INTEGER;
+  form_count INTEGER;
+  total_required INTEGER := 9; -- 4 modules + 5 forms
+BEGIN
+  SELECT COUNT(*) INTO module_count FROM onboarding_progress WHERE user_id = user_id_param;
+  SELECT COUNT(*) INTO form_count FROM form_submissions WHERE user_id = user_id_param;
+  
+  RETURN ROUND(((module_count + form_count) * 100.0) / total_required);
+END;
+$$ LANGUAGE plpgsql;
+```
+
+### Edge Functions Integration
+
+```javascript
+// Supabase Edge Function for HR notifications
+export default async function notifyHR(req) {
+  const { employee_data, event_type } = await req.json();
+  
+  // Send email notification
+  const emailResponse = await fetch('https://api.sendgrid.com/v3/mail/send', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${Deno.env.get('SENDGRID_API_KEY')}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      personalizations: [{
+        to: [{ email: 'hr@fsw-denver.com' }],
+        subject: `Onboarding Update: ${employee_data.name}`
+      }],
+      from: { email: 'notifications@fsw-denver.com' },
+      content: [{
+        type: 'text/html',
+        value: generateEmailTemplate(employee_data, event_type)
+      }]
+    })
+  });
+  
+  return new Response(JSON.stringify({ success: true }));
+}
+```
+
+---
+
+**Last Updated:** 2025-01-12  
+**Database Version:** 2.0 (PostgreSQL Migration)  
+**Supabase Version:** Latest  
+**PostgreSQL Version:** 15.x  
+**Node.js Compatibility:** >=18.0.0
