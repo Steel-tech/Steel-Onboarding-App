@@ -71,7 +71,8 @@ A comprehensive, enterprise-grade **full-stack web application** specifically de
 ### Backend (Server-Side)
 
 **Production Node.js/Express server with:**
-- **Database Layer:** SQLite with 6 production tables
+- **Database Layer:** Supabase PostgreSQL with 6 production tables
+- **Connection Pooling:** Optimized pg connection management
 - **Authentication API:** JWT-based login/logout system
 - **Progress API:** Module completion tracking
 - **Form API:** Digital form submissions with signatures
