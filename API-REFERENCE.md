@@ -522,33 +522,58 @@ Permissions-Policy: geolocation=(), microphone=(), camera=()
 
 <function name="GET /api/health">
   <signature>GET /api/health</signature>
-  <purpose>System health check and uptime monitoring</purpose>
+  <purpose>System health check and uptime monitoring with database status</purpose>
   <authentication>None required (public endpoint)</authentication>
-  <rate-limit>100 requests per 15 minutes per IP</rate-limit>
+  <rate-limit>10 requests per 15 minutes per IP (moderateRateLimit)</rate-limit>
   
   <parameters>
     <param name="none" type="none" required="false">No parameters required</param>
   </parameters>
   
-  <returns>Server status and runtime information</returns>
+  <returns>Server status, database connectivity, and runtime information</returns>
   <response-example>
     <success status="200">
     {
       "status": "healthy",
+      "database": "connected",
       "timestamp": "2025-01-10T16:00:00Z",
       "uptime": 86400.5
     }
     </success>
+    <partial-failure status="200">
+    {
+      "status": "healthy",
+      "database": "disconnected",
+      "timestamp": "2025-01-10T16:00:00Z",
+      "uptime": 86400.5
+    }
+    </partial-failure>
   </response-example>
   
   <errors>
-    <error type="500">Server unavailable</error>
+    <error type="500">Server unhealthy with error details</error>
   </errors>
+  
+  <database-check>
+    <operation>Attempts to get database connection via getDatabaseConnection()</operation>
+    <fallback>Returns "disconnected" status if database unavailable</fallback>
+    <states>connected | disconnected | unknown</states>
+    <timeout>Uses database connection timeout settings</timeout>
+  </database-check>
+  
+  <response-fields>
+    <field name="status">Always "healthy" for 200 responses, "unhealthy" for 500</field>
+    <field name="database">Connection status: connected|disconnected|unknown</field>
+    <field name="timestamp">Current server time in ISO 8601 format</field>
+    <field name="uptime">Process uptime in seconds (process.uptime())</field>
+    <field name="error">Only present in 500 responses with error.message</field>
+  </response-fields>
   
   <monitoring-use>
     <use>Load balancer health checks</use>
     <use>Uptime monitoring services</use>
     <use>DevOps status dashboards</use>
+    <use>Database connectivity monitoring</use>
   </monitoring-use>
   
   <curl-example>
