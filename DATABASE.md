@@ -1,21 +1,34 @@
 # Steel Onboarding Application - Database Documentation
 
 Complete database architecture documentation for the Steel Onboarding
-Application SQLite database system.
+Application PostgreSQL database system via Supabase cloud platform.
 
 ## Overview
 
-SQLite database system supporting user authentication, employee onboarding
-tracking, form submissions, audit logging, and HR notifications. Designed
-for production use with security, performance, and compliance requirements.
+Cloud-native PostgreSQL database system deployed on Supabase, supporting user authentication, employee onboarding tracking, form submissions, audit logging, and HR notifications. Features built-in Row Level Security (RLS), real-time subscriptions, and automatic backups for enterprise-grade reliability.
 
 ## Database Configuration
 
+### Environment Variables
+
 | Setting | Type | Default | Description |
 |---------|------|---------|-------------|
-| DB_PATH | string | ./onboarding.db | SQLite database file location |
+| DATABASE_URL | string | (required) | PostgreSQL connection string from Supabase |
+| SUPABASE_URL | string | (required) | Supabase project URL for client connections |
+| SUPABASE_ANON_KEY | string | (required) | Supabase anonymous key for client authentication |
+| SUPABASE_SERVICE_ROLE_KEY | string | (required) | Service role key for server-side operations |
 | BCRYPT_ROUNDS | integer | 12 | Password hashing rounds for security |
 | JWT_SECRET | string | (required) | Secret key for JWT token signing |
+
+### Connection Pool Settings
+
+| Setting | Value | Purpose |
+|---------|-------|----------|
+| max | 5 | Maximum connections for serverless optimization |
+| min | 0 | Allow scaling to zero connections |
+| idleTimeoutMillis | 10000 | Shorter timeout for serverless environments |
+| connectionTimeoutMillis | 10000 | Connection establishment timeout |
+| ssl | true (production) | SSL enforcement for secure connections |
 
 ## Database Schema
 
@@ -25,15 +38,15 @@ for production use with security, performance, and compliance requirements.
 
 | Column | Type | Constraints | Description |
 |--------|------|-------------|-------------|
-| id | INTEGER | PRIMARY KEY AUTOINCREMENT | Unique user identifier |
-| username | TEXT | UNIQUE NOT NULL | Login username (lowercase) |
-| password_hash | TEXT | NOT NULL | bcrypt hashed password (12+ rounds) |
-| role | TEXT | NOT NULL DEFAULT 'employee' | User role: admin, hr, employee |
-| name | TEXT | NOT NULL | Full display name |
-| email | TEXT | | Email address for notifications |
-| created_at | DATETIME | DEFAULT CURRENT_TIMESTAMP | Account creation time |
-| last_login | DATETIME | | Last successful login timestamp |
-| is_active | BOOLEAN | DEFAULT 1 | Account status flag |
+| id | SERIAL | PRIMARY KEY | Auto-incrementing unique user identifier |
+| username | VARCHAR(255) | UNIQUE NOT NULL | Login username (lowercase) |
+| password_hash | VARCHAR(255) | NOT NULL | bcrypt hashed password (12+ rounds) |
+| role | VARCHAR(50) | NOT NULL DEFAULT 'employee' | User role: admin, hr, employee |
+| name | VARCHAR(255) | NOT NULL | Full display name |
+| email | VARCHAR(255) | | Email address for notifications |
+| created_at | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP | Account creation time |
+| last_login | TIMESTAMP | | Last successful login timestamp |
+| is_active | BOOLEAN | DEFAULT TRUE | Account status flag |
 
 **Indexes:**
 - UNIQUE index on username
@@ -57,17 +70,17 @@ for production use with security, performance, and compliance requirements.
 
 | Column | Type | Constraints | Description |
 |--------|------|-------------|-------------|
-| id | INTEGER | PRIMARY KEY AUTOINCREMENT | Unique record identifier |
-| user_id | INTEGER | NOT NULL, FK to users.id | Foreign key to users table |
-| employee_id | TEXT | UNIQUE | Company employee ID (FSW######) |
-| name | TEXT | NOT NULL | Employee full name |
-| email | TEXT | NOT NULL | Employee work email address |
-| phone | TEXT | | Employee phone number |
-| position | TEXT | NOT NULL | Job title/position |
+| id | SERIAL | PRIMARY KEY | Auto-incrementing unique record identifier |
+| user_id | INTEGER | NOT NULL REFERENCES users(id) | Foreign key to users table |
+| employee_id | VARCHAR(50) | UNIQUE | Company employee ID (FSW######) |
+| name | VARCHAR(255) | NOT NULL | Employee full name |
+| email | VARCHAR(255) | NOT NULL | Employee work email address |
+| phone | VARCHAR(20) | | Employee phone number |
+| position | VARCHAR(255) | NOT NULL | Job title/position |
 | start_date | DATE | NOT NULL | Employment start date |
-| supervisor | TEXT | | Assigned supervisor name |
-| created_at | DATETIME | DEFAULT CURRENT_TIMESTAMP | Record creation time |
-| updated_at | DATETIME | DEFAULT CURRENT_TIMESTAMP | Last update timestamp |
+| supervisor | VARCHAR(255) | | Assigned supervisor name |
+| created_at | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP | Record creation time |
+| updated_at | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP | Last update timestamp |
 
 **Indexes:**
 - idx_employee_data_user_id on user_id
@@ -91,12 +104,15 @@ for production use with security, performance, and compliance requirements.
 
 | Column | Type | Constraints | Description |
 |--------|------|-------------|-------------|
-| id | INTEGER | PRIMARY KEY AUTOINCREMENT | Unique progress record |
-| user_id | INTEGER | NOT NULL, FK to users.id | Foreign key to users table |
-| employee_id | TEXT | NOT NULL | Employee identifier for reporting |
-| module_name | TEXT | NOT NULL | Training module identifier |
-| completed_at | DATETIME | DEFAULT CURRENT_TIMESTAMP | Module completion time |
+| id | SERIAL | PRIMARY KEY | Auto-incrementing unique progress record |
+| user_id | INTEGER | NOT NULL REFERENCES users(id) | Foreign key to users table |
+| employee_id | VARCHAR(50) | NOT NULL | Employee identifier for reporting |
+| module_name | VARCHAR(255) | NOT NULL | Training module identifier |
+| completed_at | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP | Module completion time |
 | progress_data | TEXT | | JSON blob with module progress data |
+
+**Constraints:**
+- UNIQUE(user_id, module_name) - Prevents duplicate module completions
 
 **Indexes:**
 - idx_onboarding_progress_user_id on user_id
@@ -119,15 +135,18 @@ for production use with security, performance, and compliance requirements.
 
 | Column | Type | Constraints | Description |
 |--------|------|-------------|-------------|
-| id | INTEGER | PRIMARY KEY AUTOINCREMENT | Unique submission identifier |
-| user_id | INTEGER | NOT NULL, FK to users.id | Foreign key to users table |
-| employee_id | TEXT | NOT NULL | Employee identifier for audit trails |
-| form_type | TEXT | NOT NULL | Type/category of form submitted |
+| id | SERIAL | PRIMARY KEY | Auto-incrementing unique submission identifier |
+| user_id | INTEGER | NOT NULL REFERENCES users(id) | Foreign key to users table |
+| employee_id | VARCHAR(50) | NOT NULL | Employee identifier for audit trails |
+| form_type | VARCHAR(255) | NOT NULL | Type/category of form submitted |
 | form_data | TEXT | NOT NULL | JSON blob with complete form data |
 | digital_signature | TEXT | | Base64 encoded signature image |
-| submitted_at | DATETIME | DEFAULT CURRENT_TIMESTAMP | Form submission time |
-| ip_address | TEXT | | Client IP address for audit purposes |
+| submitted_at | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP | Form submission time |
+| ip_address | VARCHAR(45) | | Client IP address for audit purposes |
 | user_agent | TEXT | | Browser user agent for audit purposes |
+
+**Constraints:**
+- UNIQUE(user_id, form_type) - One submission per form type per user
 
 **Indexes:**
 - idx_form_submissions_user_id on user_id
@@ -151,14 +170,14 @@ for production use with security, performance, and compliance requirements.
 
 | Column | Type | Constraints | Description |
 |--------|------|-------------|-------------|
-| id | INTEGER | PRIMARY KEY AUTOINCREMENT | Unique log entry identifier |
-| user_id | INTEGER | FK to users.id | Foreign key (null for system events) |
-| employee_id | TEXT | | Employee identifier when applicable |
-| action | TEXT | NOT NULL | Action type/category performed |
+| id | SERIAL | PRIMARY KEY | Auto-incrementing unique log entry identifier |
+| user_id | INTEGER | REFERENCES users(id) | Foreign key (null for system events) |
+| employee_id | VARCHAR(50) | | Employee identifier when applicable |
+| action | VARCHAR(255) | NOT NULL | Action type/category performed |
 | details | TEXT | | JSON blob with action-specific details |
-| ip_address | TEXT | | Client IP address for security tracking |
+| ip_address | VARCHAR(45) | | Client IP address for security tracking |
 | user_agent | TEXT | | Browser user agent information |
-| created_at | DATETIME | DEFAULT CURRENT_TIMESTAMP | Log entry timestamp |
+| created_at | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP | Log entry timestamp |
 
 **Indexes:**
 - idx_audit_logs_user_id on user_id
@@ -182,13 +201,13 @@ for production use with security, performance, and compliance requirements.
 
 | Column | Type | Constraints | Description |
 |--------|------|-------------|-------------|
-| id | INTEGER | PRIMARY KEY AUTOINCREMENT | Unique notification identifier |
-| user_id | INTEGER | NOT NULL, FK to users.id | Foreign key to users table |
-| employee_id | TEXT | NOT NULL | Employee ID for notification context |
-| notification_type | TEXT | NOT NULL | Notification category/trigger |
+| id | SERIAL | PRIMARY KEY | Auto-incrementing unique notification identifier |
+| user_id | INTEGER | NOT NULL REFERENCES users(id) | Foreign key to users table |
+| employee_id | VARCHAR(50) | NOT NULL | Employee ID for notification context |
+| notification_type | VARCHAR(255) | NOT NULL | Notification category/trigger |
 | message | TEXT | NOT NULL | Notification message content |
-| sent_at | DATETIME | DEFAULT CURRENT_TIMESTAMP | Notification timestamp |
-| email_sent | BOOLEAN | DEFAULT 0 | Email delivery success flag |
+| sent_at | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP | Notification timestamp |
+| email_sent | BOOLEAN | DEFAULT FALSE | Email delivery success flag |
 
 **Sample Data:**
 ```json
