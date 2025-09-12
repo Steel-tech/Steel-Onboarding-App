@@ -420,11 +420,11 @@ PORT=3001
 NODE_ENV=production
 FRONTEND_URL=https://your-domain.com
 
-# Database
-DB_PATH=./production.db
+# Supabase Database Configuration
+DATABASE_URL=postgresql://postgres:[PASSWORD]@db.[PROJECT-REF].supabase.co:5432/postgres
 
-# Security
-JWT_SECRET=your-super-secure-secret-key-here
+# Security Configuration
+JWT_SECRET=your-super-secure-64-byte-random-string
 BCRYPT_ROUNDS=12
 SESSION_TIMEOUT=1800000
 
@@ -436,6 +436,13 @@ EMAIL_PASS=your-app-password
 HR_EMAIL=tasha@fsw-denver.com
 ADMIN_EMAIL=admin@fsw-denver.com
 ```
+
+**To get your DATABASE_URL:**
+1. Go to https://app.supabase.com
+2. Select your project
+3. Go to Settings → Database
+4. Copy the connection string from "Connection string" section
+5. Replace `[YOUR-PASSWORD]` with your database password
 
 #### 5. **Start the Application**
 
