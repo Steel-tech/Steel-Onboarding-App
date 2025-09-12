@@ -243,11 +243,12 @@ Permissions-Policy: geolocation=(), microphone=(), camera=()
   <signature>POST /api/progress/module</signature>
   <purpose>Record completion of training module and update progress tracking</purpose>
   <authentication>Bearer JWT token required</authentication>
-  <rate-limit>100 requests per 15 minutes per IP</rate-limit>
+  <rate-limit>10 requests per 15 minutes per IP (moderateRateLimit)</rate-limit>
+  <middleware>authenticateToken, moduleProgressValidation, handleValidationErrors, auditLog('MODULE_PROGRESS_SAVE')</middleware>
   
   <parameters>
-    <param name="moduleName" type="string" required="true">Module identifier (2-50 chars, alphanumeric/hyphens/underscores)</param>
-    <param name="progressData" type="object" required="false">Additional progress data (JSON object)</param>
+    <param name="moduleName" type="string" required="true">Module identifier (2-50 chars, alphanumeric/hyphens/underscores only)</param>
+    <param name="progressData" type="object" required="false">Additional progress data (JSON object, validated for XSS)</param>
   </parameters>
   
   <request-example>
@@ -257,7 +258,8 @@ Permissions-Policy: geolocation=(), microphone=(), camera=()
       "progressData": {
         "completionTime": 1800,
         "score": 95,
-        "attempts": 1
+        "attempts": 1,
+        "userAgent": "Mozilla/5.0..."
       }
     }
     </input>
@@ -279,10 +281,22 @@ Permissions-Policy: geolocation=(), microphone=(), camera=()
     <error type="500">Database error or email service failure</error>
   </errors>
   
+  <validation>
+    <rule field="moduleName">2-50 chars, regex: /^[a-zA-Z0-9\-_]+$/, sanitized</rule>
+    <rule field="progressData">Optional object, validated for dangerous patterns</rule>
+  </validation>
+  
+  <database-operation>
+    <query>INSERT INTO onboarding_progress ... ON CONFLICT (user_id, module_name) DO UPDATE SET ...</query>
+    <description>Uses PostgreSQL UPSERT to handle repeated module completions</description>
+    <lookup>Requires employee_data record to exist for user_id</lookup>
+  </database-operation>
+  
   <side-effects>
-    <effect>Updates or inserts module completion record</effect>
-    <effect>Sends HR notification about module completion</effect>
-    <effect>Creates audit log entry</effect>
+    <effect>Updates or inserts module completion record with timestamp</effect>
+    <effect>Sends HR notification email about module completion</effect>
+    <effect>Creates audit log entry with MODULE_COMPLETED action</effect>
+    <effect>Stores progress_data as JSON string in PostgreSQL</effect>
   </side-effects>
   
   <curl-example>
