@@ -311,12 +311,13 @@ Permissions-Policy: geolocation=(), microphone=(), camera=()
   <signature>POST /api/forms/submit</signature>
   <purpose>Submit completed onboarding forms with optional digital signature</purpose>
   <authentication>Bearer JWT token required</authentication>
-  <rate-limit>100 requests per 15 minutes per IP</rate-limit>
+  <rate-limit>10 requests per 15 minutes per IP (moderateRateLimit)</rate-limit>
+  <middleware>authenticateToken, formSubmissionValidation, handleValidationErrors, auditLog('FORM_SUBMISSION')</middleware>
   
   <parameters>
     <param name="formType" type="string" required="true">Form type (handbook|health-safety|new-hire-orientation|steel-erection|welding-procedures|equipment-training)</param>
-    <param name="formData" type="object" required="true">Form data object (validated for XSS/injection)</param>
-    <param name="digitalSignature" type="string" required="false">Base64 image data URL for canvas signature</param>
+    <param name="formData" type="object" required="true">Form data object (validated for XSS/injection patterns)</param>
+    <param name="digitalSignature" type="string" required="false">Base64 image data URL for canvas signature (1KB-500KB)</param>
   </parameters>
   
   <request-example>
@@ -353,16 +354,26 @@ Permissions-Policy: geolocation=(), microphone=(), camera=()
     <error type="500">Database error or email service failure</error>
   </errors>
   
-  <validation-rules>
-    <rule>Form data checked for XSS patterns (script tags, javascript:, eval(), etc.)</rule>
-    <rule>Digital signature must be valid data URL with reasonable size (1KB-500KB)</rule>
-    <rule>Names and emails in form data re-validated with same rules as employee data</rule>
-  </validation-rules>
+  <validation>
+    <rule field="formType">Must be one of 6 predefined form types</rule>
+    <rule field="formData">Object validated for XSS patterns (script tags, eval, etc.)</rule>
+    <rule field="formData.fullName">If present, validated with SecurityValidator.validateName()</rule>
+    <rule field="formData.email">If present, validated with SecurityValidator.validateEmail()</rule>
+    <rule field="digitalSignature">Optional, must be valid data:image/(png|jpeg|jpg);base64, URL</rule>
+  </validation>
+  
+  <database-operation>
+    <query>INSERT INTO form_submissions ... ON CONFLICT (user_id, form_type) DO UPDATE SET ...</query>
+    <description>Uses PostgreSQL UPSERT to allow form resubmission</description>
+    <lookup>Requires employee_data record to exist for user_id</lookup>
+    <metadata>Stores IP address and User-Agent for audit trail</metadata>
+  </database-operation>
   
   <side-effects>
-    <effect>Stores form data and signature with metadata (IP, User-Agent)</effect>
-    <effect>Sends HR notification about form submission</effect>
-    <effect>Creates audit log entry</effect>
+    <effect>Stores form data as JSON string and signature with metadata (IP, User-Agent)</effect>
+    <effect>Sends HR notification email about form submission with form type</effect>
+    <effect>Creates audit log entry with FORM_SUBMITTED action</effect>
+    <effect>Updates submitted_at timestamp on resubmission</effect>
   </side-effects>
   
   <curl-example>
