@@ -88,7 +88,7 @@ async function testDataPersistence() {
             digital_signature: `${testEmployee.name} - Test Signature`
         };
 
-        const { data: form, error: formError } = await supabase
+        const { error: formError } = await supabase
             .from('form_submissions')
             .insert([formData])
             .select()
