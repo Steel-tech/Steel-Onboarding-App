@@ -17,8 +17,8 @@
 - **Company:** Flawless Steel Welding
 - **Address:** 5353 Joliet St, Denver, CO 80239
 - **Phone:** (720) 638-7289
-- **HR Contact:** hr@fsw-denver.com
-- **General Email:** info@fsw-denver.com
+- **HR Contact:** tasha@fsw-denver.com
+- **General Email:** tasha@fsw-denver.com
 
 ## Enhanced Project Description
 
@@ -421,7 +421,7 @@ EMAIL_HOST=smtp.gmail.com
 EMAIL_PORT=587
 EMAIL_USER=your-email@company.com
 EMAIL_PASS=your-app-password
-HR_EMAIL=hr@fsw-denver.com
+HR_EMAIL=tasha@fsw-denver.com
 ADMIN_EMAIL=admin@fsw-denver.com
 ```
 
@@ -1017,7 +1017,7 @@ curl -I http://localhost/onboarding/orientation-video.mp4
 For urgent technical issues preventing onboarding completion:
 
 - **HR Department:** (720) 638-7289
-- **Email Support:** hr@fsw-denver.com  
+- **Email Support:** tasha@fsw-denver.com  
 - **Alternative:** Complete paper-based onboarding checklist
 - **Supervisor Contact:** Refer to welcome module for assigned supervisor
 
@@ -1383,7 +1383,7 @@ EMAIL_HOST=smtp.gmail.com
 EMAIL_PORT=587
 EMAIL_USER=notifications@company.com
 EMAIL_PASS=app-specific-password
-HR_EMAIL=hr@fsw-denver.com
+HR_EMAIL=tasha@fsw-denver.com
 ```
 
 ### Data Storage Schema
@@ -1432,14 +1432,14 @@ HR_EMAIL=hr@fsw-denver.com
 
 **Built with safety and quality in mind - The Flawless Steel Welding Way**
 
-*For technical support or questions, contact HR at (720) 638-7289 or hr@fsw-denver.com*
+*For technical support or questions, contact HR at (720) 638-7289 or tasha@fsw-denver.com*
 
 **Support Resources:**
 
 - Office: (720) 638-7289  
 - Address: 5353 Joliet St, Denver, CO 80239
-- Email: hr@fsw-denver.com (HR matters)
-- Email: info@fsw-denver.com (General inquiries)
+- Email: tasha@fsw-denver.com (HR matters)
+- Email: tasha@fsw-denver.com (General inquiries)
 
 ---
 
