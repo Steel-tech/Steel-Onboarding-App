@@ -119,7 +119,7 @@ The debugger will output data like this:
 ```json
 {
   "email": {
-    "to": "hr@fsw-denver.com",
+    "to": "tasha@fsw-denver.com",
     "subject": "FSW Master Control - 2025-01-09 14:30",
     "body": "Your email content here...",
     "html": "<html>formatted content</html>"
@@ -137,7 +137,7 @@ The debugger will output data like this:
     },
     "location": "5353 Joliet St, Denver, CO 80239",
     "attendees": [
-      { "email": "hr@fsw-denver.com" }
+      { "email": "tasha@fsw-denver.com" }
     ]
   }
 }
@@ -149,7 +149,7 @@ If you prefer not to use the debugger, configure nodes directly:
 
 ### Email Node Direct Config:
 ```
-To: hr@fsw-denver.com
+To: tasha@fsw-denver.com
 Subject: FSW Report - {{ $now.format('YYYY-MM-DD') }}
 Body: {{ JSON.stringify($input.all()[0].json, null, 2) }}
 ```
