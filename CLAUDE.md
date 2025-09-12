@@ -74,7 +74,8 @@ appState = {
 // - Real-time subscriptions for live updates
 ```
 
-All frontend state syncs with PostgreSQL backend via API calls and Supabase real-time subscriptions.
+All frontend state syncs with PostgreSQL backend via API calls and Supabase 
+real-time subscriptions.
 
 ## Development Commands
 
