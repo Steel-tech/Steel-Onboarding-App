@@ -706,29 +706,81 @@ const employeeValidation = [
 
 ## Troubleshooting Guide
 
-### Common Issues and Solutions
+### Common Supabase/PostgreSQL Issues
 
-#### Database Locked Error
+#### Connection Pool Exhaustion
 
-**Symptom:** Error: database is locked
-**Cause:** Long-running transaction or connection not properly closed
-
-**Solution:**
-1. Check for hung processes: `ps aux | grep node`
-2. Kill hung processes if found
-3. Restart application server
-4. Verify database integrity after restart
-
-#### Authentication Failures
-
-**Symptom:** Users cannot log in with correct credentials
-**Cause:** Password hash corruption or JWT secret mismatch
+**Symptom:** `Error: remaining connection slots are reserved`
+**Cause:** Too many concurrent connections or connection leaks
 
 **Solution:**
-1. Check users table for password_hash field integrity
-2. Verify JWT_SECRET environment variable consistency
-3. Reset user password using setup-database.js if needed
-4. Clear browser cache and cookies
+```javascript
+// Optimize connection pool settings
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  max: 3, // Reduce for serverless
+  min: 0,
+  idleTimeoutMillis: 10000,
+  connectionTimeoutMillis: 10000
+});
+
+// Always release connections
+const client = await pool.connect();
+try {
+  const result = await client.query('SELECT * FROM users');
+  return result;
+} finally {
+  client.release(); // Critical!
+}
+```
+
+#### RLS Policy Violations
+
+**Symptom:** `Error: new row violates row-level security policy`
+**Cause:** Insufficient permissions or incorrect RLS policy
+
+**Solution:**
+```sql
+-- Check current policies
+SELECT schemaname, tablename, policyname, permissive, roles, cmd, qual
+FROM pg_policies WHERE tablename = 'employee_data';
+
+-- Update policy for broader access
+ALTER POLICY "employee_access_policy" ON employee_data
+USING (user_id = auth.uid() OR auth.jwt() ->> 'role' IN ('hr', 'admin'));
+```
+
+#### Supabase Auth Issues
+
+**Symptom:** `Error: Invalid login credentials`
+**Cause:** Auth configuration mismatch or user not confirmed
+
+**Solution:**
+```javascript
+// Check user confirmation status
+const { data: { user }, error } = await supabase.auth.getUser();
+if (user && !user.email_confirmed_at) {
+  // Resend confirmation email
+  await supabase.auth.resend({
+    type: 'signup',
+    email: user.email
+  });
+}
+
+// Debug auth session
+const { data: { session }, error } = await supabase.auth.getSession();
+console.log('Current session:', session);
+```
+
+**Environment Check:**
+```bash
+# Verify Supabase configuration
+echo "SUPABASE_URL: $SUPABASE_URL"
+echo "SUPABASE_ANON_KEY: ${SUPABASE_ANON_KEY:0:20}..."
+
+# Test connection
+psql $DATABASE_URL -c "SELECT version();"
+```
 
 #### Form Submission Errors
 
