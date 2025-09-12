@@ -194,7 +194,7 @@ Best regards,
 Flawless Steel Welding Onboarding System`;
         
         // Create mailto link
-        const mailtoLink = `mailto:hr@fsw-denver.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+        const mailtoLink = `mailto:tasha@fsw-denver.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
         
         // Try to open default email client
         const emailWindow = window.open(mailtoLink);
@@ -212,7 +212,7 @@ Flawless Steel Welding Onboarding System`;
                         <h3>Email HR Team</h3>
                         <p>Please copy this information and send to HR:</p>
                         <div class="email-details">
-                            <p><strong>To:</strong> hr@fsw-denver.com</p>
+                            <p><strong>To:</strong> tasha@fsw-denver.com</p>
                             <p><strong>Subject:</strong> ${subject}</p>
                             <textarea readonly rows="10" cols="50">${body}</textarea>
                         </div>
