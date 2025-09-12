@@ -60,7 +60,7 @@ async function testDataPersistence() {
             })
         };
 
-        const { data: progress, error: progressError } = await supabase
+        const { error: progressError } = await supabase
             .from('onboarding_progress')
             .insert([progressData])
             .select()
