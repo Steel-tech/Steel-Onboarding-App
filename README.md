@@ -394,14 +394,20 @@ node --version  # Should be 18.0.0+
 npm --version   # Should be 9.0.0+
 ```
 
-#### 3. **Database Setup**
+#### 3. **Supabase Database Setup**
 
+**Option A: Use Supabase Dashboard**
+1. Create a new Supabase project at https://app.supabase.com
+2. Copy your DATABASE_URL from Project Settings → Database
+3. Tables will be created automatically on first server start
+
+**Option B: Manual SQL Setup**
 ```bash
-# Initialize SQLite database and create tables
+# Run the database setup script (creates tables if they don't exist)
 node setup-database.js
 
-# Or use the setup script
-npm run setup
+# Or let the server create tables on startup
+npm start
 ```
 
 #### 4. **Environment Configuration**
