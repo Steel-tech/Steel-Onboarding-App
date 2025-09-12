@@ -455,6 +455,99 @@ WHERE idx_tup_read = 0;
 - Configure connection timeouts for serverless deployment
 - Track connection acquisition times
 
+## Migration from SQLite to Supabase/PostgreSQL
+
+### Pre-Migration Assessment
+
+1. **Data Inventory:**
+   ```bash
+   # Export SQLite schema
+   sqlite3 onboarding.db ".schema" > sqlite_schema.sql
+   
+   # Count records in each table
+   sqlite3 onboarding.db "SELECT 'users', COUNT(*) FROM users
+   UNION SELECT 'employee_data', COUNT(*) FROM employee_data
+   UNION SELECT 'onboarding_progress', COUNT(*) FROM onboarding_progress;"
+   ```
+
+2. **Schema Mapping:**
+   | SQLite Type | PostgreSQL Type | Notes |
+   |-------------|-----------------|-------|
+   | INTEGER PRIMARY KEY AUTOINCREMENT | SERIAL PRIMARY KEY | Auto-incrementing |
+   | TEXT | VARCHAR(255) or TEXT | Size-specific or unlimited |
+   | DATETIME | TIMESTAMP | Timezone support available |
+   | BOOLEAN | BOOLEAN | Native boolean type |
+
+### Migration Steps
+
+1. **Setup Supabase Project:**
+   ```bash
+   # Install Supabase CLI
+   npm install -g @supabase/cli
+   
+   # Login and create project
+   supabase login
+   supabase projects create steel-onboarding
+   ```
+
+2. **Schema Migration:**
+   ```sql
+   -- Create PostgreSQL schema (run via Supabase SQL editor)
+   -- Tables created automatically by database.js initialization
+   
+   -- Add indexes for performance
+   CREATE INDEX idx_employee_data_user_id ON employee_data(user_id);
+   CREATE INDEX idx_onboarding_progress_composite ON onboarding_progress(user_id, module_name);
+   CREATE INDEX idx_form_submissions_composite ON form_submissions(user_id, form_type);
+   CREATE INDEX idx_audit_logs_created_at ON audit_logs(created_at DESC);
+   ```
+
+3. **Data Export from SQLite:**
+   ```bash
+   # Export data to CSV files
+   sqlite3 -header -csv onboarding.db "SELECT * FROM users;" > users.csv
+   sqlite3 -header -csv onboarding.db "SELECT * FROM employee_data;" > employee_data.csv
+   sqlite3 -header -csv onboarding.db "SELECT * FROM onboarding_progress;" > progress.csv
+   sqlite3 -header -csv onboarding.db "SELECT * FROM form_submissions;" > forms.csv
+   sqlite3 -header -csv onboarding.db "SELECT * FROM audit_logs;" > audit.csv
+   ```
+
+4. **Data Import to PostgreSQL:**
+   ```sql
+   -- Import via Supabase SQL editor or psql
+   \COPY users(username, password_hash, role, name, email, created_at, last_login, is_active) 
+   FROM 'users.csv' WITH (FORMAT csv, HEADER true);
+   
+   \COPY employee_data(user_id, employee_id, name, email, phone, position, start_date, supervisor, created_at, updated_at) 
+   FROM 'employee_data.csv' WITH (FORMAT csv, HEADER true);
+   
+   -- Continue for other tables...
+   ```
+
+### Post-Migration Verification
+
+```sql
+-- Verify record counts match
+SELECT 'users' as table_name, COUNT(*) as record_count FROM users
+UNION ALL
+SELECT 'employee_data', COUNT(*) FROM employee_data
+UNION ALL
+SELECT 'onboarding_progress', COUNT(*) FROM onboarding_progress;
+
+-- Check foreign key relationships
+SELECT e.employee_id, e.name 
+FROM employee_data e 
+LEFT JOIN users u ON e.user_id = u.id 
+WHERE u.id IS NULL;
+
+-- Verify data integrity
+SELECT p.user_id, COUNT(*) 
+FROM onboarding_progress p 
+LEFT JOIN users u ON p.user_id = u.id 
+WHERE u.id IS NULL 
+GROUP BY p.user_id;
+```
+
 ## Data Retention Policies
 
 ### User Data Retention
