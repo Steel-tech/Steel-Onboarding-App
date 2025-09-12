@@ -878,38 +878,97 @@ EMAIL_PASS=your-gmail-app-password
 
 ## Input Validation Rules
 
-### String Sanitization
-- Remove HTML tags: `< >` characters stripped
-- Remove protocol handlers: `javascript:`, `data:`, `vbscript:`
-- Length limit: 1000 characters maximum
-- XSS pattern detection for dangerous content
+### SecurityValidator Class Implementation
+
+#### String Sanitization (sanitizeString method)
+```javascript
+// Applied to all string inputs
+return input
+    .trim()
+    .replace(/[<>]/g, '')           // Remove HTML tags
+    .replace(/javascript:/gi, '')    // Remove JS protocols  
+    .replace(/data:/gi, '')         // Remove data URIs
+    .replace(/vbscript:/gi, '')     // Remove VBScript
+    .substring(0, 1000);            // Limit length
+```
+
+#### XSS Pattern Detection (validateFormData method)
+Dangerous patterns blocked in form data:
+```javascript
+const dangerousPatterns = [
+    /<script/i,      // Script tags
+    /javascript:/i,   // JS protocol
+    /vbscript:/i,    // VBScript protocol
+    /onload=/i,      // Event handlers
+    /onerror=/i,
+    /onclick=/i,
+    /eval\(/i,       // Eval function
+    /document\./i,   // DOM access
+    /window\./i      // Window access
+];
+```
 
 ### Field-Specific Validation
 
-#### Names
-- Pattern: `/^[a-zA-Z\s\-'.]{2,50}$/`
-- Length: 2-50 characters
-- Allowed: Letters, spaces, hyphens, apostrophes
+#### Names (validateName method)
+- **Pattern**: `/^[a-zA-Z\s\-'.]{2,50}$/`
+- **Length**: 2-50 characters
+- **Allowed**: Letters, spaces, hyphens, apostrophes
+- **Sanitization**: Applied before validation
 
-#### Email Addresses
-- Pattern: Standard RFC-compliant email validation
-- Length: Maximum 254 characters
-- Normalization: Converted to lowercase
+#### Email Addresses (validateEmail method)  
+- **Pattern**: `/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/`
+- **Length**: Maximum 254 characters (RFC compliant)
+- **Normalization**: Converted to lowercase
+- **Sanitization**: Applied before validation
 
-#### Phone Numbers
-- Pattern: `/^[1-9]\d{9}$/` (US format)
-- Format: Automatically formatted as (xxx) xxx-xxxx
-- Validation: 10 digits, not starting with 0
+#### Phone Numbers (validatePhone method)
+- **Input Pattern**: `/^[\d\s\-\(\)+]{10,15}$/` (flexible input)
+- **Validation Pattern**: `/^[1-9]\d{9}$/` (US format, 10 digits)
+- **Format**: Automatically formatted as `(xxx) xxx-xxxx`
+- **Validation**: Must not start with 0
 
-#### Dates
-- Format: ISO 8601 string
-- Range: Within one year of current date
-- Validation: Valid date object creation
+#### Job Positions (validatePosition method)
+- **Pattern**: `/^[a-zA-Z0-9\s\-/&.,()]{2,100}$/`
+- **Length**: 2-100 characters
+- **Allowed**: Alphanumeric + common punctuation
+- **Sanitization**: Applied before validation
 
-### Digital Signatures
-- Format: Must be valid `data:image/(png|jpeg|jpg);base64,` URL
-- Size: Between 1KB and 500KB
-- Validation: Base64 data integrity check
+#### Dates (validateDate method)
+- **Format**: ISO 8601 string (YYYY-MM-DD)
+- **Range**: Within one year of current date (past or future)
+- **Validation**: Valid Date object creation
+- **Bounds Check**: `date >= oneYearAgo && date <= oneYearFromNow`
+
+#### Digital Signatures (validateDigitalSignature method)
+- **Format**: Must be valid `data:image/(png|jpeg|jpg);base64,` URL
+- **Size**: Between 1KB and 500KB base64 data
+- **Validation**: Base64 data integrity check
+- **Usage**: Canvas signature capture validation
+
+### Express-Validator Middleware Chains
+
+#### Employee Data Validation Chain
+- **Name**: `body('name').notEmpty().isLength({min:2,max:50}).matches(/^[a-zA-Z\s\-'.]+$/)`
+- **Email**: `body('email').isEmail().isLength({max:254}).normalizeEmail()`
+- **Phone**: `body('phone').optional().matches(/^[\d\s\-\(\)+]{10,15}$/)`
+- **Position**: `body('position').notEmpty().isLength({min:2,max:100}).matches(/^[a-zA-Z0-9\s\-/&.,()]+$/)`
+- **Start Date**: `body('start_date').isISO8601().custom(validateDate)`
+
+#### Module Progress Validation Chain
+- **Module Name**: `body('moduleName').notEmpty().isLength({min:2,max:50}).matches(/^[a-zA-Z0-9\-_]+$/)`
+- **Progress Data**: `body('progressData').optional().isObject().custom(validateFormData)`
+
+#### Form Submission Validation Chain
+- **Form Type**: `body('formType').isIn(['handbook','health-safety','new-hire-orientation','steel-erection','welding-procedures','equipment-training'])`
+- **Form Data**: `body('formData').isObject().custom(validateFormData + name/email validation)`
+- **Digital Signature**: `body('digitalSignature').optional().custom(validateDigitalSignature)`
+
+### Sanitization Middleware
+Applied to all requests via `sanitizeInputs` middleware:
+- **Body Parameters**: All string values in req.body sanitized
+- **Query Parameters**: All string values in req.query sanitized
+- **Automatic**: Applied before validation chains execute
 
 ## Security Considerations
 
