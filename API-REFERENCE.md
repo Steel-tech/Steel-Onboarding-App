@@ -105,9 +105,10 @@ Permissions-Policy: geolocation=(), microphone=(), camera=()
 
 <function name="POST /api/auth/login">
   <signature>POST /api/auth/login</signature>
-  <purpose>Authenticate user and obtain JWT access token</purpose>
+  <purpose>Authenticate user and obtain JWT access token (Express.js fallback auth)</purpose>
   <authentication>None required (public endpoint)</authentication>
-  <rate-limit>5 attempts per 15 minutes per IP</rate-limit>
+  <rate-limit>3 attempts per 15 minutes per IP (strictRateLimit)</rate-limit>
+  <middleware>loginValidation, handleValidationErrors, auditLog('LOGIN_ATTEMPT')</middleware>
   
   <parameters>
     <param name="username" type="string" required="true">Username (3-50 chars, alphanumeric + underscore/hyphen)</param>
@@ -117,8 +118,8 @@ Permissions-Policy: geolocation=(), microphone=(), camera=()
   <request-example>
     <input>
     {
-      "username": "employee",
-      "password": "fsw2025!"
+      "username": "admin",
+      "password": "admin2025!"
     }
     </input>
   </request-example>
@@ -131,25 +132,36 @@ Permissions-Policy: geolocation=(), microphone=(), camera=()
       "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
       "user": {
         "id": 1,
-        "username": "employee",
-        "role": "employee",
-        "name": "New Employee"
+        "username": "admin",
+        "role": "hr",
+        "name": "HR Administrator"
       }
     }
     </success>
   </response-example>
   
   <errors>
-    <error type="400">Missing username or password</error>
+    <error type="400">Missing username or password, or validation failed</error>
     <error type="401">Invalid credentials</error>
     <error type="429">Too many login attempts</error>
     <error type="500">Internal server error</error>
   </errors>
   
+  <validation>
+    <rule field="username">3-50 chars, alphanumeric + underscore/hyphen, sanitized</rule>
+    <rule field="password">6-100 chars, required for authentication</rule>
+  </validation>
+  
+  <side-effects>
+    <effect>Updates last_login timestamp in users table</effect>
+    <effect>Creates audit log entry (LOGIN_SUCCESS or LOGIN_FAILED)</effect>
+    <effect>Checks user is_active status before authentication</effect>
+  </side-effects>
+  
   <curl-example>
   curl -X POST http://localhost:3001/api/auth/login \
     -H "Content-Type: application/json" \
-    -d '{"username":"employee","password":"fsw2025!"}'
+    -d '{"username":"admin","password":"admin2025!"}'
   </curl-example>
 </function>
 
