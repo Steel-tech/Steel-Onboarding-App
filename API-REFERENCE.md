@@ -4,18 +4,19 @@
 purpose: Comprehensive API documentation for Steel Onboarding App backend server
 type: API
 language: Node.js/Express
-dependencies: express, cors, helmet, express-rate-limit, bcrypt, jsonwebtoken, sqlite3, nodemailer
-last-updated: 2025-09-06
+dependencies: express, cors, helmet, express-rate-limit, bcrypt, jsonwebtoken, pg, nodemailer, express-validator
+last-updated: 2025-09-12
 </metadata>
 
 <overview>
-The Steel Onboarding App backend provides a secure, production-ready API for managing employee onboarding workflows. Built with Express.js, it features JWT authentication, comprehensive input validation, rate limiting, audit logging, and automated HR notifications.
+The Steel Onboarding App backend provides a secure, production-ready API for managing employee onboarding workflows. Built with Express.js, it features JWT authentication, comprehensive input validation, rate limiting, audit logging, and automated HR notifications. The system integrates with Supabase for authentication and uses PostgreSQL for data persistence.
 
 **Base URL**: `http://localhost:3001/api`  
-**Authentication**: Bearer JWT tokens  
+**Authentication**: Bearer JWT tokens (8-hour expiry)  
 **Content-Type**: `application/json`  
-**Rate Limiting**: Applied to all endpoints  
-**Database**: SQLite with comprehensive audit trail  
+**Rate Limiting**: 3 attempts/15min for auth, 10 attempts/15min for general endpoints  
+**Database**: PostgreSQL via Supabase with comprehensive audit trail  
+**Frontend Auth**: Dual system - Supabase client-side auth + Express.js JWT fallback  
 </overview>
 
 ## Authentication Flow
