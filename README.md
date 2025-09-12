@@ -1259,13 +1259,12 @@ CREATE TABLE employee_data (
 
 ```sql
 CREATE TABLE onboarding_progress (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id INTEGER NOT NULL,
-    employee_id TEXT NOT NULL,
-    module_name TEXT NOT NULL,
-    completed_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    progress_data TEXT, -- JSON blob
-    FOREIGN KEY (user_id) REFERENCES users (id),
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL REFERENCES users(id),
+    employee_id VARCHAR(50) NOT NULL,
+    module_name VARCHAR(255) NOT NULL,
+    completed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    progress_data TEXT,  -- JSON string
     UNIQUE(user_id, module_name)
 );
 ```
