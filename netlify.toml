@@ -1,0 +1,41 @@
+# Netlify Deployment Configuration for Steel Onboarding App
+# This configures a static site deployment with client-side Supabase integration
+
+[build]
+  # No build process needed - static HTML/JS/CSS files
+  publish = "."
+  
+[build.environment]
+  # These will be injected at build time
+  SUPABASE_URL = "https://sfsswfzgrdctiyukhczj.supabase.co"
+  SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNmc3N3ZnpncmRjdGl5dWtoY3pqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTcyOTg3MDgsImV4cCI6MjA3Mjg3NDcwOH0.u2oVMOCziHVlzFFlP7b8v_M5tHnGuW1Uwm65bJu3dVw"
+
+# Security headers for production
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com https://*.supabase.co; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; font-src 'self' https://cdnjs.cloudflare.com; img-src 'self' data: blob:; connect-src 'self' https://*.supabase.co wss://*.supabase.co"
+
+# Redirect all API calls that aren't available in static deployment
+[[redirects]]
+  from = "/api/*"
+  to = "/index.html"
+  status = 404
+
+# Handle client-side routing
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Form handling via Netlify Forms (fallback for contact forms)
+[[forms]]
+  name = "hr-contact"
+  action = "/success"
+  
+# Environment-specific redirects for HR notifications
+# These will need to be configured in Supabase Edge Functions or webhooks
