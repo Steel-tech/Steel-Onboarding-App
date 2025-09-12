@@ -22,7 +22,7 @@
 
 ## Enhanced Project Description
 
-A comprehensive, enterprise-grade **full-stack web application** specifically designed for steel fabrication and welding companies. This production-ready system combines a modern frontend with a secure Node.js/Express backend and SQLite database to deliver complete digital transformation of the employee onboarding experience, featuring safety-first training, compliance tracking, HR automation, and advanced security measures.
+A comprehensive, enterprise-grade **full-stack web application** specifically designed for steel fabrication and welding companies. This production-ready system combines a modern frontend with a secure Node.js/Express backend and **Supabase PostgreSQL database** to deliver complete digital transformation of the employee onboarding experience, featuring safety-first training, compliance tracking, HR automation, and advanced security measures.
 
 ## Production Tech Stack
 
