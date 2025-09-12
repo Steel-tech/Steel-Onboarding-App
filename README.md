@@ -334,13 +334,15 @@ Differentiators are maintained in a grid structure that automatically adapts to 
 **System Requirements:**
 - **Node.js** 18.0.0 or higher
 - **npm** 9.0.0 or higher
+- **Supabase Account** with PostgreSQL database
 - Modern web browser (Chrome 90+, Firefox 88+, Safari 14+, Edge 90+)
 - Git LFS for video file handling
 
-**Optional for Production:**
-- SSL certificate for HTTPS
-- Reverse proxy (Nginx/Apache)
-- Process manager (PM2)
+**Required for Production:**
+- **Supabase Project** with DATABASE_URL
+- SSL certificate for HTTPS (automatically provided by Supabase)
+- Environment variables configured
+- Optional: Reverse proxy (Nginx/Apache), Process manager (PM2)
 
 ### Quick Start
 
