@@ -388,7 +388,8 @@ Permissions-Policy: geolocation=(), microphone=(), camera=()
   <signature>GET /api/hr/dashboard</signature>
   <purpose>Retrieve HR dashboard data with employee progress and statistics</purpose>
   <authentication>Bearer JWT token with 'hr' role required</authentication>
-  <rate-limit>100 requests per 15 minutes per IP</rate-limit>
+  <rate-limit>10 requests per 15 minutes per IP (moderateRateLimit)</rate-limit>
+  <middleware>authenticateToken (with role check)</middleware>
   
   <parameters>
     <param name="none" type="none" required="false">No parameters required</param>
@@ -426,11 +427,27 @@ Permissions-Policy: geolocation=(), microphone=(), camera=()
     <error type="500">Database error</error>
   </errors>
   
+  <database-operation>
+    <query>Complex JOIN query across employee_data, users, onboarding_progress, form_submissions</query>
+    <aggregation>COUNT(DISTINCT p.module_name) as completed_modules</aggregation>
+    <aggregation>COUNT(DISTINCT f.form_type) as submitted_forms</aggregation>
+    <grouping>GROUP BY e.employee_id to aggregate per employee</grouping>
+    <ordering>ORDER BY e.created_at DESC (newest employees first)</ordering>
+  </database-operation>
+  
   <business-logic>
     <rule>Completion defined as 4+ modules AND 5+ forms</rule>
     <rule>Results ordered by employee creation date (newest first)</rule>
-    <rule>Statistics calculated in real-time from database</rule>
+    <rule>Statistics calculated in real-time from database aggregations</rule>
+    <rule>Role validation: req.user.role !== 'hr' returns 403</rule>
+    <rule>Completion rate calculated as percentage with Math.round()</rule>
   </business-logic>
+  
+  <authorization>
+    <check>JWT token must be valid and not expired</check>
+    <check>User role must be exactly 'hr' (not 'admin' or 'employee')</check>
+    <check>Returns 403 Forbidden if role check fails</check>
+  </authorization>
   
   <curl-example>
   curl -X GET http://localhost:3001/api/hr/dashboard \
