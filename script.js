@@ -3599,6 +3599,11 @@ async function saveSignature() {
         
         // Update dependency states for newly unlocked items
         updateChecklistDependencyStates();
+        
+        // Show notification about completed item and unlocked items
+        showNotification(`Document signed and ${checklistId} completed! Check for newly available items.`, 'success');
+    } else {
+        showNotification('Signature saved successfully!', 'success');
     }
     
     // Update acknowledgment progress
@@ -3612,8 +3617,6 @@ async function saveSignature() {
     
     // Close signature modal
     closeSignature();
-    
-    showNotification('Signature saved successfully!', 'success');
     
     logger.info('Digital signature captured', {
         formType: currentFormType,
