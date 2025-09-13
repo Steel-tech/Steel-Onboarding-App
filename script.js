@@ -3392,6 +3392,9 @@ function handleFormSubmission(event) {
     
     updateAcknowledmentProgress();
     
+    // Save state with updated checklist items
+    saveState().catch(error => console.error('[FSW] Save state error after form submission:', error));
+    
     // Close modal
     closeFillableForm();
     
