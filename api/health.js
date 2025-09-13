@@ -13,6 +13,7 @@ export default function handler(req, res) {
         database: hasDatabase ? 'configured' : 'not configured',
         supabase: hasSupabase ? 'configured' : 'not configured',
         timestamp: new Date().toISOString(),
+        version: '1.0.1',
         uptime: process.uptime(),
         env: process.env.NODE_ENV || 'development'
     });
