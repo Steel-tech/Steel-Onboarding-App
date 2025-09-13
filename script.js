@@ -1006,11 +1006,30 @@ function saveEmployeeData() {
             // Generate employee ID
             const employeeId = `FSW${Date.now().toString().slice(-6)}`;
             
-            // Create Supabase client if not exists
+            // Wait for Supabase client to be ready
             if (!window.supabase) {
-                const supabaseUrl = 'https://sfsswfzgrdctiyukhczj.supabase.co';
-                const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNmc3N3ZnpncmRjdGl5dWtoY3pqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTcyOTg3MDgsImV4cCI6MjA3Mjg3NDcwOH0.u2oVMOCziHVlzFFlP7b8v_M5tHnGuW1Uwm65bJu3dVw';
-                window.supabase = window.supabase || window.createClient(supabaseUrl, supabaseKey);
+                console.log('[FSW Supabase] Waiting for Supabase client to initialize...');
+                await new Promise((resolve, reject) => {
+                    if (window.supabase) {
+                        resolve();
+                        return;
+                    }
+                    
+                    const timeout = setTimeout(() => {
+                        reject(new Error('Supabase client initialization timeout'));
+                    }, 10000); // 10 second timeout
+                    
+                    window.addEventListener('supabaseReady', () => {
+                        clearTimeout(timeout);
+                        resolve();
+                    }, { once: true });
+                    
+                    window.addEventListener('supabaseError', (event) => {
+                        clearTimeout(timeout);
+                        reject(new Error('Supabase initialization failed: ' + event.detail.error));
+                    }, { once: true });
+                });
+                console.log('[FSW Supabase] ✅ Supabase client ready');
             }
             
             // Save to user_profiles table (which has working RLS)
