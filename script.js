@@ -3535,6 +3535,26 @@ async function saveSignature() {
     // Update form status UI
     updateFormStatus(currentFormType, 'completed');
     
+    // IMPORTANT: Also check the corresponding checklist item
+    const checklistId = getChecklistIdForForm(currentFormType);
+    if (checklistId) {
+        console.log(`[FSW Debug] Marking checklist item ${checklistId} as completed for form ${currentFormType}`);
+        appState.checklistItems[checklistId] = true;
+        
+        // Update the checkbox in the UI
+        const checkbox = document.getElementById(checklistId);
+        if (checkbox) {
+            checkbox.checked = true;
+            const parent = checkbox.closest('.checklist-item, .form-item');
+            if (parent) {
+                parent.classList.add('completed');
+            }
+        }
+        
+        // Update dependency states for newly unlocked items
+        updateChecklistDependencyStates();
+    }
+    
     // Update acknowledgment progress
     updateAcknowledmentProgress();
     
