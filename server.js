@@ -367,8 +367,11 @@ app.post('/api/auth/register-employee',
         const employeeId = `FSW${Date.now().toString().slice(-6)}`;
         
         try {
+            // Get database connection
+            const db = await getDatabaseConnection();
+            
             // Create user account
-            const userResult = await database.insert(
+            const userResult = await db.insert(
                 `INSERT INTO users (username, password_hash, role, name, email, created_at) 
                  VALUES ($1, $2, $3, $4, $5, CURRENT_TIMESTAMP)`,
                 [username, hashedPassword, 'employee', name, email]
@@ -377,7 +380,7 @@ app.post('/api/auth/register-employee',
             const userId = userResult.id;
             
             // Create employee data
-            await database.run(
+            await db.run(
                 `INSERT INTO employee_data 
                  (user_id, employee_id, name, email, phone, position, start_date, supervisor, updated_at) 
                  VALUES ($1, $2, $3, $4, $5, $6, $7, $8, CURRENT_TIMESTAMP)`,
