@@ -344,6 +344,129 @@ app.post('/api/auth/login',
     }
 });
 
+// Auto-registration endpoint for new employees (simplified auth)
+app.post('/api/auth/register-employee', 
+    employeeDataValidation,
+    handleValidationErrors,
+    auditLog('EMPLOYEE_AUTO_REGISTER'),
+    async (req, res) => {
+    try {
+        const { name, email, phone, position, start_date, supervisor } = req.body;
+        
+        // Validate required fields
+        if (!name || !email || !position || !start_date) {
+            return res.status(400).json({ error: 'Missing required fields' });
+        }
+        
+        // Generate unique username and temporary password
+        const username = email.toLowerCase();
+        const tempPassword = 'Welcome2024!'; // Simple temp password for onboarding
+        const hashedPassword = await bcrypt.hash(tempPassword, parseInt(config.BCRYPT_ROUNDS));
+        
+        // Generate employee ID
+        const employeeId = `FSW${Date.now().toString().slice(-6)}`;
+        
+        try {
+            // Create user account
+            const userResult = await database.insert(
+                `INSERT INTO users (username, password_hash, role, name, email, created_at) 
+                 VALUES ($1, $2, $3, $4, $5, CURRENT_TIMESTAMP)`,
+                [username, hashedPassword, 'employee', name, email]
+            );
+            
+            const userId = userResult.id;
+            
+            // Create employee data
+            await database.run(
+                `INSERT INTO employee_data 
+                 (user_id, employee_id, name, email, phone, position, start_date, supervisor, updated_at) 
+                 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, CURRENT_TIMESTAMP)`,
+                [userId, employeeId, name, email, phone, position, start_date, supervisor]
+            );
+            
+            // Generate JWT token for immediate use
+            const token = jwt.sign(
+                { 
+                    id: userId, 
+                    username: username, 
+                    role: 'employee',
+                    name: name
+                },
+                config.JWT_SECRET,
+                { expiresIn: '8h' }
+            );
+            
+            await logActivity(userId, employeeId, 'EMPLOYEE_REGISTERED', { name, position }, req);
+            
+            // Send HR notification
+            await emailService.sendHRNotification(
+                { name, email, position, start_date },
+                'ONBOARDING_STARTED'
+            );
+            
+            res.json({ 
+                success: true, 
+                employeeId,
+                token,
+                user: {
+                    id: userId,
+                    username: username,
+                    role: 'employee',
+                    name: name
+                }
+            });
+            
+        } catch (dbError) {
+            if (dbError.message?.includes('unique constraint') || dbError.code === '23505') {
+                // User already exists, try to login instead
+                const existingUser = await database.get(
+                    'SELECT * FROM users WHERE username = $1',
+                    [username]
+                );
+                
+                if (existingUser) {
+                    const token = jwt.sign(
+                        { 
+                            id: existingUser.id, 
+                            username: existingUser.username, 
+                            role: existingUser.role,
+                            name: existingUser.name
+                        },
+                        config.JWT_SECRET,
+                        { expiresIn: '8h' }
+                    );
+                    
+                    const existingEmployee = await database.get(
+                        'SELECT employee_id FROM employee_data WHERE user_id = $1',
+                        [existingUser.id]
+                    );
+                    
+                    res.json({
+                        success: true,
+                        employeeId: existingEmployee?.employee_id || employeeId,
+                        token,
+                        user: {
+                            id: existingUser.id,
+                            username: existingUser.username,
+                            role: existingUser.role,
+                            name: existingUser.name
+                        },
+                        message: 'Existing user logged in'
+                    });
+                } else {
+                    throw dbError;
+                }
+            } else {
+                throw dbError;
+            }
+        }
+        
+    } catch (error) {
+        console.error('Employee registration error:', error);
+        res.status(500).json({ error: 'Failed to register employee' });
+    }
+});
+
 // Employee data endpoints
 app.post('/api/employee/data', 
     authenticateToken,
