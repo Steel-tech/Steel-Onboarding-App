@@ -735,9 +735,9 @@ app.get('/api/backup/export', authenticateToken, async (req, res) => {
 app.get('/api/health', async (req, res) => {
     try {
         // Try to get database connection (but don't fail if it's not available)
-        let dbStatus = 'unknown';
+        let dbStatus;
         try {
-            const db = await getDatabaseConnection();
+            await getDatabaseConnection();
             dbStatus = 'connected';
         } catch (error) {
             dbStatus = 'disconnected';
