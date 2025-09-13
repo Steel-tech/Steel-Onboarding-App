@@ -1,6 +1,6 @@
 // Vercel serverless function for employee registration
 import { Pool } from 'pg';
-import bcrypt from 'bcryptjs';
+import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
 const pool = new Pool({
