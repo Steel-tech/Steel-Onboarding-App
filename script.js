@@ -806,18 +806,58 @@ function saveEmployeeData() {
             throw new Error('Start date must be within one year of today');
         }
         
-        // Sanitize and store data
-        appState.employeeData = {
+        // Sanitize and prepare data
+        const employeeData = {
             name: name.replace(/\s+/g, ' '), // Normalize whitespace
             email: email,
             phone: phone.replace(/\D/g, '').replace(/(\d{3})(\d{3})(\d{4})/, '($1) $2-$3'), // Format phone
             position: position.replace(/\s+/g, ' '), // Normalize whitespace
-            startDate: startDate,
+            start_date: startDate, // Backend expects start_date
             supervisor: supervisor.replace(/\s+/g, ' ') // Normalize whitespace
         };
         
+        // Store in app state
+        appState.employeeData = employeeData;
+        
+        // Create user session for this employee
+        const userId = `fsw_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        const userSession = {
+            id: userId,
+            name: employeeData.name,
+            email: employeeData.email,
+            position: employeeData.position,
+            authenticated: true,
+            sessionStart: Date.now()
+        };
+        
+        // Store session for getCurrentEmployee()
+        sessionStorage.setItem('fsw_user_session', JSON.stringify(userSession));
+        console.log('[FSW Auth] Created user session:', userSession);
+        
+        // Save to backend API
+        try {
+            // Initialize API client if not exists
+            if (!window.apiClient) {
+                window.apiClient = new APIClient();
+            }
+            
+            console.log('[FSW API] Saving employee data to backend...');
+            const employeeId = await window.apiClient.saveEmployeeData(employeeData);
+            console.log('[FSW API] ✅ Employee data saved with ID:', employeeId);
+            
+            // Update app state with employee ID
+            appState.employeeData.employeeId = employeeId;
+            
+            showNotification('Employee information saved to database successfully!', 'success');
+            
+        } catch (apiError) {
+            console.error('[FSW API] Failed to save to backend:', apiError);
+            showNotification('Employee info saved locally. Will sync when server is available.', 'warning');
+        }
+        
+        // Save state to Supabase as backup
         saveState().catch(error => console.error('[FSW] Save state error in employee form:', error));
-        showNotification('Employee information saved successfully!', 'success');
+        
         updateProgress();
         
         // Track successful form completion
