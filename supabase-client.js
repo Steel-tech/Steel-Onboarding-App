@@ -5,11 +5,33 @@
 let supabase = null;
 let supabaseConfig = null;
 
+// Wait for Supabase CDN to load
+function waitForSupabase() {
+  return new Promise((resolve) => {
+    if (window.supabase) {
+      resolve(window.supabase);
+    } else {
+      const checkSupabase = () => {
+        if (window.supabase) {
+          resolve(window.supabase);
+        } else {
+          setTimeout(checkSupabase, 100);
+        }
+      };
+      checkSupabase();
+    }
+  });
+}
+
 // Initialize Supabase client asynchronously
 async function initializeSupabase() {
   try {
     console.log('[Supabase] Loading configuration...');
-    
+
+    // Wait for Supabase CDN to be available
+    await waitForSupabase();
+    console.log('[Supabase] CDN loaded successfully');
+
     // Try to fetch configuration from server first, fallback to hardcoded
     try {
       const response = await fetch('/api/config');
@@ -27,7 +49,7 @@ async function initializeSupabase() {
         supabaseAnonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNmc3N3ZnpncmRjdGl5dWtoY3pqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTcyOTg3MDgsImV4cCI6MjA3Mjg3NDcwOH0.u2oVMOCziHVlzFFlP7b8v_M5tHnGuW1Uwm65bJu3dVw'
       };
     }
-    
+
     // Create Supabase client
     supabase = window.supabase.createClient(supabaseConfig.supabaseUrl, supabaseConfig.supabaseAnonKey, {
       auth: {
