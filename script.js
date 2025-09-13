@@ -999,57 +999,67 @@ function saveEmployeeData() {
         sessionStorage.setItem('fsw_user_session', JSON.stringify(userSession));
         console.log('[FSW Auth] Created user session:', userSession);
         
-        // Register employee and get JWT token
+        // Save directly to Supabase (bypass broken Vercel backend)
         try {
-            console.log('[FSW API] Registering employee and creating session...');
+            console.log('[FSW Supabase] Saving employee data directly to Supabase...');
             
-            const response = await fetch('/api/auth/register-employee', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(employeeData)
-            });
+            // Generate employee ID
+            const employeeId = `FSW${Date.now().toString().slice(-6)}`;
             
-            const result = await response.json();
-            
-            if (result.success) {
-                console.log('[FSW API] ✅ Employee registered with ID:', result.employeeId);
-                
-                // Store JWT token for future API calls
-                localStorage.setItem('fsw_auth_token', result.token);
-                
-                // Update user session with backend data
-                const userSession = {
-                    id: result.user.id,
-                    name: result.user.name,
-                    email: employeeData.email,
-                    position: employeeData.position,
-                    authenticated: true,
-                    sessionStart: Date.now(),
-                    token: result.token
-                };
-                
-                sessionStorage.setItem('fsw_user_session', JSON.stringify(userSession));
-                console.log('[FSW Auth] Updated user session with backend auth:', userSession);
-                
-                // Update app state with employee ID
-                appState.employeeData.employeeId = result.employeeId;
-                
-                // Configure API client to use the token
-                if (!window.apiClient) {
-                    window.apiClient = new APIClient();
-                }
-                window.apiClient.setToken(result.token);
-                
-                showNotification('Employee registration completed! Data saved to database.', 'success');
-                
-            } else {
-                throw new Error(result.error || 'Registration failed');
+            // Create Supabase client if not exists
+            if (!window.supabase) {
+                const supabaseUrl = 'https://sfsswfzgrdctiyukhczj.supabase.co';
+                const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNmc3N3ZnpncmRjdGl5dWtoY3pqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTcyOTg3MDgsImV4cCI6MjA3Mjg3NDcwOH0.u2oVMOCziHVlzFFlP7b8v_M5tHnGuW1Uwm65bJu3dVw';
+                window.supabase = window.supabase || window.createClient(supabaseUrl, supabaseKey);
             }
             
-        } catch (apiError) {
-            console.error('[FSW API] Failed to register employee:', apiError);
+            // Save to user_profiles table (which has working RLS)
+            const profileData = {
+                user_id: userId,
+                name: employeeData.name,
+                email: employeeData.email,
+                position: employeeData.position,
+                start_date: employeeData.start_date,
+                phone: employeeData.phone,
+                supervisor: employeeData.supervisor,
+                employee_id: employeeId,
+                onboarding_completed: false,
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString()
+            };
+            
+            const { data, error } = await window.supabase
+                .from('user_profiles')
+                .upsert(profileData, { onConflict: 'user_id' })
+                .select();
+                
+            if (error) {
+                throw error;
+            }
+            
+            console.log('[FSW Supabase] ✅ Employee data saved:', data);
+            
+            // Update user session
+            const userSession = {
+                id: userId,
+                name: employeeData.name,
+                email: employeeData.email,
+                position: employeeData.position,
+                authenticated: true,
+                sessionStart: Date.now(),
+                supabaseId: data[0]?.id
+            };
+            
+            sessionStorage.setItem('fsw_user_session', JSON.stringify(userSession));
+            console.log('[FSW Auth] Created user session with Supabase data:', userSession);
+            
+            // Update app state with employee ID
+            appState.employeeData.employeeId = employeeId;
+            
+            showNotification('Employee registration completed! Data saved to database.', 'success');
+            
+        } catch (supabaseError) {
+            console.error('[FSW Supabase] Failed to save to Supabase:', supabaseError);
             showNotification('Registration failed. Data saved locally for retry.', 'error');
             
             // Fallback to local session only
