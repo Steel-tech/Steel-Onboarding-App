@@ -900,7 +900,7 @@ function saveEmployeeData() {
                 if (!window.apiClient) {
                     window.apiClient = new APIClient();
                 }
-                window.apiClient.setAuthToken(result.token);
+                window.apiClient.setToken(result.token);
                 
                 showNotification('Employee registration completed! Data saved to database.', 'success');
                 
