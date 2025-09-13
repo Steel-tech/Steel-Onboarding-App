@@ -659,6 +659,28 @@ window.checkAuthState = function() {
     };
 };
 
+// Map form types to their corresponding checklist item IDs
+function getChecklistIdForForm(formType) {
+    const formToChecklistMap = {
+        'w4': 'w4-form',
+        'i9': 'i9-form', 
+        'direct-deposit': 'direct-deposit',
+        'emergency-contact': 'emergency-contact',
+        'benefits': 'benefits',
+        'safety-agreement': 'safety-agreement',
+        'employee-handbook': 'day1-handbook',
+        'company-policies': 'day1-company-info',
+        'ppe-acknowledgment': 'day1-ppe-training',
+        'safety-procedures': 'day1-emergency-procedures',
+        'hazard-communication': 'day2-hazard-recognition',
+        'crane-safety': 'day2-crane-safety'
+    };
+    
+    const checklistId = formToChecklistMap[formType];
+    console.log(`[FSW Debug] Form ${formType} maps to checklist item: ${checklistId}`);
+    return checklistId;
+}
+
 // Initialize all event listeners
 function initializeEventListeners() {
     // Tab navigation
