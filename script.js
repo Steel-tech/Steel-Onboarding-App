@@ -60,6 +60,13 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize the app immediately - login modal will handle authentication
     setTimeout(async () => {
         DOM_CACHE.init();
+        
+        // Initialize API client for backend communication
+        if (!window.apiClient) {
+            window.apiClient = new APIClient();
+            console.log('[FSW API] API Client initialized');
+        }
+        
         await loadState();
         initializeEventListeners();
         initializeVideoPlayer();
