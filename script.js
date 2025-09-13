@@ -54,8 +54,10 @@ let appState = {
 document.addEventListener('DOMContentLoaded', function() {
     showLoadingScreen();
     
-    // TEMPORARY: Skip authentication for testing
-    console.log('[FSW App] DEVELOPMENT MODE: Skipping authentication');
+    // Initialize app with proper authentication flow
+    console.log('[FSW App] Starting proper initialization...');
+    
+    // Initialize the app immediately - login modal will handle authentication
     setTimeout(async () => {
         DOM_CACHE.init();
         await loadState();
