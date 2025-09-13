@@ -64,7 +64,15 @@ document.addEventListener('DOMContentLoaded', function() {
         // Initialize API client for backend communication
         if (!window.apiClient) {
             window.apiClient = new APIClient();
-            console.log('[FSW API] API Client initialized');
+            
+            // Load existing auth token if available
+            const existingToken = localStorage.getItem('fsw_auth_token');
+            if (existingToken) {
+                window.apiClient.setToken(existingToken);
+                console.log('[FSW API] API Client initialized with existing token');
+            } else {
+                console.log('[FSW API] API Client initialized without token');
+            }
         }
         
         await loadState();
