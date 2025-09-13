@@ -3388,6 +3388,11 @@ function handleFormSubmission(event) {
         
         // Update dependency states for newly unlocked items
         updateChecklistDependencyStates();
+        
+        // Show notification about completed item and unlocked items
+        showNotification(`Form submitted and ${checklistId} completed! Check for newly available items.`, 'success');
+    } else {
+        showNotification('Form submitted successfully!', 'success');
     }
     
     updateAcknowledmentProgress();
@@ -3397,9 +3402,6 @@ function handleFormSubmission(event) {
     
     // Close modal
     closeFillableForm();
-    
-    // Show success notification
-    showNotification('Form submitted successfully!', 'success');
     
     // Update overall progress
     updateProgress();
