@@ -681,6 +681,35 @@ function getChecklistIdForForm(formType) {
     return checklistId;
 }
 
+// Debug function to test checklist workflow
+window.testChecklistWorkflow = function() {
+    console.log('[FSW Debug] Testing checklist workflow...');
+    console.log('Current checklist state:', appState.checklistItems);
+    console.log('Dependencies map:', CHECKLIST_DEPENDENCIES);
+    
+    // Test each form type mapping
+    const testForms = ['w4', 'i9', 'safety-agreement', 'employee-handbook'];
+    testForms.forEach(formType => {
+        const checklistId = getChecklistIdForForm(formType);
+        console.log(`Form '${formType}' -> Checklist '${checklistId}'`);
+        
+        if (checklistId) {
+            const checkbox = document.getElementById(checklistId);
+            console.log(`  Checkbox found: ${!!checkbox}, Current state: ${checkbox?.checked}`);
+            
+            const dependencies = CHECKLIST_DEPENDENCIES[checklistId];
+            if (dependencies) {
+                console.log(`  Dependencies: ${dependencies.join(', ')}`);
+                console.log(`  Dependencies met: ${dependencies.every(dep => appState.checklistItems[dep])}`);
+            } else {
+                console.log(`  No dependencies`);
+            }
+        }
+    });
+    
+    return 'Check console for detailed workflow analysis';
+};
+
 // Initialize all event listeners
 function initializeEventListeners() {
     // Tab navigation
