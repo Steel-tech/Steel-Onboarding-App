@@ -3604,6 +3604,9 @@ async function saveSignature() {
     // Update overall progress
     updateProgress();
     
+    // Save state with updated checklist items
+    saveState().catch(error => console.error('[FSW] Save state error after signature completion:', error));
+    
     // Close signature modal
     closeSignature();
     
