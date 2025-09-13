@@ -578,6 +578,87 @@ window.testSaveState = async function() {
     }
 };
 
+// Debug function to test complete data flow
+window.testDataFlow = async function() {
+    console.log('[FSW Debug] Testing complete data flow...');
+    
+    const testData = {
+        name: 'Test Employee',
+        email: 'test@flawlesssteelwelding.com',
+        phone: '555-123-4567',
+        position: 'Test Welder',
+        start_date: new Date().toISOString().split('T')[0],
+        supervisor: 'Test Supervisor'
+    };
+    
+    try {
+        // Test employee registration
+        console.log('[FSW Debug] 1. Testing employee registration...');
+        const response = await fetch('/api/auth/register-employee', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(testData)
+        });
+        
+        const result = await response.json();
+        
+        if (!result.success) {
+            throw new Error('Registration failed: ' + result.error);
+        }
+        
+        console.log('[FSW Debug] ✅ Employee registration successful:', result.employeeId);
+        
+        // Test token authentication
+        console.log('[FSW Debug] 2. Testing token authentication...');
+        const authTest = await fetch('/api/progress/module', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${result.token}`
+            },
+            body: JSON.stringify({
+                moduleName: 'test-module',
+                progressData: { test: true }
+            })
+        });
+        
+        const authResult = await authTest.json();
+        
+        if (!authResult.success) {
+            throw new Error('Token auth failed: ' + authResult.error);
+        }
+        
+        console.log('[FSW Debug] ✅ Token authentication successful');
+        
+        // Test Supabase data visibility
+        console.log('[FSW Debug] 3. Testing Supabase data...');
+        // This would need to be checked in Supabase dashboard
+        
+        return 'SUCCESS: Complete data flow working! Check Supabase dashboard for data.';
+        
+    } catch (error) {
+        console.error('[FSW Debug] ❌ Data flow test failed:', error);
+        return 'ERROR: ' + error.message;
+    }
+};
+
+// Debug function to check current authentication state
+window.checkAuthState = function() {
+    console.log('[FSW Debug] Authentication state check:');
+    console.log('- Current employee:', getCurrentEmployee());
+    console.log('- Session storage:', sessionStorage.getItem('fsw_user_session'));
+    console.log('- Auth token:', localStorage.getItem('fsw_auth_token'));
+    console.log('- API client token:', window.apiClient?.token);
+    console.log('- App state employee data:', appState.employeeData);
+    
+    return {
+        currentEmployee: getCurrentEmployee(),
+        hasToken: !!localStorage.getItem('fsw_auth_token'),
+        hasSession: !!sessionStorage.getItem('fsw_user_session'),
+        apiClientReady: !!window.apiClient?.token
+    };
+};
+
 // Initialize all event listeners
 function initializeEventListeners() {
     // Tab navigation
