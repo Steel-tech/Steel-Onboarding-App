@@ -859,25 +859,69 @@ function saveEmployeeData() {
         sessionStorage.setItem('fsw_user_session', JSON.stringify(userSession));
         console.log('[FSW Auth] Created user session:', userSession);
         
-        // Save to backend API
+        // Register employee and get JWT token
         try {
-            // Initialize API client if not exists
-            if (!window.apiClient) {
-                window.apiClient = new APIClient();
+            console.log('[FSW API] Registering employee and creating session...');
+            
+            const response = await fetch('/api/auth/register-employee', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(employeeData)
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                console.log('[FSW API] ✅ Employee registered with ID:', result.employeeId);
+                
+                // Store JWT token for future API calls
+                localStorage.setItem('fsw_auth_token', result.token);
+                
+                // Update user session with backend data
+                const userSession = {
+                    id: result.user.id,
+                    name: result.user.name,
+                    email: employeeData.email,
+                    position: employeeData.position,
+                    authenticated: true,
+                    sessionStart: Date.now(),
+                    token: result.token
+                };
+                
+                sessionStorage.setItem('fsw_user_session', JSON.stringify(userSession));
+                console.log('[FSW Auth] Updated user session with backend auth:', userSession);
+                
+                // Update app state with employee ID
+                appState.employeeData.employeeId = result.employeeId;
+                
+                // Configure API client to use the token
+                if (!window.apiClient) {
+                    window.apiClient = new APIClient();
+                }
+                window.apiClient.setAuthToken(result.token);
+                
+                showNotification('Employee registration completed! Data saved to database.', 'success');
+                
+            } else {
+                throw new Error(result.error || 'Registration failed');
             }
             
-            console.log('[FSW API] Saving employee data to backend...');
-            const employeeId = await window.apiClient.saveEmployeeData(employeeData);
-            console.log('[FSW API] ✅ Employee data saved with ID:', employeeId);
-            
-            // Update app state with employee ID
-            appState.employeeData.employeeId = employeeId;
-            
-            showNotification('Employee information saved to database successfully!', 'success');
-            
         } catch (apiError) {
-            console.error('[FSW API] Failed to save to backend:', apiError);
-            showNotification('Employee info saved locally. Will sync when server is available.', 'warning');
+            console.error('[FSW API] Failed to register employee:', apiError);
+            showNotification('Registration failed. Data saved locally for retry.', 'error');
+            
+            // Fallback to local session only
+            const fallbackSession = {
+                id: userId,
+                name: employeeData.name,
+                email: employeeData.email,
+                position: employeeData.position,
+                authenticated: false,
+                sessionStart: Date.now()
+            };
+            sessionStorage.setItem('fsw_user_session', JSON.stringify(fallbackSession));
         }
         
         // Save state to Supabase as backup
