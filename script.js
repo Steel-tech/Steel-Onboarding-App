@@ -702,7 +702,7 @@ function showTab(tabName) {
 }
 
 // Complete safety module with analytics
-function completeModule(moduleName, button) {
+async function completeModule(moduleName, button) {
     if (!appState.completedModules.includes(moduleName)) {
         appState.completedModules.push(moduleName);
         button.textContent = '✓ Completed';
@@ -712,9 +712,27 @@ function completeModule(moduleName, button) {
         // Track module completion
         trackModuleCompletion(moduleName);
         
+        // Save to backend API
+        try {
+            if (!window.apiClient) {
+                window.apiClient = new APIClient();
+            }
+            
+            console.log(`[FSW API] Saving module completion: ${moduleName}`);
+            await window.apiClient.saveModuleProgress(moduleName, {
+                completedAt: new Date().toISOString(),
+                moduleType: 'training'
+            });
+            console.log(`[FSW API] ✅ Module completion saved: ${moduleName}`);
+            
+        } catch (apiError) {
+            console.error(`[FSW API] Failed to save module completion for ${moduleName}:`, apiError);
+            // Continue with local save as fallback
+        }
+        
         saveState().catch(error => console.error('[FSW] Save state error in completeModule:', error));
         updateProgress();
-        showNotification(`${moduleName.toUpperCase()} module completed!`);
+        showNotification(`${moduleName.toUpperCase()} module completed and saved!`);
         
         // Check if all safety and equipment training modules are completed
         const safetyModules = ['ppe', 'hazards', 'emergency', 'crane'];
