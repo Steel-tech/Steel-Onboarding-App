@@ -143,7 +143,7 @@ class EmailService {
             return;
         }
         
-        this.transporter = nodemailer.createTransporter({
+        this.transporter = nodemailer.createTransport({
             host: config.EMAIL_HOST,
             port: config.EMAIL_PORT,
             secure: false,
