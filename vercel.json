@@ -70,7 +70,31 @@
       }
     },
     {
-      "src": "/(.*)",
+      "src": "/styles.css",
+      "dest": "/styles.css"
+    },
+    {
+      "src": "/script.js",
+      "dest": "/script.js"
+    },
+    {
+      "src": "/api-client.js",
+      "dest": "/api-client.js"
+    },
+    {
+      "src": "/event-handlers.js",
+      "dest": "/event-handlers.js"
+    },
+    {
+      "src": "/supabase-client.js",
+      "dest": "/supabase-client.js"
+    },
+    {
+      "src": "/.*\\.(png|jpg|jpeg|gif|pdf|ico|svg)$",
+      "dest": "/$0"
+    },
+    {
+      "src": "^/$",
       "dest": "/index.html",
       "headers": {
         "X-Frame-Options": "DENY",
