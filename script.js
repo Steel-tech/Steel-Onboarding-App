@@ -934,7 +934,7 @@ function saveEmployeeData() {
         appState.employeeData = employeeData;
         
         // Create user session for this employee
-        const userId = `fsw_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        const userId = `fsw_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
         const userSession = {
             id: userId,
             name: employeeData.name,
